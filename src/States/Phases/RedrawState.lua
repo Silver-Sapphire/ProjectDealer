@@ -5,13 +5,15 @@ function RedrawState:init()
 
     DECKLIST = {}
     
-    for i=1,50 do
+    for i=50, 1, -1 do
         table.insert(DECKLIST, {['value'] = i})
     end
     
 
     -- initialize boards
+    -- local player
     self.player1Field = Field(DECKLIST, false)
+    -- peer player
     self.player2Field = Field(DECKLIST, true)
     
     -- set starters from decks

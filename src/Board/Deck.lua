@@ -16,7 +16,7 @@ function Deck:init(decklist)
 
     --TODO make ride deck
 
-    return self
+    return self.deck
 end
 
 function Deck:render()

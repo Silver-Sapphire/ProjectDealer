@@ -44,7 +44,7 @@ function Field:init(decklist, flipped)
 
     -- draw initial 5 cards
     for i=1, 5 do
-        local _ = table.remove(self.deck)
+        local _ = table.remove(self.deck.deck)
         table.insert(self.hand, _)
     end
 end
@@ -84,8 +84,8 @@ function Field:render()
     -- ensure we draw the playmat once, before we draw anything else
     else
         -- draw "playmat"
-        love.graphics.setColor(160, 77, 0, 245)
-        love.graphics.rectangle('fill', VIRTUAL_WIDTH/12,VIRTUAL_HEIGHT/12, 10*VIRTUAL_WIDTH/12,10*VIRTUAL_HEIGHT/12)
+        love.graphics.setColor(150/255, 77/255, 40/255, 245/255)
+        love.graphics.rectangle('fill', VIRTUAL_WIDTH/12,0, 10*VIRTUAL_WIDTH/12,VIRTUAL_HEIGHT)
     end
 
     -- Render hand
