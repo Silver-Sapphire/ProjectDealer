@@ -34,7 +34,7 @@ end
 
 function Selection:update(dt)
     if self.cursor then
-        if love.keyboard.wasPressed('up') then
+        if love.keyboard.wasPressed('up') or love.keyboard.wasPressed('left') then
             if self.currentSelection == 1 then
                 self.currentSelection = #self.items
             else
@@ -43,7 +43,7 @@ function Selection:update(dt)
             
             gSounds['blip']:stop()
             gSounds['blip']:play()
-        elseif love.keyboard.wasPressed('down') then
+        elseif love.keyboard.wasPressed('down') or love.keyboard.wasPressed('right') then
             if self.currentSelection == #self.items then
                 self.currentSelection = 1
             else

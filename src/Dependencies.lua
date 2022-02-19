@@ -11,6 +11,7 @@ require 'src/menu_defs'
 require 'src/Shuffler'
 require 'src/deck_list'
 require 'src/StateMachine'
+require 'src/StateStack'
 require 'src/Util'
 
 require 'src/Board/Field'
@@ -23,13 +24,16 @@ require 'src/gui/ProgressBar'
 require 'src/gui/Selection'
 require 'src/gui/Textbox'
 
+require 'src/gui/MenuSelectUpToN'
+require 'src/gui/MultiSelection'
+
 require 'src/states/TestState'
 
 require 'src/states/BaseState'
+
+require 'src/states/StartState'
 require 'src/states/ConnectState'
 require 'src/states/ResultsState'
-require 'src/states/StartState'
-require 'src/states/StateStack'
 
 require 'src/states/phases/RedrawState'
 require 'src/states/phases/EndPhaseState'

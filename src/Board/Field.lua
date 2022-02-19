@@ -2,7 +2,9 @@ Field = Class{}
 
 function Field:init(decklist, flipped)
     self.flipped = flipped
-    self.deck = Deck(decklist)
+    -- self.deck = Deck(decklist)
+    self.deck = decklist
+
     -- self.rideDeck = self.deck.rideDeck
     -- self.deck.shuffle()
 
@@ -44,7 +46,8 @@ function Field:init(decklist, flipped)
 
     -- draw initial 5 cards
     for i=1, 5 do
-        local _ = table.remove(self.deck.deck)
+        --local _ = table.remove(self.deck.deck)
+        local _ = table.remove(self.deck)
         table.insert(self.hand, _)
     end
 end
@@ -101,14 +104,14 @@ function Field:render()
         
         -- debug rendering
         love.graphics.setColor(1,0,0,1)
-        love.graphics.print(self.hand[i].value, handX+CARD_HEIGHT/2,handY-CARD_WIDTH/2)
+        love.graphics.print(self.hand[i].value, handX-CARD_HEIGHT/2,handY+CARD_WIDTH/2)
 
         -- change handX location for next loop
         handX = handX + CARD_WIDTH -2
     end
 
     -- Render deck
-    self.deck:render()
+    -- self.deck:render()
 
     -- display deck count
 
