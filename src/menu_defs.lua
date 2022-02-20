@@ -37,5 +37,10 @@ MENU_DEFS = {
                 gStateStack:push(EndPhaseState())
             end
         }
+    },
+    ['redraw-menu'] = {
+        -- a function implementation of a redraw, where the player selects any number of cards
+        -- from their oppening hand to put on the bottom of the deck, and then draws till they have
+        -- 5 in hand again, then shuffles the deck.
     }
 }

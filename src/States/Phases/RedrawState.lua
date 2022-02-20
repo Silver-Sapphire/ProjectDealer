@@ -6,7 +6,8 @@ function RedrawState:init()
     DECKLIST = {}
     
     for i=50, 1, -1 do
-        table.insert(DECKLIST, {['value'] = i})
+        table.insert(DECKLIST, {['value'] = i,
+                                ['grade'] = math.random(0, 3)})
     end
     
 
@@ -34,8 +35,11 @@ function RedrawState:init()
         width = VIRTUAL_WIDTH/2,
         height = VIRTUAL_HEIGHT/4,
 
+        
         onSubmitFunction = function (selections) 
+            -- return selected cards
             for k, selection in pairs(selections) do
+                -- cringe manual looping to expant itirater scope
                 local ptr, i = 0, 1
                 while ptr == 0 do
                     if selection.value == self.player1Field.hand[i].value then
@@ -44,16 +48,24 @@ function RedrawState:init()
                     i = i + 1
                 end
 
-                local _ = table.remove(self.player1Field.hand, i)
-                table.insert(self.player1Field.deck, 1, _)
+                local _ = table.remove(self.player1Field.hand, ptr)
+                table.insert(self.player1Field.deck, ptr, _)
             end
 
+            -- draw to 5
             while #self.player1Field.hand < 5 do
                 local _ = table.remove(self.player1Field.deck)
                 table.insert(self.player1Field.hand, _)
             end
 
-            --TODO shuffle deck
+            -- TODO shuffle deck
+            --self.player1Field.deck:shuffle()
+
+            -- TODO dispatch prepared event to server
+            --gEvent.dispatch:redraw(#selections)
+
+            -- delete menu after use
+            self.redrawMenu = nil
         end
     }
     --]]
@@ -74,12 +86,16 @@ function RedrawState:update(dt)
     self.player1Field:update(dt)
     self.player2Field:update(dt)
 
-    self.redrawMenu:update(dt)
+    if self.redrawMenu then 
+        self.redrawMenu:update(dt)
+    end
 end
 
 function RedrawState:render()
     self.player1Field:render()
     self.player2Field:render()
 
-    self.redrawMenu:render()
+    if self.redrawMenu then 
+        self.redrawMenu:render()
+    end
 end

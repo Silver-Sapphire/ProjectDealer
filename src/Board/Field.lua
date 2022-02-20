@@ -98,13 +98,15 @@ function Field:render()
     local handY = VIRTUAL_HEIGHT -CARD_HEIGHT - 4
     
     for i=1, handsize do 
+        local _card = self.hand[i]
         -- draw a card
         love.graphics.setColor(0,0,0,1)
         love.graphics.rectangle('fill', handX,handY, CARD_WIDTH,CARD_HEIGHT)
         
-        -- debug rendering
+        -- display card grade
         love.graphics.setColor(1,0,0,1)
-        love.graphics.print(self.hand[i].value, handX-CARD_HEIGHT/2,handY+CARD_WIDTH/2)
+        love.graphics.print(_card.value, handX-CARD_HEIGHT/2,handY+CARD_WIDTH/2)
+        love.graphics.print(_card.grade, handX-CARD_HEIGHT/2,handY+CARD_WIDTH)
 
         -- change handX location for next loop
         handX = handX + CARD_WIDTH -2

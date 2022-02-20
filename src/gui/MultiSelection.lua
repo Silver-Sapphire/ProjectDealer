@@ -93,11 +93,12 @@ function MultiSelction:render()
 
         -- draw selection marker if we're at the right index
         if i == self.currentSelection then
-            love.graphics.draw(gTextures['cursor'], paddedX - 9, self.y)
+            love.graphics.draw(gTextures['cursor'], paddedX - 10, self.y + 28)
         end
 
         love.graphics.setColor(1,0,0,1)
-        love.graphics.printf(self.items[i].value, paddedX, self.y, self.width, 'center')
+        love.graphics.print(self.items[i].value, paddedX + 8, self.y + 24)
+        love.graphics.print(self.items[i].grade, paddedX + 8, self.y + 32)
 
         currentX = currentX + self.gapWidth
     end
