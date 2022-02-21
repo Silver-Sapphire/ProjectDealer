@@ -105,7 +105,7 @@ function Field:render()
         
         -- display card grade
         love.graphics.setColor(1,0,0,1)
-        love.graphics.print(_card.value, handX-CARD_HEIGHT/2,handY+CARD_WIDTH/2)
+        -- love.graphics.print(_card.value, handX-CARD_HEIGHT/2,handY+CARD_WIDTH/2)
         love.graphics.print(_card.grade, handX-CARD_HEIGHT/2,handY+CARD_WIDTH)
 
         -- change handX location for next loop

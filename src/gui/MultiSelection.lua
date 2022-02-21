@@ -74,9 +74,10 @@ function MultiSelction:update(dt)
             -- TODO make confirmation menu
 
 
+            -- selections are the indexes of selected items and are ordered (small to large)
             for i=1, #self.items do
                 if self.items[i].selected then
-                    table.insert(self.selections, self.items[i])
+                    table.insert(self.selections, i)
                 end
             end
             -- pass selections into whatever function the menu was for
@@ -97,7 +98,7 @@ function MultiSelction:render()
         end
 
         love.graphics.setColor(1,0,0,1)
-        love.graphics.print(self.items[i].value, paddedX + 8, self.y + 24)
+        -- love.graphics.print(self.items[i].value, paddedX + 8, self.y + 24)
         love.graphics.print(self.items[i].grade, paddedX + 8, self.y + 32)
 
         currentX = currentX + self.gapWidth

@@ -1,21 +1,56 @@
 RedrawState = Class{__includes = BaseState}
+local function shuffle(deck)
+    local shuffledDeck = {}
+    local cardsToShuffle = deck
+
+    -- put a random card from the old 'pile' and put it in the new one
+    -- Hypothises: running this once and eleven times should be identicly random
+    local timesToShuffle = 1
+    
+    for i=0, timesToShuffle do
+        -- shuffling of deck here
+        shuffledDeck = {}
+        while #cardsToShuffle > 0 do
+            -- remove a random card from an input table, and move it to the output table
+            local _ = table.remove(cardsToShuffle, math.random(#cardsToShuffle))
+            table.insert(shuffledDeck, _)
+        end
+
+        -- reset tables to shuffle again
+        cardsToShuffle = shuffledDeck
+    end
+
+    return shuffledDeck
+end
 
 function RedrawState:init()
     ----[[
 
     DECKLIST = {}
     
-    for i=50, 1, -1 do
-        table.insert(DECKLIST, {['value'] = i,
-                                ['grade'] = math.random(0, 3)})
+    for i=1, 16 do
+        table.insert(DECKLIST, {['grade'] = 0})
     end
-    
+
+    for i=1, 14 do
+        table.insert(DECKLIST, {['grade'] = 1})
+    end
+
+    for i=1, 11 do
+        table.insert(DECKLIST, {['grade'] = 2})
+    end
+
+    for i=1, 8 do
+        table.insert(DECKLIST, {['grade'] = 3})
+    end
+
+    _DECKLIST = shuffle(DECKLIST)
 
     -- initialize boards
     -- local player
-    self.player1Field = Field(DECKLIST, false)
+    self.player1Field = Field(_DECKLIST, false)
     -- peer player
-    self.player2Field = Field(DECKLIST, true)
+    self.player2Field = Field(_DECKLIST, true)
     
     -- set starters from decks
 
@@ -35,21 +70,17 @@ function RedrawState:init()
         width = VIRTUAL_WIDTH/2,
         height = VIRTUAL_HEIGHT/4,
 
-        
         onSubmitFunction = function (selections) 
             -- return selected cards
-            for k, selection in pairs(selections) do
-                -- cringe manual looping to expant itirater scope
-                local ptr, i = 0, 1
-                while ptr == 0 do
-                    if selection.value == self.player1Field.hand[i].value then
-                        ptr = i 
-                    end
-                    i = i + 1
-                end
+            local _indexAdjuster = 0
+            for k, selectionIndex in pairs(selections) do
+                -- the following line are debug code to address selection table indexing mis-matching
+                selectionIndex = selectionIndex - _indexAdjuster
+                _indexAdjuster = _indexAdjuster + 1
 
-                local _ = table.remove(self.player1Field.hand, ptr)
-                table.insert(self.player1Field.deck, ptr, _)
+                -- cringe manual looping to expant itirater scope
+                local _ = table.remove(self.player1Field.hand, selectionIndex)
+                table.insert(self.player1Field.deck, 1, _)
             end
 
             -- draw to 5
@@ -65,7 +96,8 @@ function RedrawState:init()
             --gEvent.dispatch:redraw(#selections)
 
             -- delete menu after use
-            self.redrawMenu = nil
+            self.redrawMenu.items = self.player1Field.hand
+            self.redrawMenu.multiSelction.selections = {}
         end
     }
     --]]
