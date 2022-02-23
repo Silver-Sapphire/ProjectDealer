@@ -8,14 +8,7 @@ MENU_DEFS = {
             text = 'Field Test',
             onSelect = function()
                 -- gStateStack:pop()
-                gStateStack:push(RedrawState())
-            end
-        },
-        {
-            text = 'Peer Connect Test',
-            onSelect = function()
-                gStateStack:pop()
-                gStateStack:push(ConnectState())
+                gStateStack:push(VanguardState())
             end
         },
         {
@@ -28,13 +21,6 @@ MENU_DEFS = {
             text = 'Options',
             onSelect = function()
 
-            end
-        },
-        {
-            text = "Self Connect Test",
-            onSelect = function()
-                gStateStack:pop()
-                gStateStack:push(EndPhaseState())
             end
         }
     },

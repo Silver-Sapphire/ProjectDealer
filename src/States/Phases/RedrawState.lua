@@ -1,4 +1,5 @@
 RedrawState = Class{__includes = BaseState}
+
 local function shuffle(deck)
     local shuffledDeck = {}
     local cardsToShuffle = deck
@@ -24,7 +25,8 @@ local function shuffle(deck)
 end
 
 function RedrawState:init()
-    ----[[
+    
+    REDRAWMENU = function () end
 
     DECKLIST = {}
     
@@ -59,7 +61,7 @@ function RedrawState:init()
     -- local player draws 5? (done in feild currently)
 
     -- redraw menu
-    self.redrawMenu = MenuSelectUpToN {
+    REDRAWMENU = MenuSelectUpToN {
         mandatoryFlag = false,
         maxCount = #self.player1Field.hand,
 
@@ -77,30 +79,30 @@ function RedrawState:init()
                 -- the following line are debug code to address selection table indexing mis-matching
                 selectionIndex = selectionIndex - _indexAdjuster
                 _indexAdjuster = _indexAdjuster + 1
-
+    
                 -- cringe manual looping to expant itirater scope
                 local _ = table.remove(self.player1Field.hand, selectionIndex)
                 table.insert(self.player1Field.deck, 1, _)
             end
-
+    
             -- draw to 5
             while #self.player1Field.hand < 5 do
                 local _ = table.remove(self.player1Field.deck)
                 table.insert(self.player1Field.hand, _)
             end
-
+    
             -- TODO shuffle deck
             --self.player1Field.deck:shuffle()
-
+    
             -- TODO dispatch prepared event to server
             --gEvent.dispatch:redraw(#selections)
-
-            -- delete menu after use
-            self.redrawMenu.items = self.player1Field.hand
-            self.redrawMenu.multiSelction.selections = {}
+    
+            -- proceed to rest of game
+            vStateMachine:change('ride')
         end
     }
-    --]]
+
+    self.redrawMenu = REDRAWMENU
 end
 
 function RedrawState:update(dt)

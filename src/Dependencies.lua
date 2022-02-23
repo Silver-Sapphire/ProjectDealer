@@ -27,9 +27,9 @@ require 'src/gui/Textbox'
 require 'src/gui/MenuSelectUpToN'
 require 'src/gui/MultiSelection'
 
-require 'src/states/TestState'
-
 require 'src/states/BaseState'
+require 'src/states/TestState'
+require 'src/states/VanguardState'
 
 require 'src/states/StartState'
 require 'src/states/ConnectState'
