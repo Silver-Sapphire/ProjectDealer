@@ -25,11 +25,14 @@ local function shuffle(deck)
 end
 
 function RedrawState:init()
-    
+    -- redraw menu prototype, C style
     REDRAWMENU = function () end
-
-    DECKLIST = {}
     
+    -- todo set starters from decks
+
+    -- initialize and shuffle both players decks
+    -- a deck making hack for prototyping
+    DECKLIST = {}
     for i=1, 16 do
         table.insert(DECKLIST, {['grade'] = 0})
     end
@@ -49,23 +52,21 @@ function RedrawState:init()
     _DECKLIST = shuffle(DECKLIST)
 
     -- initialize boards
-    -- local player
-    self.player1Field = Field(_DECKLIST, false)
-    -- peer player
-    self.player2Field = Field(_DECKLIST, true)
-    
-    -- set starters from decks
-
-    -- initialize and shuffle both players decks
+    self.fields = {}
+    -- local player [1]
+    local player1Field = Field(_DECKLIST, false)
+    table.insert(self.fields, player1Field)
+    -- peer player [2]
+    local player2Field = Field(_DECKLIST, true)
+    table.insert(self.fields, player2Field)
 
     -- local player draws 5? (done in feild currently)
-
     -- redraw menu
     REDRAWMENU = MenuSelectUpToN {
         mandatoryFlag = false,
-        maxCount = #self.player1Field.hand,
+        maxCount = #self.fields[1].hand,
 
-        items = self.player1Field.hand,
+        items = self.fields[1].hand,
 
         x = 0,
         y = VIRTUAL_HEIGHT*3/4,
@@ -81,28 +82,32 @@ function RedrawState:init()
                 _indexAdjuster = _indexAdjuster + 1
     
                 -- cringe manual looping to expant itirater scope
-                local _ = table.remove(self.player1Field.hand, selectionIndex)
-                table.insert(self.player1Field.deck, 1, _)
+                local _ = table.remove(self.fields[1].hand, selectionIndex)
+                table.insert(self.fields[1].deck, 1, _)
             end
     
             -- draw to 5
-            while #self.player1Field.hand < 5 do
-                local _ = table.remove(self.player1Field.deck)
-                table.insert(self.player1Field.hand, _)
+            while #self.fields[1].hand < 5 do
+                local _ = table.remove(self.fields[1].deck)
+                table.insert(self.fields[1].hand, _)
             end
     
             -- TODO shuffle deck
-            --self.player1Field.deck:shuffle()
+            --self.fields.player1Field.deck:shuffle()
     
             -- TODO dispatch prepared event to server
             --gEvent.dispatch:redraw(#selections)
     
             -- proceed to rest of game
-            vStateMachine:change('ride')
+            vStateMachine:change('ride', self.fields)
+                    
+            -- _REDRAWMENU = REDRAWMENU
+            -- self.redrawMenu = _REDRAWMENU
         end
     }
-
-    self.redrawMenu = REDRAWMENU
+    
+    _REDRAWMENU = REDRAWMENU
+    self.redrawMenu = _REDRAWMENU
 end
 
 function RedrawState:update(dt)
@@ -117,8 +122,9 @@ function RedrawState:update(dt)
         gStateStack:pop()
     end
 
-    self.player1Field:update(dt)
-    self.player2Field:update(dt)
+    for k, field in pairs(self.fields) do
+        field:update(dt)
+    end
 
     if self.redrawMenu then 
         self.redrawMenu:update(dt)
@@ -126,9 +132,13 @@ function RedrawState:update(dt)
 end
 
 function RedrawState:render()
-    self.player1Field:render()
-    self.player2Field:render()
+    -- draw fields
+    for k, field in pairs(self.fields) do
+        field:render()
+    end
 
+    -- draw gui
+    love.graphics.print('Select cards to redraw w/enter, and submit w/space', 36, VIRTUAL_HEIGHT*3/4)
     if self.redrawMenu then 
         self.redrawMenu:render()
     end

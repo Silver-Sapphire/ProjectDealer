@@ -28,15 +28,25 @@ require 'src/gui/MenuSelectUpToN'
 require 'src/gui/MultiSelection'
 
 require 'src/states/BaseState'
-require 'src/states/TestState'
-require 'src/states/VanguardState'
 
-require 'src/states/StartState'
-require 'src/states/ConnectState'
-require 'src/states/ResultsState'
+require 'src/states/Game/ConnectState'
+require 'src/states/Game/FadeInState'
+require 'src/states/Game/FadeOutState'
+require 'src/states/Game/ResultsState'
+require 'src/states/Game/StartState'
+require 'src/states/Game/TestState'
+require 'src/states/Game/VanguardState'
 
 require 'src/states/phases/RedrawState'
+-- require 'src/states/phases/StandUpPhaseState'
+-- require 'src/states/phases/StandPhaseState'
+require 'src/states/phases/DrawPhaseState'
+require 'src/states/phases/RidePhaseState'
+require 'src/states/phases/MainPhaseState'
+require 'src/states/phases/BattlePhaseState'
 require 'src/states/phases/EndPhaseState'
+
+-- require 'src/states/Actions/'
 
 gTextures = {
     ['cursor'] = love.graphics.newImage('graphics/cursor.png'),

@@ -18,6 +18,9 @@ function MenuSelectUpToN:init(def)
         width = def.width,
         height = def.height,
 
+        -- a reference to our field, so menus can affect the board state
+        -- fields = def.fields,
+
         -- the function the menu calls is detached from any individual item,
         -- and instead takes the selected items as arguments
         onSubmitFunction = def.onSubmitFunction
