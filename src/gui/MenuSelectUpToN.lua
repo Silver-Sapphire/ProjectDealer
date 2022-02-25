@@ -11,8 +11,8 @@ function MenuSelectUpToN:init(def)
         -- this flag is set if a certain amount N MUST be selected, and is false if the user can select up to or less than N
         mandatoryFlag = def.mandatoryFlag,
         maxCount = def.maxCount,
-
         items = def.items,
+        
         x = def.x,
         y = def.y,
         width = def.width,

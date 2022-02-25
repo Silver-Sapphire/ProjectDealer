@@ -1,25 +1,9 @@
 DrawPhaseState = Class{__includes = BaseState}
 
-function DrawPhaseState:init(field)
-    --[[
-    self.field = field
-
-    beggining of turn triggers here
-    check timing
-
-    for circle in rear
-        circle.unit.state = stand
-
-    check timing
-
-    trigger timing
-    check timing
-
-    cardToDraw = field.deck[#deck]
-    
-    check timing
-    g assist step
-    ]]
+function DrawPhaseState:enter(fields)
+    self.fields = fields
+    Event.dispatch('draw')
+    vStateMachine:change('ride', self.fields)
 end
 
 function DrawPhaseState:update(dt)
@@ -34,5 +18,8 @@ function DrawPhaseState:update(dt)
 end
 
 function DrawPhaseState:render()
-
+    -- draw fields
+    for k, field in pairs(self.fields) do
+        field:render()
+    end
 end

@@ -1,8 +1,63 @@
--- DECKLIST = {
---     for i=1,50 do
---         table.insert(DECKLIST, {['value'] = i})
---     end
--- }
+function shuffle(deck)
+    local shuffledDeck = {}
+    local cardsToShuffle = deck
+
+    -- put a random card from the old 'pile' and put it in the new one
+    -- Hypothises: running this once and eleven times should be identicly random
+    local timesToShuffle = 1
+    
+    for i=0, timesToShuffle do
+        -- shuffling of deck here
+        shuffledDeck = {}
+        while #cardsToShuffle > 0 do
+            -- remove a random card from an input table, and move it to the output table
+            local _ = table.remove(cardsToShuffle, math.random(#cardsToShuffle))
+            table.insert(shuffledDeck, _)
+        end
+
+        -- reset tables to shuffle again
+        cardsToShuffle = shuffledDeck
+    end
+
+    return shuffledDeck
+end
+
+
+-- todo set starters from decks
+
+-- initialize and shuffle both players decks
+-- a deck making hack for prototyping
+DECKLIST = {}
+for i=1, 16 do
+    if i%4 == 0 then
+        table.insert(DECKLIST, {['grade'] = 0,
+                                ['trigger'] = 'heal',
+                                ['power'] = 5,
+                                ['shield'] = 20})
+    else
+        table.insert(DECKLIST, {['grade'] = 0,
+                                ['trigger'] = 'crit',
+                                ['power'] = 5,
+                                ['shield'] = 15})
+    end
+end
+
+for i=1, 14 do
+    table.insert(DECKLIST, {['grade'] = 1,
+                            ['power'] = 8,
+                            ['shield'] = 10})
+end
+
+for i=1, 11 do
+    table.insert(DECKLIST, {['grade'] = 2,
+                            ['power'] = 10,
+                            ['shield'] = 5})
+end
+
+for i=1, 8 do
+    table.insert(DECKLIST, {['grade'] = 3,
+                            ['power'] = 11})
+end
 
 --[[
 DECK_LIST = {

@@ -70,7 +70,6 @@ function MultiSelction:update(dt)
 
     -- confirm and submit all selections
     if love.keyboard.wasPressed('space') then
-        -- TODO make mandtary flag work
             -- TODO make confirmation menu
 
 
@@ -80,8 +79,17 @@ function MultiSelction:update(dt)
                     table.insert(self.selections, i)
                 end
             end
+
+            -- enforce mandatory flag
+            if #self.selections ~= self.maxCount and self.mandatoryFlag then
+                return false
+            end
+
+            if #self.selections == 0 then
+                return self.onSubmitFunction()
+            end
             -- pass selections into whatever function the menu was for
-            self.onSubmitFunction(self.selections)
+            return self.onSubmitFunction(self.selections)
     end
 end 
 
@@ -94,10 +102,16 @@ function MultiSelction:render()
 
         -- draw selection marker if we're at the right index
         if i == self.currentSelection then
+            love.graphics.setColor(1,1,1,1)
             love.graphics.draw(gTextures['cursor'], paddedX - 10, self.y + 28)
         end
 
-        love.graphics.setColor(1,0,0,1)
+        -- highlight selected cards
+        if self.items[i].selected then
+            love.graphics.setColor(0,1,0,1)
+        else
+            love.graphics.setColor(1,0,0,1)
+        end
         -- love.graphics.print(self.items[i].value, paddedX + 8, self.y + 24)
         love.graphics.print(self.items[i].grade, paddedX + 8, self.y + 32)
 

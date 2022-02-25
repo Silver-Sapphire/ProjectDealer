@@ -19,7 +19,7 @@ function Field:init(decklist, flipped)
 
     self.orderZone = {}
 
-    self.vanguard = {}
+    self.vanguard = {{['grade'] = 0}}
 
     self.soul = {}
 
@@ -43,13 +43,6 @@ function Field:init(decklist, flipped)
         ['6'] = {}
         --]]
     }
-
-    -- draw initial 5 cards
-    for i=1, 5 do
-        --local _ = table.remove(self.deck.deck)
-        local _ = table.remove(self.deck)
-        table.insert(self.hand, _)
-    end
 end
 
 function Field:update(dt)
@@ -98,22 +91,35 @@ function Field:render()
     local handY = VIRTUAL_HEIGHT -CARD_HEIGHT - 4
     
     for i=1, handsize do 
+        -- TODO rotate cards in hand
+
         local _card = self.hand[i]
         -- draw a card
-        love.graphics.setColor(0,0,0,1)
+        -- set color based on attribute
+        if _card.trigger == 'crit' then
+            love.graphics.setColor(1,1,1/4,1)
+        elseif _card.trigger == 'heal' then
+            love.graphics.setColor(1/4,1,1/4,1)
+        else
+            love.graphics.setColor(0,0,0,1)
+        end
         love.graphics.rectangle('fill', handX,handY, CARD_WIDTH,CARD_HEIGHT)
         
         -- display card grade
         love.graphics.setColor(1,0,0,1)
         -- love.graphics.print(_card.value, handX-CARD_HEIGHT/2,handY+CARD_WIDTH/2)
-        love.graphics.print(_card.grade, handX-CARD_HEIGHT/2,handY+CARD_WIDTH)
+        love.graphics.print(_card.grade, handX+1, handY+1)
 
         -- change handX location for next loop
-        handX = handX + CARD_WIDTH -2
+        handX = handX + CARD_WIDTH +4
     end
 
     -- Render deck
-    -- self.deck:render()
+    -- make a larger deck thicker by drawing a rectangle for every 4 cards in our deck
+    love.graphics.setColor(0,0,0.7,1)
+    for i=1, math.floor(#self.deck/4) do
+        love.graphics.rectangle('fill', VIRTUAL_WIDTH*3/4 +i,VIRTUAL_HEIGHT*5/8 -i ,CARD_WIDTH,CARD_HEIGHT)
+    end
 
     -- display deck count
 
@@ -127,7 +133,12 @@ function Field:render()
 
     -- Render R
 
-    -- Render V + soul 
+    -- Render V(s?) + soul 
+    love.graphics.setColor(0,0,0,1)
+    love.graphics.rectangle('fill', VIRTUAL_WIDTH/2-CARD_WIDTH/2,VIRTUAL_HEIGHT*5/8-CARD_HEIGHT/2, CARD_WIDTH,CARD_HEIGHT)
+
+    love.graphics.setColor(1,0,0,1)
+    love.graphics.print(self.vanguard[1].grade, VIRTUAL_WIDTH/2, VIRTUAL_HEIGHT*5/8)
 
     -- display soul count
 

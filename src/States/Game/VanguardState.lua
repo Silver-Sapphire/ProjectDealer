@@ -2,7 +2,7 @@
 -- a state machine representing a game of CFV
 VanguardState = Class{__includes = BaseState}
 
-function VanguardState:init()
+function VanguardState:enter()
     -- setup a state machine for keeing track of game phases
     vStateMachine = StateMachine {
         ['redraw'] = function() return RedrawState() end,
@@ -14,7 +14,27 @@ function VanguardState:init()
         ['battle'] = function() return BattlePhaseState() end,
         ['end'] = function() return EndPhaseState() end
     }    
-    vStateMachine:change('redraw')
+
+    Event.on('draw', function()
+        local _ = table.remove(self.fields[1].deck)
+        table.insert(self.fields[1].hand, _)
+    end)
+
+    _DECKLIST = shuffle(DECKLIST)
+    -- initialize boards
+    self.fields = {}
+    -- local player [1]
+    local player1Field = Field(_DECKLIST, false)
+    table.insert(self.fields, player1Field)
+    -- draw initial 5 cards
+    for i=1, 5 do
+        Event.dispatch('draw')
+    end
+    -- peer player [2]
+    local player2Field = Field(_DECKLIST, true)
+    table.insert(self.fields, player2Field)
+
+    vStateMachine:change('redraw', self.fields)
 end
 
 function VanguardState:update(dt)
