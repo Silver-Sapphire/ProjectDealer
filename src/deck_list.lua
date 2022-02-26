@@ -43,9 +43,16 @@ for i=1, 16 do
 end
 
 for i=1, 14 do
-    table.insert(DECKLIST, {['grade'] = 1,
-                            ['power'] = 8,
-                            ['shield'] = 10})
+    if i < 11 then
+        table.insert(DECKLIST, {['grade'] = 1,
+                                ['power'] = 8,
+                                ['shield'] = 10})
+    else
+        table.insert(DECKLIST, {['grade'] = 1,
+                                ['power'] = 7,
+                                ['shield'] = 0,
+                                ['sentinel'] = true})
+    end
 end
 
 for i=1, 11 do

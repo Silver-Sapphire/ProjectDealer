@@ -1,25 +1,27 @@
 --[[
-    A class for multi-selection menus that allows the player to either;
-    choose exactly N options, or choose up to N options, set via flag.
+    A class that takes a table or cards paired with their coresponding field index,
+    and allows the player to select a specified amount of cards to be used
+    with a given callback function, such as searching, redrwaing, riding, ect.
+
+    !! requires input "items" table to be made of tables containing a card, and its index
 ]]
 
-MultiSelction = Class{}
+SelectCards = Class{}
 
-function MultiSelction:init(def)
-    -- afformentioned flag
+function SelectCards:init(def)
     self.mandatoryFlag = def.mandatoryFlag
-    self.maxCount = def.maxCount
-    self.curCount = 0
-    self.text = def.text
+    self.maxSelections = def.maxSelections
+    self.numSelected = 0
     self.items = def.items
+    self.text = def.text
+
     self.x = def.x
     self.y = def.y
     self.width = def.width
-    self.height = def.height
+    self.height= def.height
     self.font = def.font or gFonts['small']
 
-    -- only one should be used at a time, but having both calculated might be useful later
-    self.gapHeight = self.height / #self.items
+    -- this gap creation method won't work for larger menus and will need a scrolling feature
     self.gapWidth = self.width / #self.items
 
     self.currentSelection = 1
@@ -27,7 +29,7 @@ function MultiSelction:init(def)
     self.onSubmitFunction = def.onSubmitFunction
 end
 
-function MultiSelction:update(dt)
+function SelectCards:update(dt)
     -- move curser with keyboard input
     if love.keyboard.wasPressed('up') or love.keyboard.wasPressed('left') then
         if self.currentSelection == 1 then
@@ -54,73 +56,50 @@ function MultiSelction:update(dt)
     if love.keyboard.wasPressed('return') or love.keyboard.wasPressed('enter') then
         if self.items[self.currentSelection].selected then
             self.items[self.currentSelection].selected = false
-            self.curCount = self.curCount - 1
+            self.numSelected = self.numSelected - 1
 
         --  ensure we don't select more than is valid
-        elseif self.curCount < self.maxCount then
+        elseif self.numSelected < self.maxSelections then
             self.items[self.currentSelection].selected = true
-            self.curCount = self.curCount + 1
+            self.numSelected = self.numSelected + 1
         end
         
         gSounds['blip']:stop()
         gSounds['blip']:play()
-        -- TODO make flag to render a checkmark/oppacity or something
-        -- to make visually distinct something is selected
     end
 
-    -- confirm and submit all selections
+    -- Submit selections
     if love.keyboard.wasPressed('space') then
-            -- TODO make confirmation menu
+        -- TODO push confirmation menu
 
+        --enforce mandatory flag
+        if self.mandatoryFlag and #self.selections ~= self.maxSelections then
+            return false
+        elseif #self.selections == 0 then
+            return self.onSubmitFunction()
+        end
 
-            -- selections are the indexes of selected items and are ordered (small to large)
-            for i=1, #self.items do
-                if self.items[i].selected then
-                    table.insert(self.selections, i)
-                end
-            end
-
-            -- enforce mandatory flag
-            if #self.selections ~= self.maxCount and self.mandatoryFlag then
-                return false
-            end
-
-            if #self.selections == 0 then
-                return self.onSubmitFunction()
-            end
-            -- pass selections into whatever function the menu was for
-            return self.onSubmitFunction(self.selections)
+        return self.onSubmitFunction(self.selections)
     end
-end 
+end
 
-function MultiSelction:render()
+function SelectCards:render()
     -- Display menu text/description
     if self.text then
         love.graphics.print(self.text, self.x + 4, self.y + 4)
     end
-
+    
     -- local currentY = self.y 
     local currentX = self.x
 
     -- draw each item/card
     for i = 1, #self.items do
         local paddedX = currentX + (self.gapWidth / 2) - 4
-
+        renderCard(self.items[i].card, currentX, self.y + self.height/4)
         -- draw selection marker if we're at the right index
         if i == self.currentSelection then
             love.graphics.setColor(1,1,1,1)
-            love.graphics.draw(gTextures['cursor'], paddedX - 10, self.y + 28)
+            love.graphics.draw(gTextures['cursor'], paddedX - 10, self.y + self.height/6)
         end
-
-        -- highlight selected cards
-        if self.items[i].selected then
-            love.graphics.setColor(0,1,0,1)
-        else
-            love.graphics.setColor(1,0,0,1)
-        end
-        -- love.graphics.print(self.items[i].value, paddedX + 8, self.y + 24)
-        love.graphics.print(self.items[i].grade, paddedX + 8, self.y + 32)
-
-        currentX = currentX + self.gapWidth
     end
 end

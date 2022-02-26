@@ -21,6 +21,7 @@ require 'src/Board/Deck'
 require 'src/gui/Menu'
 require 'src/gui/Panel'
 require 'src/gui/ProgressBar'
+require 'src/gui/SelectCards'
 require 'src/gui/Selection'
 require 'src/gui/Textbox'
 

@@ -5,6 +5,7 @@ function RedrawState:enter(fields)
     if #self.fields[1].hand ~= 0 then
         -- redraw menu
         gStateStack:push(MenuState(MenuSelectUpToN{
+            text = 'Select cards to redraw w/enter, and submit w/space',
             mandatoryFlag = false,
             maxCount = #self.fields[1].hand,
 
@@ -12,7 +13,7 @@ function RedrawState:enter(fields)
 
             x = 0,
             y = VIRTUAL_HEIGHT*3/4,
-            width = VIRTUAL_WIDTH/2,
+            width = VIRTUAL_WIDTH*3/8,
             height = VIRTUAL_HEIGHT/4,
 
             onSubmitFunction = function (selections) 
@@ -70,8 +71,4 @@ function RedrawState:render()
     for k, field in pairs(self.fields) do
         field:render()
     end
-
-    -- draw gui
-    love.graphics.print('Select cards to redraw w/enter, and submit w/space', 
-                        36, VIRTUAL_HEIGHT*3/5)
 end

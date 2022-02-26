@@ -50,3 +50,24 @@ function ParseAddress(address)
 	foo = string.sub(address, 0, bar)
 	return foo
 end
+
+
+-- display a card
+function renderCard(card, x, y)
+	-- set color based on attribute ("art")
+	if card.trigger == 'crit' then
+		love.graphics.setColor(7/8, 7/8, 1/4,1)--darker yellow
+	elseif card.trigger == 'heal' then
+		love.graphics.setColor(1/4, 1, 1/4, 1)--green
+	elseif card.sentinel then
+		love.graphics.setColor(7/8, 7/8, 1/2, 1)--brighter yellow
+	else
+		love.graphics.setColor(0, 0, 0, 1)--black
+	end
+
+	-- card ""art"""
+	love.graphics.rectangle('fill', x,y, CARD_WIDTH,CARD_HEIGHT)
+	-- card grade
+	love.graphics.setColor(1,1,1,1)--white
+	love.graphics.print(card.grade, x+1, y+1)
+end

@@ -84,41 +84,11 @@ function Field:render()
         love.graphics.rectangle('fill', VIRTUAL_WIDTH/12,0, 10*VIRTUAL_WIDTH/12,VIRTUAL_HEIGHT)
     end
 
-    -- Render hand
-    love.graphics.setFont(gFonts["medium"])
-    local handsize = #self.hand
-    local handX = VIRTUAL_WIDTH/2 - handsize/2
-    local handY = VIRTUAL_HEIGHT -CARD_HEIGHT - 4
-    
-    for i=1, handsize do 
-        -- TODO rotate cards in hand
-
-        local _card = self.hand[i]
-        -- draw a card
-        -- set color based on attribute
-        if _card.trigger == 'crit' then
-            love.graphics.setColor(1,1,1/4,1)
-        elseif _card.trigger == 'heal' then
-            love.graphics.setColor(1/4,1,1/4,1)
-        else
-            love.graphics.setColor(0,0,0,1)
-        end
-        love.graphics.rectangle('fill', handX,handY, CARD_WIDTH,CARD_HEIGHT)
-        
-        -- display card grade
-        love.graphics.setColor(1,0,0,1)
-        -- love.graphics.print(_card.value, handX-CARD_HEIGHT/2,handY+CARD_WIDTH/2)
-        love.graphics.print(_card.grade, handX+1, handY+1)
-
-        -- change handX location for next loop
-        handX = handX + CARD_WIDTH +4
-    end
-
     -- Render deck
     -- make a larger deck thicker by drawing a rectangle for every 4 cards in our deck
     love.graphics.setColor(0,0,0.7,1)
     for i=1, math.floor(#self.deck/4) do
-        love.graphics.rectangle('fill', VIRTUAL_WIDTH*3/4 +i,VIRTUAL_HEIGHT*5/8 -i ,CARD_WIDTH,CARD_HEIGHT)
+        love.graphics.rectangle('fill', VIRTUAL_WIDTH*3/4 + i,VIRTUAL_HEIGHT*5/8 - math.floor(i/2), CARD_WIDTH,CARD_HEIGHT)
     end
 
     -- display deck count
@@ -133,20 +103,46 @@ function Field:render()
 
     -- Render R
 
-    -- Render V(s?) + soul 
-    love.graphics.setColor(0,0,0,1)
-    love.graphics.rectangle('fill', VIRTUAL_WIDTH/2-CARD_WIDTH/2,VIRTUAL_HEIGHT*5/8-CARD_HEIGHT/2, CARD_WIDTH,CARD_HEIGHT)
+    -- draw soul stack
+    local vX, vY = VIRTUAL_WIDTH/2 - CARD_WIDTH/2, VIRTUAL_HEIGHT*5/8 - CARD_HEIGHT/2
+    local soulOffset = 0
+    if #self.soul > 2 then
+        for i=1, math.floor(#self.soul/3) do
+            love.graphics.setColor(0,0,0,1)--black
+            love.graphics.rectangle('fill', vX,vY, CARD_WIDTH,CARD_HEIGHT)
+            soulOffset = soulOffset + 1
+        end
+    end
 
-    love.graphics.setColor(1,0,0,1)
-    love.graphics.print(self.vanguard[1].grade, VIRTUAL_WIDTH/2, VIRTUAL_HEIGHT*5/8)
-
+    -- Render V(s?)
+    if #self.vanguard == 1 then
+        renderCard(self.vanguard[1], vX + math.floor(soulOffset/2), vY - soulOffset)
+    else
+        -- legion rendering
+    end
     -- display soul count
+    love.graphics.print('Soul:'.. #self.soul, vX, vY + CARD_HEIGHT)
 
     -- Render G
 
     -- Render damage
 
+
     -- display avalaible CB / dmg
+
+
+    -- Render hand
+    local handsize = #self.hand
+    local handX, handY = VIRTUAL_WIDTH/2 - handsize/2, VIRTUAL_HEIGHT -CARD_HEIGHT - 4
+    for i=1, handsize do 
+        -- TODO rotate cards in hand
+
+        local _card = self.hand[i]
+        renderCard(_card, handX, handY)
+
+        -- change handX location for next loop
+        handX = handX + CARD_WIDTH +4
+    end
 
     -- "unflip" by returning to draw to its original state
     if self.flipped then
