@@ -19,7 +19,8 @@ function Field:init(decklist, flipped)
 
     self.orderZone = {}
 
-    self.vanguard = {{['grade'] = 0}}
+    self.vanguard = {{['grade'] = 0,
+                      ['power'] = 7}}
 
     self.soul = {}
 
