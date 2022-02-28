@@ -4,12 +4,14 @@ function RidePhaseState:enter(fields)
     self.fields = fields
     if #self.fields[1].hand ~= 0 then
         local options = {}
+        local _vGrade = self.fields[1].vanguard[1].grade
         -- determine ridable cards
         for i=1, #self.fields[1].hand do
-            if self.fields[1].hand[i].grade == self.fields[1].vanguard.grade or 
-               self.fields[1].hand[i].grade == self.fields[1].vanguard.grade + 1 then
+            local _card = self.fields[1].hand[i]
+            if _card.grade == _vGrade or 
+               _card.grade == _vGrade + 1 then
                 local option = {
-                    card = self.fields[1].hand[i],
+                    card = _card,
                     index = 'self.fields[1].hand[' .. i .. "]"
                 }
                 table.insert(options, option)
@@ -17,7 +19,7 @@ function RidePhaseState:enter(fields)
         end
 
         gStateStack:push(MenuState(SelectCards{
-            mandatoryFlag = false,
+            mandatoryFlag = false, 
             maxCount = 1,
             items = options,
 

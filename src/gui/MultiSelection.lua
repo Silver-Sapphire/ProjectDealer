@@ -94,10 +94,6 @@ function MultiSelction:update(dt)
 end 
 
 function MultiSelction:render()
-    -- Display menu text/description
-    if self.text then
-        love.graphics.print(self.text, self.x + 4, self.y + 4)
-    end
 
     -- local currentY = self.y 
     local currentX = self.x

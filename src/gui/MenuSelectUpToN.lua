@@ -6,7 +6,7 @@ MenuSelectUpToN = Class{}
 
 function MenuSelectUpToN:init(def)
     self.panel = Panel(def.x, def.y, def.width, def.height)
-
+    self.text = def.text
     self.multiSelction = MultiSelction {
         -- this flag is set if a certain amount N MUST be selected, and is false if the user can select up to or less than N
         mandatoryFlag = def.mandatoryFlag,
@@ -34,4 +34,10 @@ end
 function MenuSelectUpToN:render()
     self.panel:render()
     self.multiSelction:render()
+    
+    -- Display menu text/description
+    if self.text then
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.print(self.text, self.multiSelction.x + 4, self.multiSelction.y + 4)
+    end
 end
