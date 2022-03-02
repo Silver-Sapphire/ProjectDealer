@@ -16,12 +16,20 @@ function Menu:init(def)
     self.panel = Panel(def.x, def.y, def.width, def.height)
     
     self.selection = Selection {
+        orientation = def.orientation or 'vertical',
+        text = def.text or false,
+        areCards = def.areCards or false,
+        -- a minimum and maximum number of selections to be made
+        minSel = def.minSel or 1,
+        maxSel = def.maxSel or 1,
+        
         items = def.items,
+        
         x = def.x,
         y = def.y,
         width = def.width,
         height = def.height,
-        cursor = def.cursor
+        onSubmitFunction = def.onSubmitFunction or function () end
     }
 end
 

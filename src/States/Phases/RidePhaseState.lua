@@ -12,39 +12,38 @@ function RidePhaseState:enter(fields)
                _card.grade == _vGrade + 1 then
                 local option = {
                     card = _card,
-                    index = 'self.fields[1].hand[' .. i .. "]"
+                    player = 1,
+                    table = 'hand',
+                    index = i
                 }
                 table.insert(options, option)
             end
         end
 
-        gStateStack:push(MenuState(SelectCards{
-            mandatoryFlag = false, 
-            maxCount = 1,
+        gStateStack:push(MenuState(Menu{
+            oreintation = 'horizontal',
+            text = 'Select a card to ride w/enter, and submit w/space',
+            areCards = true,
+            minSel = 0,
+            maxSel = 1,
+
             items = options,
 
             x = 0,
             y = VIRTUAL_HEIGHT*3/4,
             width = VIRTUAL_WIDTH/2,
             height = VIRTUAL_HEIGHT/4,
+
             onSubmitFunction = function (selection)
-                gStateStack:pop()
-                if selection then
+                if #selection > 0 then
                     Event.dispatch('ride', selection)
                 end
-
+                -- todo, trigger on ride skills
+                gStateStack:pop()
                 vStateMachine:change('main', self.fields)
             end
         }))
     end
-   Event.on('ride', function (selection) 
-        -- determine selection's index
-        local _ = table.remove(self.fields[1].hand, selection[1])
-        table.insert(self.fields[1].vanguard, _)
-
-        _ = table.remove(self.fields[1].vanguard, 1)
-        table.insert(self.fields[1].soul, _)
-   end)
 end
 
 function RidePhaseState:update(dt)

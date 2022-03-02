@@ -6,7 +6,7 @@ end
 
 function MainPhaseState:update(dt)
     if love.keyboard.wasPressed('m') then
-        vStateMachine:change('redraw')
+        vStateMachine:change('redraw', self.fields)
     end
 
     if love.keyboard.wasPressed('q') then

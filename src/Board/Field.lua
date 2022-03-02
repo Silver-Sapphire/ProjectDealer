@@ -56,7 +56,7 @@ function Field:update(dt)
     -- end
 
     -- if card in field clicked then
-    --     move to drop 
+    --     move to drop
     -- end
 
     -- if drop clicked then
@@ -114,16 +114,18 @@ function Field:render()
             soulOffset = soulOffset + 1
         end
     end
+    
+    -- display soul count
+	love.graphics.setColor(1,1,1,1)--white
+	love.graphics.setFont(gFonts['small'])
+    love.graphics.print('Soul:'.. #self.soul, vX, vY + CARD_HEIGHT)
 
     -- Render V(s?)
     if #self.vanguard == 1 then
-        renderCard(self.vanguard[1], vX + math.floor(soulOffset/2), vY - soulOffset)
+        RenderCard(self.vanguard[1], vX + math.floor(soulOffset/2), vY - soulOffset)
     else
         -- legion rendering
     end
-    -- display soul count
-    love.graphics.print('Soul:'.. #self.soul, vX, vY + CARD_HEIGHT)
-
     -- Render G
 
     -- Render damage
@@ -139,7 +141,7 @@ function Field:render()
         -- TODO rotate cards in hand
 
         local _card = self.hand[i]
-        renderCard(_card, handX, handY)
+        RenderCard(_card, handX, handY)
 
         -- change handX location for next loop
         handX = handX + CARD_WIDTH +4

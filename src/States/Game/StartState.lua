@@ -13,7 +13,6 @@ function StartState:init()
         y = VIRTUAL_HEIGHT / 2 - #self.menuItems * heightCons / 2,
         width = widthCons,
         height = #self.menuItems * heightCons,
-        cursor = true,
         items = self.menuItems
     }
 end
@@ -23,6 +22,5 @@ function StartState:update(dt)
 end
 
 function StartState:render()
-    love.graphics.setFont(gFonts["medium"])
     self.mainMenu:render()
 end

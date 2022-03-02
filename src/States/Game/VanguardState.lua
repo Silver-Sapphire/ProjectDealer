@@ -15,10 +15,33 @@ function VanguardState:enter()
         ['end'] = function() return EndPhaseState() end
     }    
 
+    -- setup game actions, with self discriptive name
     Event.on('draw', function()
         local _ = table.remove(self.fields[1].deck)
         table.insert(self.fields[1].hand, _)
     end)
+    
+    Event.on('ride', function (selection)
+        -- move selected card to V
+        self:moveCard({
+            _field = 1, -- todo make dynamic
+            _inputTable = selection.table,
+            _inputIndex = selection.index,
+
+            _outputTable = "vanguard"-- and here
+            -- output to end of table implied
+        })
+
+        -- move older vanguard unit to soul
+        self:moveCard({
+            _field = 1, -- todo make dynamic
+            _inputTable = "vanguard",
+            _inputIndex = 1,
+
+            _outputTable = "soul"
+            -- output to end of table implied
+        })
+   end)
 
     _DECKLIST = shuffle(DECKLIST)
     -- initialize boards
@@ -49,7 +72,7 @@ end
 -- from a given location at a given index, to another specified location, at at an option index
 function VanguardState:moveCard(request)
 	-- setup variables
-	local _field = request._field 
+	local _field = request._field
 	local _inputTable = request._inputTable
 	local _inputIndex = request._inputIndex
 	local _outputTable = request._outputTable
@@ -97,11 +120,82 @@ function VanguardState:moveCard(request)
 	end
 
 	-- move _card to it's destination
-    -- using a fancier method
-    local _output = "self.fields[" .. _field .. "]." .. _outputTable 
-    if _outputIndex then
-        table.insert(_output, _outputIndex, _card)
-    else
-        table.insert(_output, _card)
-    end
+    -- -- using a fancier method
+    -- local _output = "self.fields[" .. _field .. "]." .. _outputTable
+    -- if _outputIndex then
+    --     table.insert(_output, _outputIndex, _card)
+    -- else
+    --     table.insert(_output, _card)
+    -- end
+    --Fancier method failed, because you can't directly index a table via string.
+    --TODO find a way to access a table via string?
+
+    if _outputTable == "hand" then
+        if _outputIndex then
+            table.insert(self.fields[_field].hand, _outputIndex, _card)
+        else
+            table.insert(self.fields[_field].hand, _card)
+        end
+    elseif _outputTable == "deck" then
+        if _outputIndex then
+            table.insert(self.fields[_field].deck, _outputIndex, _card)
+        else
+            table.insert(self.fields[_field].deck, _card)
+        end
+    elseif _outputTable == "drop" then
+        if _outputIndex then
+            table.insert(self.fields[_field].drop, _outputIndex, _card)
+        else
+            table.insert(self.fields[_field].drop, _card)
+        end
+	elseif _outputTable == "bind" then
+        if _outputIndex then
+            table.insert(self.fields[_field].bind, _outputIndex, _card)
+        else
+            table.insert(self.fields[_field].bind, _card)
+        end
+	elseif _outputTable == "trigger" then
+        if _outputIndex then
+            table.insert(self.fields[_field].trigger, _outputIndex, _card)
+        else
+            table.insert(self.fields[_field].trigger, _card)
+        end
+	elseif _outputTable == "order" then
+        if _outputIndex then
+            table.insert(self.fields[_field].order, _outputIndex, _card)
+        else
+            table.insert(self.fields[_field].order, _card)
+        end
+	elseif _outputTable == "damage" then
+        if _outputIndex then
+            table.insert(self.fields[_field].damage, _outputIndex, _card)
+        else
+            table.insert(self.fields[_field].damage, _card)
+        end
+	elseif _outputTable == "guard" then
+        if _outputIndex then
+            table.insert(self.fields[_field].guard, _outputIndex, _card)
+        else
+            table.insert(self.fields[_field].guard, _card)
+        end
+	elseif _outputTable == "soul" then
+        if _outputIndex then
+            table.insert(self.fields[_field].soul, _outputIndex, _card)
+        else
+            table.insert(self.fields[_field].soul, _card)
+        end
+	elseif _outputTable == "vanguard" then
+        if _outputIndex then
+            table.insert(self.fields[_field].vanguard, _outputIndex, _card)
+        else
+            table.insert(self.fields[_field].vanguard, _card)
+        end
+	elseif _outputTable == "rearguard" then
+        if _outputIndex then
+            table.insert(self.fields[_field].rearguard, _outputIndex, _card)
+        else
+            table.insert(self.fields[_field].rearguard, _card)
+        end
+	-- insert front/back row, ect here
+	end
 end

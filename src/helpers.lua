@@ -53,7 +53,7 @@ end
 
 
 -- display a card
-function renderCard(card, x, y)
+function RenderCard(card, x, y)
 	-- set color based on attribute ("art")
 	if card.trigger == 'crit' then
 		love.graphics.setColor(7/8, 7/8, 1/4,1)--darker yellow
@@ -69,5 +69,6 @@ function renderCard(card, x, y)
 	love.graphics.rectangle('fill', x,y, CARD_WIDTH,CARD_HEIGHT)
 	-- card grade
 	love.graphics.setColor(1,1,1,1)--white
+	love.graphics.setFont(gFonts['small'])
 	love.graphics.print(card.grade, x+1, y+1)
 end

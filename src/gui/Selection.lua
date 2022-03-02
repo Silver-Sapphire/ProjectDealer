@@ -1,39 +1,40 @@
 --[[
-    GD50
-    Pokemon
-
-    Author: Colton Ogden
-    cogden@cs50.harvard.edu
-
-    The Selection class gives us a list of textual items that link to callbacks;
-    this particular implementation only has one dimension of items (vertically),
-    but a more robust implementation might include columns as well for a more
-    grid-like selection, as seen in many kinds of interfaces and games.
+    a modification of the orignal GD50 selection menu that now supports multiple functionalites
 ]]
 
 Selection = Class{}
 
-function Selection:init(def)
+function Selection:init(def) -- defaults
+    self.orientation = def.orientation --or 'Vertical'
+    self.text = def.text --or false,
+    self.areCards = def.areCards --or false,
+    -- a minimum and maximum number of selections to be made
+    self.minSel = def.minSel --or 1,
+    self.maxSel = def.maxSel --or 1,
+    if self.maxSel == 0 then
+        self.maxSel = false
+    end
+
     self.items = def.items
+
     self.x = def.x
     self.y = def.y
-
     self.height = def.height
     self.width = def.width
-    self.font = def.font or gFonts['small']
+    self.font = def.font or gFonts['medium']
+    self.onSubmitFunction = def.onSubmitFunction -- or function()end
 
     self.gapHeight = self.height / #self.items
+    self.gapWidth = self.width / #self.items
 
     self.currentSelection = 1
-
-    -- a flag we can optionally set to have a panel wait for the player
-    -- to press confrim information, without making a selection.
-    self.cursor = def.cursor
-
+    self.numSelected = 0
+    self.selections = {}
 end
 
 function Selection:update(dt)
-    if self.cursor then
+    -- move cursor in memory
+    if self.maxSel ~= 0 then
         if love.keyboard.wasPressed('up') or love.keyboard.wasPressed('left') then
             if self.currentSelection == 1 then
                 self.currentSelection = #self.items
@@ -55,27 +56,101 @@ function Selection:update(dt)
         end
     end
         
+    -- subbmission actions
     if love.keyboard.wasPressed('return') or love.keyboard.wasPressed('enter') then
-        self.items[self.currentSelection].onSelect()
-        
         gSounds['blip']:stop()
         gSounds['blip']:play()
+
+        local _selection = self.items[self.currentSelection]
+        if not self.maxSel then
+            -- confirmation type functionallity
+            _selection.onSelect()
+    
+        elseif self.maxSel == 1 then
+            -- submit a single item
+            -- TODO add confirmation feature (and at bottom)
+            if self.areCards then
+                _selection.selected = true
+                self:subimtSelections()
+            else 
+                _selection.onSelect()
+            end
+        else
+            -- prime to submit mutliple items
+            if not _selection.selected then
+                _selection.selected = true
+                self.numSelected = self.numSelected + 1
+            else
+                _selection.selected = false
+                self.numSelected = self.numSelected - 1
+            end
+        end
+    end
+
+    -- submit multiple selections
+    if love.keyboard.wasPressed('space') and self.maxSel >= 1 then
+        -- ensure we submit a minimum requirement, if one exists
+        if self.numSelected >= self.minSel then
+            self:subimtSelections()
+        end
     end
 end
 
 function Selection:render()
-    local currentY = self.y
+    local currentX = self.x + self.gapWidth/2
+    local currentY = self.y + self.gapHeight/2
+    if self.text then
+        love.graphics.setFont(self.font)
+        love.graphics.printf(self.text, self.x +4, self.y +4, -- +4 to avoid overlapping with menu boarder
+                             self.width, 'left')
+    end
 
+    -- draw each item
     for i = 1, #self.items do
         local paddedY = currentY + (self.gapHeight / 2) - self.font:getHeight() / 2
+        local paddedX = currentX + (self.gapWidth / 2 ) - 6--self.font:getWidth() / 2
 
-        -- draw selection marker if we're at the right index
-        if i == self.currentSelection and self.cursor then
-            love.graphics.draw(gTextures['cursor'], self.x - 9, paddedY)
+        -- render things from left to right, or top to bottom
+        if self.orientation == 'vertical' then
+            -- draw selection marker if we're at the right index
+            if i == self.currentSelection and self.maxSel then
+                love.graphics.draw(gTextures['cursor'], self.x - 9, paddedY) -- -9 to avoid overlap
+            end
+
+            -- draw cards if they are the items
+            if self.areCards then
+                RenderCard(self.items[i].card, self.x + CARD_WIDTH/2, paddedY - CARD_HEIGHT/2)
+            
+            else -- render text if not cards
+                love.graphics.printf(self.items[i].text, self.x, paddedY, self.width, 'center')
+            end
+            currentY = currentY + self.gapHeight
+        
+        else--if self.orientation --'horizontal' then
+            -- same as above section, but with the relvant x and y swaps
+            -- draw selection marker if we're at the right index
+            if i == self.currentSelection and self.maxSel then
+                love.graphics.draw(gTextures['cursor'], paddedX - 9, self.y) -- -9 to avoid overlap
+            end
+
+            -- draw cards if they are the items
+            if self.areCards then
+                renderCard(self.items[i].card, paddedX + CARD_WIDTH/2, self.y - CARD_HEIGHT/2)
+            
+            else -- render text if not cards
+                love.graphics.printf(self.items[i].text, self.x, paddedX, self.width, 'center')
+            end
+            currentX = currentX + self.gapWidth
         end
-
-        love.graphics.printf(self.items[i].text, self.x, paddedY, self.width, 'center')
-
-        currentY = currentY + self.gapHeight
     end
+end
+
+function Selection:subimtSelections()
+    --todo, add confirmation feature
+    for k, item in pairs(self.items) do
+        if item.selected then
+            table.insert(self.selections, item)
+        end
+    end
+    self.onSubmitFunction(self.selections)
 end

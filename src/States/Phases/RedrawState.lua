@@ -1,33 +1,44 @@
 RedrawState = Class{__includes = BaseState}
 
 function RedrawState:enter(fields)
+    --TODO make work for both players FOR EVERY STATE w/ network events
+    -- until then, use process ai instead
     self.fields = fields
-    if #self.fields[1].hand ~= 0 then
+    local handsize = #self.fields[1].hand
+    if handsize ~= 0 then
+        -- create a table of cards, with their
+        local options = {}
+        for i = 1, handsize do
+            local option = {
+                card = self.fields[1].hand[i],
+                player = 1,
+                table = 'hand',
+                index = i
+            }
+            table.insert(options, option)
+        end
         -- redraw menu
-        gStateStack:push(MenuState(MenuSelectUpToN{
+        gStateStack:push(MenuState(Menu{
+            oreintation = 'horizontal',
             text = 'Select cards to redraw w/enter, and submit w/space',
-            mandatoryFlag = false,
-            maxCount = #self.fields[1].hand,
+            areCards = true,
+            minSel = 0,
+            maxSel = handsize,
 
-            items = self.fields[1].hand,
+            items = options,
 
-            x = 0,
+            x = VIRTUAL_WIDTH/8,
             y = VIRTUAL_HEIGHT*3/4,
-            width = VIRTUAL_WIDTH*3/8,
+            width = VIRTUAL_WIDTH*3/4,
             height = VIRTUAL_HEIGHT/4,
 
             onSubmitFunction = function (selections) 
                 -- event:dispatch(redraw(selections))
                 -- return selected cards to deck
-                local _indexAdjuster = 0
-                if selections then
-                    for k, selectionIndex in pairs(selections) do
-                        -- the following line are debug code to address selection table indexing mis-matching
-                        selectionIndex = selectionIndex - _indexAdjuster
-                        _indexAdjuster = _indexAdjuster + 1
-            
-                        -- cringe manual looping to expant itirater scope
-                        local _ = table.remove(self.fields[1].hand, selectionIndex)
+                if #selections > 0 then
+                    -- go over selectings from highest index to lowest, to avoid messing with index math
+                    for i = #selections, 1, -1 do
+                        local _ = table.remove(self.fields[1].hand, selections[i].index)
                         table.insert(self.fields[1].deck, 1, _)
                     end
                     -- draw for each card redrawn
