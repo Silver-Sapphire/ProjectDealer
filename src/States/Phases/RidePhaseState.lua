@@ -21,22 +21,23 @@ function RidePhaseState:enter(fields)
         end
 
         gStateStack:push(MenuState(Menu{
-            oreintation = 'horizontal',
+            orientation = 'horizontal',
             text = 'Select a card to ride w/enter, and submit w/space',
+            font = gFonts['small'],
             areCards = true,
             minSel = 0,
             maxSel = 1,
 
             items = options,
 
-            x = 0,
+            x = VIRTUAL_WIDTH/4,
             y = VIRTUAL_HEIGHT*3/4,
             width = VIRTUAL_WIDTH/2,
             height = VIRTUAL_HEIGHT/4,
 
             onSubmitFunction = function (selection)
                 if #selection > 0 then
-                    Event.dispatch('ride', selection)
+                    Event.dispatch('ride', selection[1])
                 end
                 -- todo, trigger on ride skills
                 gStateStack:pop()
@@ -44,6 +45,8 @@ function RidePhaseState:enter(fields)
             end
         }))
     end
+    self.flag_ = false
+    self.selection = false
 end
 
 function RidePhaseState:update(dt)
@@ -56,6 +59,19 @@ function RidePhaseState:render()
         field:render()
     end
 
+    if self.flag_ then
+        if self.selection then
+            love.graphics.setFont(gFonts['large'])
+            love.graphics.setColor(1,1,0,1)
+            RenderCard(self.selection.card, 10, 10)
+        end
+    end
+
     -- draw gui
     love.graphics.print('Select a card to ride w/enter, and submit w/space', 36, VIRTUAL_HEIGHT*3/5)
+end
+
+function RidePhaseState:debugPrint(selection)
+    self.selection = selection
+    self.flag_ = true
 end

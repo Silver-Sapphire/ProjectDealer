@@ -19,8 +19,9 @@ function RedrawState:enter(fields)
         end
         -- redraw menu
         gStateStack:push(MenuState(Menu{
-            oreintation = 'horizontal',
+            orientation = 'horizontal',
             text = 'Select cards to redraw w/enter, and submit w/space',
+            font = gFonts['small'],
             areCards = true,
             minSel = 0,
             maxSel = handsize,

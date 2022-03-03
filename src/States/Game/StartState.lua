@@ -13,6 +13,7 @@ function StartState:init()
         y = VIRTUAL_HEIGHT / 2 - #self.menuItems * heightCons / 2,
         width = widthCons,
         height = #self.menuItems * heightCons,
+        font = gFonts['medium'],
         items = self.menuItems
     }
 end

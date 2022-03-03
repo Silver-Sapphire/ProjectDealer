@@ -11,9 +11,6 @@ function Selection:init(def) -- defaults
     -- a minimum and maximum number of selections to be made
     self.minSel = def.minSel --or 1,
     self.maxSel = def.maxSel --or 1,
-    if self.maxSel == 0 then
-        self.maxSel = false
-    end
 
     self.items = def.items
 
@@ -21,7 +18,7 @@ function Selection:init(def) -- defaults
     self.y = def.y
     self.height = def.height
     self.width = def.width
-    self.font = def.font or gFonts['medium']
+    self.font = def.font --or gFonts['medium']
     self.onSubmitFunction = def.onSubmitFunction -- or function()end
 
     self.gapHeight = self.height / #self.items
@@ -62,11 +59,11 @@ function Selection:update(dt)
         gSounds['blip']:play()
 
         local _selection = self.items[self.currentSelection]
-        if not self.maxSel then
+        if self.maxSel == 0 then
             -- confirmation type functionallity
             _selection.onSelect()
     
-        elseif self.maxSel == 1 then
+        elseif self.maxSel == 1 and self.minSel ==1 then
             -- submit a single item
             -- TODO add confirmation feature (and at bottom)
             if self.areCards then
@@ -77,10 +74,10 @@ function Selection:update(dt)
             end
         else
             -- prime to submit mutliple items
-            if not _selection.selected then
+            if not _selection.selected and self.numSelected < self.maxSel then
                 _selection.selected = true
                 self.numSelected = self.numSelected + 1
-            else
+            elseif _selection.selected then
                 _selection.selected = false
                 self.numSelected = self.numSelected - 1
             end
@@ -107,39 +104,48 @@ function Selection:render()
 
     -- draw each item
     for i = 1, #self.items do
-        local paddedY = currentY + (self.gapHeight / 2) - self.font:getHeight() / 2
-        local paddedX = currentX + (self.gapWidth / 2 ) - 6--self.font:getWidth() / 2
+        local paddedY = currentY - self.font:getHeight() / 2
+        local paddedX = currentX - 6--self.font:getWidth() / 2
 
         -- render things from left to right, or top to bottom
         if self.orientation == 'vertical' then
+            -- draw cards if they are the items
+            if self.areCards then
+                RenderCard(self.items[i].card, self.x + CARD_WIDTH*2/3, paddedY - CARD_HEIGHT*2/3)
+            
+            else -- render text if not cards
+                love.graphics.setFont(self.font)
+                love.graphics.printf(self.items[i].text, self.x, paddedY, self.width, 'center')
+            end
             -- draw selection marker if we're at the right index
             if i == self.currentSelection and self.maxSel then
                 love.graphics.draw(gTextures['cursor'], self.x - 9, paddedY) -- -9 to avoid overlap
             end
 
-            -- draw cards if they are the items
-            if self.areCards then
-                RenderCard(self.items[i].card, self.x + CARD_WIDTH/2, paddedY - CARD_HEIGHT/2)
             
-            else -- render text if not cards
-                love.graphics.printf(self.items[i].text, self.x, paddedY, self.width, 'center')
-            end
             currentY = currentY + self.gapHeight
         
         else--if self.orientation --'horizontal' then
             -- same as above section, but with the relvant x and y swaps
-            -- draw selection marker if we're at the right index
-            if i == self.currentSelection and self.maxSel then
-                love.graphics.draw(gTextures['cursor'], paddedX - 9, self.y) -- -9 to avoid overlap
-            end
-
-            -- draw cards if they are the items
+             -- draw cards if they are the items
             if self.areCards then
-                renderCard(self.items[i].card, paddedX + CARD_WIDTH/2, self.y - CARD_HEIGHT/2)
-            
+                RenderCard(self.items[i].card, paddedX - CARD_WIDTH/2, self.y + CARD_HEIGHT/2)
+                if self.items[i].selected then
+                    love.graphics.setColor(1/2, 1/1, 2/2, 2/3)
+                    love.graphics.rectangle('fill', paddedX - CARD_WIDTH/2, self.y + CARD_HEIGHT/2, CARD_WIDTH,CARD_HEIGHT)
+                end
+
             else -- render text if not cards
+                love.graphics.setFont(self.font)
                 love.graphics.printf(self.items[i].text, self.x, paddedX, self.width, 'center')
             end
+            -- draw selection marker if we're at the right index
+            if i == self.currentSelection and self.maxSel then
+                love.graphics.setColor(1, 1, 1, 1)--white
+                love.graphics.draw(gTextures['cursor'], paddedX - CARD_WIDTH*2/3 - 4, self.y + CARD_HEIGHT*2/3) -- +9 to avoid overlap
+            end
+
+           
             currentX = currentX + self.gapWidth
         end
     end
