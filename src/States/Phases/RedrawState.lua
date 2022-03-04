@@ -84,3 +84,20 @@ function RedrawState:render()
         field:render()
     end
 end
+
+-- AI redraw functinallity
+function RedrawState:processAI(context)
+    local keepIndicies = {} -- store index of a card to keep
+    -- redraw all triggers
+
+    -- redraw any sentinels after the first
+
+    -- keep a non sentinel 1
+
+    -- redraw 3's to dig for 1's
+
+    -- keep as many 2's as possible
+
+    -- for i = 1, 5 do
+        
+end

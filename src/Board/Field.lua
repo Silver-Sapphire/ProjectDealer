@@ -27,11 +27,11 @@ function Field:init(decklist, flipped)
     self.guardianCircle = {}
 
     self.rearguard = {
-        ['font-left'] = {},
-        ['back-left'] = {},
-        ['back-center'] = {},
-        ['back-right'] = {},
-        ['font-right'] = {}
+        ['fontLeft'] = {},
+        ['backLeft'] = {},
+        ['backCenter'] = {},
+        ['backRight'] = {},
+        ['fontRight'] = {}
     }
 
     self.damageZone = {
@@ -151,4 +151,16 @@ function Field:render()
     if self.flipped then
         love.graphics.pop()
     end
+
+    -- draw phase indicators (after pop, 
+    -- so they're drawn in the same place, and it apears only 1 exists)
+    love.graphics.setFont(gFonts['medium'])
+    love.graphics.setColor(1,1,1,1)
+
+    love.graphics.print('Stand', VIRTUAL_WIDTH - 40, VIRTUAL_HEIGHT/2)
+    love.graphics.print('Draw', VIRTUAL_WIDTH - 40, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP)
+    love.graphics.print('Ride', VIRTUAL_WIDTH - 40, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP * 2)
+    love.graphics.print('Main', VIRTUAL_WIDTH - 40, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP * 3)
+    love.graphics.print('Battle', VIRTUAL_WIDTH - 40, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP * 4)
+    love.graphics.print('End', VIRTUAL_WIDTH - 40, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP * 5)
 end

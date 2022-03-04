@@ -37,7 +37,7 @@ function RidePhaseState:enter(fields)
 
             onSubmitFunction = function (selection)
                 if #selection > 0 then
-                    Event.dispatch('ride', selection[1])
+                    Event.dispatch('ride', selection[1]) -- there should only be one selectin, but its still in a table, so we need to index into it
                 end
                 -- todo, trigger on ride skills
                 gStateStack:pop()

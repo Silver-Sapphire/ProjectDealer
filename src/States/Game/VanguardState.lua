@@ -44,6 +44,7 @@ function VanguardState:enter()
    end)
 
     _DECKLIST = shuffle(DECKLIST)
+    _DECKLIST2 = _DECKLIST
     -- initialize boards
     self.fields = {}
     -- local player [1]
@@ -54,7 +55,7 @@ function VanguardState:enter()
         Event.dispatch('draw')
     end
     -- peer player [2]
-    local player2Field = Field(_DECKLIST, true)
+    local player2Field = Field(_DECKLIST2, true)
     table.insert(self.fields, player2Field)
 
     vStateMachine:change('redraw', self.fields)
@@ -66,6 +67,82 @@ end
 
 function VanguardState:render()
     vStateMachine:render()
+end
+
+function VanguardState:chooseCircle(_card)
+    local circles = {
+        {
+            text = 'Front Left',
+            onSelect = function()
+                self:moveCard({
+                    field = 1, -- needs to be dynamic
+                    _inputTable = _card.table,
+                    _inputIndex = _card.index,
+
+                    _outputTable = self.fields[1].rearguard.frontLeft -- and here
+                })
+                gStateStack:pop()
+            end
+        },
+        {
+            text = 'Back Left',
+            onSelect = function()
+                self:moveCard({
+                    field = 1, -- needs to be dynamic
+                    _inputTable = _card.table,
+                    _inputIndex = _card.index,
+
+                    _outputTable = self.fields[1].rearguard.backLeft -- and here
+                })
+                gStateStack:pop()
+            end
+        },
+        {
+            text = 'Back Center',
+            onSelect = function()
+                self:moveCard({
+                    field = 1, -- needs to be dynamic
+                    _inputTable = _card.table,
+                    _inputIndex = _card.index,
+
+                    _outputTable = self.fields[1].rearguard.backCenter -- and here
+                })
+                gStateStack:pop()
+            end
+        },
+        {
+            text = 'Back Right',
+                onSelect = function()self:moveCard({
+                    field = 1, -- needs to be dynamic
+                    _inputTable = _card.table,
+                    _inputIndex = _card.index,
+
+                    _outputTable = self.fields[1].rearguard.backRight -- and here
+                })
+                gStateStack:pop()
+            end
+        },
+        {
+            text = 'Front Right',
+            onSelect = function()
+                self:moveCard({
+                    field = 1, -- needs to be dynamic
+                    _inputTable = _card.table,
+                    _inputIndex = _card.index,
+
+                    _outputTable = self.fields[1].rearguard.fronRight -- and here
+                })
+                gStateStack:pop()
+            end
+        },
+        {
+            text = 'Cancel',
+            onSelect = function()
+                gStateStack:pop()
+            end
+        }
+    }
+    return circles
 end
 
 -- a powerful multipurpose function that moves a card
