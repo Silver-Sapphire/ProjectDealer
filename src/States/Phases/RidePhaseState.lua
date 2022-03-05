@@ -23,16 +23,16 @@ function RidePhaseState:enter(fields)
         gStateStack:push(MenuState(Menu{
             orientation = 'horizontal',
             text = 'Select a card to ride w/enter, and submit w/space',
-            font = gFonts['small'],
+            font = gFonts['medium'],
             areCards = true,
             minSel = 0,
             maxSel = 1,
 
             items = options,
 
-            x = VIRTUAL_WIDTH/4,
+            x = 0,
             y = VIRTUAL_HEIGHT*3/4,
-            width = VIRTUAL_WIDTH/2,
+            width = VIRTUAL_WIDTH,
             height = VIRTUAL_HEIGHT/4,
 
             onSubmitFunction = function (selection)
@@ -66,9 +66,6 @@ function RidePhaseState:render()
             RenderCard(self.selection.card, 10, 10)
         end
     end
-
-    -- draw gui
-    love.graphics.print('Select a card to ride w/enter, and submit w/space', 36, VIRTUAL_HEIGHT*3/5)
 end
 
 function RidePhaseState:debugPrint(selection)

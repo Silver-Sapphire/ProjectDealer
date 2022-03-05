@@ -24,6 +24,7 @@ function MainPhaseState:enter(fields)
 
     gStateStack:push(MenuState(Menu{
         font = gFonts['medium'],
+        text = 'Actions:',
         items = actions,
 
         x = VIRTUAL_WIDTH/32,
@@ -81,9 +82,8 @@ function MainPhaseState:createCallMenu(options)
     gStateStack:push(MenuState(Menu{
         orientation = 'horizontal',
         text = 'Select a card to Call to R',
-        font = gFonts['small'],
+        font = gFonts['medium'],
         areCards = true,
-        minSel = 0,
 
         items = options,
 
@@ -93,26 +93,26 @@ function MainPhaseState:createCallMenu(options)
         height = VIRTUAL_HEIGHT/4,
 
         onSubmitFunction = function (selection)
-            gStateStack:push(MenuState(Menu{
-                orientation = 'vertical',
-                font = gFonts['medium'],
-                minSel = 1,
-                maxSel = 1,
+            if selection then
+                gStateStack:push(MenuState(Menu{
+                    orientation = 'vertical',
+                    font = gFonts['medium'],
 
-                items = gStateStack[#gStateStack - 2]:chooseCircle(selection[1]),
+                    items = GVanguardState:chooseCircle(selection[1]),
 
-                x = VIRTUAL_WIDTH/32,
-                y = VIRTUAL_HEIGHT/4,
-                width = VIRTUAL_WIDTH/4,
-                height = VIRTUAL_HEIGHT/2,
-                onSubmitFunction = function()
-                    -- this menu is popped by the item,
-                    -- so we pop the call menu here and reinstatiate it without the called card
-                    gStateStack:pop()
-                    local callableCards = self:determineCallableCards()
-                    self:createCallMenu(callableCards)
-                end
-            }))
+                    x = VIRTUAL_WIDTH/32,
+                    y = VIRTUAL_HEIGHT/4,
+                    width = VIRTUAL_WIDTH/4,
+                    height = VIRTUAL_HEIGHT/2,
+                    onSubmitFunction = function()
+                        -- this menu is popped by the item,
+                        -- so we pop the call menu here and reinstatiate it without the called card
+                        gStateStack:pop()
+                        local callableCards = self:determineCallableCards()
+                        self:createCallMenu(callableCards)
+                    end
+                }))
+            end
         end
     }))
 

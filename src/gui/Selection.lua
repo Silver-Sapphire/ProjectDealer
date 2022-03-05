@@ -66,7 +66,7 @@ function Selection:update(dt)
         elseif self.maxSel == 1 and self.minSel == 1 then
             -- submit a single item
             -- TODO add confirmation feature (and at bottom)
-            if self.areCards then
+            if self.areCards and _selection.card then
                 _selection.selected = true
                 self:subimtSelections()
             else 
@@ -145,9 +145,9 @@ function Selection:render()
                 end
 
             else -- render text if not cards
-                love.graphics.setColor(1,1,1,1)
                 love.graphics.setFont(self.font)
-                love.graphics.printf(self.items[i].text, self.x, paddedX, self.width, 'center')
+                love.graphics.setColor(1,1,1,1)
+                love.graphics.print(self.items[i].text, paddedX, self.y + self.height/2, self.width)
             end
             -- draw selection marker if we're at the right index
             if i == self.currentSelection and self.maxSel then

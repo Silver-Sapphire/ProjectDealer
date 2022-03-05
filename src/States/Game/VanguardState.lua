@@ -3,6 +3,7 @@
 VanguardState = Class{__includes = BaseState}
 
 function VanguardState:enter()
+
     -- setup a state machine for keeing track of game phases
     vStateMachine = StateMachine {
         ['redraw'] = function() return RedrawState() end,
@@ -58,6 +59,9 @@ function VanguardState:enter()
     local player2Field = Field(_DECKLIST2, true)
     table.insert(self.fields, player2Field)
 
+    -- setup global access to state
+    GVanguardState = self
+
     vStateMachine:change('redraw', self.fields)
 end
 
@@ -112,14 +116,15 @@ function VanguardState:chooseCircle(_card)
         },
         {
             text = 'Back Right',
-                onSelect = function()self:moveCard({
+            onSelect = function()
+                self:moveCard({
                     field = 1, -- needs to be dynamic
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
                     _outputTable = self.fields[1].rearguard.backRight -- and here
                 })
-                gStateStack:pop()
+            gStateStack:pop()
             end
         },
         {
