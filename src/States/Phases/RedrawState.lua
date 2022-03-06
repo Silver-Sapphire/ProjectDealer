@@ -28,9 +28,9 @@ function RedrawState:enter(fields)
 
             items = options,
 
-            x = 0,
+            x = VIRTUAL_WIDTH/4,
             y = VIRTUAL_HEIGHT*3/4,
-            width = VIRTUAL_WIDTH,
+            width = VIRTUAL_WIDTH/2,
             height = VIRTUAL_HEIGHT/4,
 
             onSubmitFunction = function (selections) 
@@ -44,7 +44,7 @@ function RedrawState:enter(fields)
                     end
                     -- draw for each card redrawn
                     for k, selection in pairs(selections) do
-                        Event.dispatch('draw')
+                        Event.dispatch('draw', {['player']=1, ['qty']=1})
                     end
                 end
                 -- TODO shuffle deck

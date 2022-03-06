@@ -14,7 +14,7 @@ Menu = Class{}
 
 function Menu:init(def)
     self.panel = Panel(def.x, def.y, def.width, def.height)
-    
+    self.player = def.player or 1
     self.selection = Selection {
         orientation = def.orientation or 'vertical',
         text = def.text or false,
@@ -22,6 +22,7 @@ function Menu:init(def)
         -- a minimum and maximum number of selections to be made
         minSel = def.minSel or 1,
         maxSel = def.maxSel or 1,
+        player = def.player or 1,
         
         items = def.items,
         
@@ -40,6 +41,5 @@ end
 
 function Menu:render()
     self.panel:render()
-    -- if self.selection.cursor = true
     self.selection:render()
 end

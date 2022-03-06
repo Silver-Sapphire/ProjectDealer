@@ -98,7 +98,7 @@ function MainPhaseState:createCallMenu(options)
                     orientation = 'vertical',
                     font = gFonts['medium'],
 
-                    items = GVanguardState:chooseCircle(selection[1]),
+                    items = self:chooseCircle(selection[1]),
 
                     x = VIRTUAL_WIDTH/32,
                     y = VIRTUAL_HEIGHT/4,

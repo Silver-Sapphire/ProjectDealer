@@ -30,9 +30,9 @@ function RidePhaseState:enter(fields)
 
             items = options,
 
-            x = 0,
+            x = VIRTUAL_WIDTH/4,
             y = VIRTUAL_HEIGHT*3/4,
-            width = VIRTUAL_WIDTH,
+            width = VIRTUAL_WIDTH/2,
             height = VIRTUAL_HEIGHT/4,
 
             onSubmitFunction = function (selection)

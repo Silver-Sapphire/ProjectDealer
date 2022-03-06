@@ -1,6 +1,7 @@
 Field = Class{}
 
 function Field:init(decklist, flipped)
+    self.turn = 0
     self.flipped = flipped
     -- self.deck = Deck(decklist)
     self.deck = decklist
@@ -27,11 +28,11 @@ function Field:init(decklist, flipped)
     self.guardianCircle = {}
 
     self.rearguard = {
-        ['fontLeft'] = {},
+        ['frontLeft'] = {},
         ['backLeft'] = {},
         ['backCenter'] = {},
         ['backRight'] = {},
-        ['fontRight'] = {}
+        ['frontRight'] = {}
     }
 
     self.damageZone = {
@@ -77,22 +78,29 @@ function Field:render()
         love.graphics.push()
         love.graphics.translate(VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
         love.graphics.rotate(math.pi) -- 180*, upside down (which will cause it to be a V-width/height above and left of the window)
-    
+        love.graphics.setColor(1/2, 1/8, 1/8, 1/2)
     -- ensure we draw the playmat once, before we draw anything else
     else
         -- draw "playmat"
         love.graphics.setColor(150/255, 77/255, 40/255, 245/255)
-        love.graphics.rectangle('fill', VIRTUAL_WIDTH/12,0, 10*VIRTUAL_WIDTH/12,VIRTUAL_HEIGHT)
+        love.graphics.rectangle('fill', -10,-10, VIRTUAL_WIDTH+10,VIRTUAL_HEIGHT+10)
+        love.graphics.setColor(1/8, 1/8, 1/2, 1/2)
     end
+    -- playmat pt2
+    love.graphics.rectangle('fill', VIRTUAL_WIDTH/8,VIRTUAL_HEIGHT/2, VIRTUAL_WIDTH*3/4,VIRTUAL_HEIGHT/2)
 
     -- Render deck
     -- make a larger deck thicker by drawing a rectangle for every 4 cards in our deck
-    love.graphics.setColor(0,0,0.7,1)
+    self.deckX = VIRTUAL_WIDTH*3/4
+    self.deckY = VIRTUAL_HEIGHT*5/8
+    love.graphics.setColor(0,0,7/10,1)
     for i=1, math.floor(#self.deck/4) do
-        love.graphics.rectangle('fill', VIRTUAL_WIDTH*3/4 + i,VIRTUAL_HEIGHT*5/8 - math.floor(i/2), CARD_WIDTH,CARD_HEIGHT)
+        love.graphics.rectangle('fill', self.deckX + i,self.deckY - math.floor(i/2), CARD_WIDTH,CARD_HEIGHT)
     end
-
     -- display deck count
+	love.graphics.setColor(1,1,1,1)--white
+	love.graphics.setFont(gFonts['small'])
+    love.graphics.print('Deck:'..#self.deck, self.deckX, self.deckY + CARD_HEIGHT)
 
     -- Render drop
 
@@ -103,32 +111,66 @@ function Field:render()
     -- display bind count
 
     -- Render R
+    --circles
+    local rR = 50
+    local rX = VIRTUAL_WIDTH/3
+    for i = 1, 3 do
+        local rY = VIRTUAL_HEIGHT*5/8
+        for i =1,2 do
+            love.graphics.draw(gTextures['R'], rX - rR, rY - rR, 0, 0.15, 0.15)
+            rY = rY + VIRTUAL_HEIGHT/8
+        end
+        rX = rX + VIRTUAL_WIDTH/6
+    end
+    --cards
+    if #self.rearguard.frontLeft ~= 0 then
+    --     local rX =
+    --     local rY =
+    --     for k, card in pairs(self.rearguard.frontLeft) do
+            RenderCard(self.rearguard.frontLeft[1], VIRTUAL_WIDTH*2/5, VIRTUAL_HEIGHT *3/5)
+    --         rX = rX +
+    --         rY = rY -
+    --     end
+    end
 
     -- draw soul stack
-    local vX, vY = VIRTUAL_WIDTH/2 - CARD_WIDTH/2, VIRTUAL_HEIGHT*5/8 - CARD_HEIGHT/2
-    local soulOffset = 0
+    -- vanguard xy coords
+    self.vX = VIRTUAL_WIDTH/2 - CARD_WIDTH/2
+    self.vY = VIRTUAL_HEIGHT*5/8 - CARD_HEIGHT/2
+    self.soulOffset = 0
     if #self.soul > 2 then
+        self.soulOffset = 0
         for i=1, math.floor(#self.soul/3) do
             love.graphics.setColor(0,0,0,1)--black
-            love.graphics.rectangle('fill', vX,vY, CARD_WIDTH,CARD_HEIGHT)
-            soulOffset = soulOffset + 1
+            love.graphics.rectangle('fill', self.vX,self.vY, CARD_WIDTH,CARD_HEIGHT)
+            self.soulOffset = self.soulOffset + 1
         end
+    else
+        self.soulOffset = 0
     end
     
     -- display soul count
 	love.graphics.setColor(1,1,1,1)--white
 	love.graphics.setFont(gFonts['small'])
-    love.graphics.print('Soul:'.. #self.soul, vX, vY + CARD_HEIGHT)
+    love.graphics.print('Soul:'.. #self.soul, self.vX, self.vY + CARD_HEIGHT)
 
     -- Render V(s?)
     if #self.vanguard == 1 then
-        RenderCard(self.vanguard[1], vX + math.floor(soulOffset/2), vY - soulOffset)
+        RenderCard(self.vanguard[1], self.vX + math.floor(self.soulOffset/2), self.vY - self.soulOffset)
     else
         -- legion rendering
     end
     -- Render G
+    --zone
+    love.graphics.setColor(6/10, 6/10, 6/10, 6/10)--trans.gray
+    love.graphics.rectangle('fill', VIRTUAL_WIDTH/8,VIRTUAL_HEIGHT/2, CARD_WIDTH*2.5,CARD_HEIGHT*1.25)
+    --cards
 
     -- Render damage
+    -- zone
+    love.graphics.setColor(7/10, 6/10, 6/10, 8/10)--trans.gray
+    love.graphics.rectangle('fill', VIRTUAL_WIDTH/8,VIRTUAL_HEIGHT*5/8, CARD_HEIGHT*2,CARD_WIDTH*7)
+    -- cards
 
 
     -- display avalaible CB / dmg
@@ -151,16 +193,15 @@ function Field:render()
     if self.flipped then
         love.graphics.pop()
     end
-
-    -- draw phase indicators (after pop, 
-    -- so they're drawn in the same place, and it apears only 1 exists)
-    love.graphics.setFont(gFonts['medium'])
+    -- things below are drawn "once"
+    -- draw phase indicators
+    love.graphics.setFont(gFonts['large'])
     love.graphics.setColor(1,1,1,1)
 
-    love.graphics.print('Stand', VIRTUAL_WIDTH - 40, VIRTUAL_HEIGHT/2)
-    love.graphics.print('Draw', VIRTUAL_WIDTH - 40, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP)
-    love.graphics.print('Ride', VIRTUAL_WIDTH - 40, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP * 2)
-    love.graphics.print('Main', VIRTUAL_WIDTH - 40, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP * 3)
-    love.graphics.print('Battle', VIRTUAL_WIDTH - 40, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP * 4)
-    love.graphics.print('End', VIRTUAL_WIDTH - 40, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP * 5)
+    love.graphics.printf('Stand', 0, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP * 2, VIRTUAL_WIDTH, 'right')
+    love.graphics.printf('Draw', 0, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP, VIRTUAL_WIDTH, 'right')
+    love.graphics.printf('Ride', 0, VIRTUAL_HEIGHT/2, VIRTUAL_WIDTH, 'right')
+    love.graphics.printf('Main', 0, VIRTUAL_HEIGHT/2 + PHASE_TEXT_GAP, VIRTUAL_WIDTH, 'right')
+    love.graphics.printf('Battle', 0, VIRTUAL_HEIGHT/2 + PHASE_TEXT_GAP * 2, VIRTUAL_WIDTH, 'right')
+    love.graphics.printf('End', 0, VIRTUAL_HEIGHT/2 + PHASE_TEXT_GAP * 3, VIRTUAL_WIDTH, 'right')
 end

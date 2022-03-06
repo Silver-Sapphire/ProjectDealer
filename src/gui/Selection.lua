@@ -119,7 +119,7 @@ function Selection:render()
             if self.areCards and self.items[i].card then
                 RenderCard(self.items[i].card, self.x + CARD_WIDTH*2/3, paddedY - CARD_HEIGHT*2/3)
                 if self.items[i].selected then
-                    love.graphics.setColor(1/2, 1/1, 2/2, 2/3)
+                    love.graphics.setColor(1/2, 1/2, 2/2, 1/3)
                     love.graphics.rectangle('fill', paddedX - CARD_WIDTH/2, self.y + CARD_HEIGHT/2, CARD_WIDTH,CARD_HEIGHT)
                 end
             else -- render text if not cards
@@ -130,7 +130,7 @@ function Selection:render()
             -- draw selection marker if we're at the right index
             if i == self.currentSelection and self.maxSel then
                 love.graphics.setColor(1, 1, 1, 1)--white
-                love.graphics.draw(gTextures['cursor'], self.x - 9, paddedY) -- -9 to avoid overlap
+                love.graphics.draw(gTextures['cursor'], self.x + self.width/6, paddedY, 0, 3, 3) -- -9 to avoid overlap
             end
             currentY = currentY + self.gapHeight
         
@@ -147,12 +147,12 @@ function Selection:render()
             else -- render text if not cards
                 love.graphics.setFont(self.font)
                 love.graphics.setColor(1,1,1,1)
-                love.graphics.print(self.items[i].text, paddedX, self.y + self.height/2, self.width)
+                love.graphics.print(self.items[i].text, paddedX, self.y + self.height/2)
             end
             -- draw selection marker if we're at the right index
             if i == self.currentSelection and self.maxSel then
                 love.graphics.setColor(1, 1, 1, 1)--white
-                love.graphics.draw(gTextures['cursor'], paddedX - CARD_WIDTH*2/3 - 4, self.y + CARD_HEIGHT*2/3) -- +9 to avoid overlap
+                love.graphics.draw(gTextures['cursor'], paddedX - CARD_WIDTH*2/3 - 4, self.y + CARD_HEIGHT*2/3, 0, 3, 3) -- +9 to avoid overlap
             end
 
            

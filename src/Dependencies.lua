@@ -52,13 +52,17 @@ require 'src/states/phases/EndPhaseState'
 
 gTextures = {
     ['cursor'] = love.graphics.newImage('graphics/cursor.png'),
-    ['background'] = love.graphics.newImage('graphics/background.png')
+    ['background'] = love.graphics.newImage('graphics/background.png'),
+    ['background-large'] = love.graphics.newImage('graphics/backgroundLarge.png'),
+    ['R'] = love.graphics.newImage('graphics/RG.png')
 }
 
 gFonts = {
-    ['small'] = love.graphics.newFont('fonts/font.ttf', 8),
-    ['medium'] = love.graphics.newFont('fonts/font.ttf', 16),
-    ['large'] = love.graphics.newFont('fonts/font.ttf', 32)
+    ['small'] = love.graphics.newFont('fonts/font.ttf', 16),
+    ['medium'] = love.graphics.newFont('fonts/font.ttf', 32),
+    ['large'] = love.graphics.newFont('fonts/font.ttf', 48),
+    ['xl'] = love.graphics.newFont('fonts/font.ttf', 64),
+    ['massive']  = love.graphics.newFont('fonts/font.ttf', 128)
 }
 
 gSounds = {

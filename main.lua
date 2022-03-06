@@ -74,7 +74,7 @@ function love.update(dt)
     backgroundX = backgroundX - BACKGROUND_SCROLL_SPEED * dt
     
     -- if we've scrolled the entire image, reset it to 0
-    if backgroundX <= -1024 + VIRTUAL_WIDTH - 4 + 51 then
+    if backgroundX <= -1*VIRTUAL_WIDTH + 120 then
         backgroundX = 0
     end
 
@@ -87,7 +87,7 @@ function love.draw()
     push:start()
 
     -- scrolling background drawn behind every state
-    love.graphics.draw(gTextures['background'], backgroundX, 0)
+    love.graphics.draw(gTextures['background-large'], backgroundX, 0)
 
     gStateStack:render()
     push:finish()
