@@ -24,7 +24,7 @@ function Selection:init(def) -- defaults
     self.gapHeight = self.height / #self.items
     self.gapWidth = self.width / #self.items
 
-    self.currentSelection = 1
+    self.currentSelection = def.currentSelection -- or 1
     self.numSelected = 0
     self.selections = {}
 end

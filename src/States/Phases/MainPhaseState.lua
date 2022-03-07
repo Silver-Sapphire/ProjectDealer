@@ -10,8 +10,10 @@ function MainPhaseState:enter(fields)
                 local callableCards = self:determineCallableCards()
                 self:createCallMenu(callableCards)
             end
-        },
-        {
+        }
+    }
+    if self.fields[1].turn ~= 1 then
+        local action = {
             text = "Battle",
             onSelect = function()
                 -- confirmation menu here
@@ -19,7 +21,19 @@ function MainPhaseState:enter(fields)
                 vStateMachine:change('battle', self.fields)
             end
         }
-    }
+        table.insert(actions, action)
+    -- skip the first battle phase
+    else
+        local action = {
+            text = "End Turn",
+            onSelect = function()
+                -- confirmation menu here
+                gStateStack:pop()
+                vStateMachine:change('end', self.fields)
+            end
+        }
+        table.insert(actions, action)
+    end
     -- insert ACT skills into actions menu
 
     gStateStack:push(MenuState(Menu{
@@ -44,10 +58,10 @@ function MainPhaseState:render()
         field:render()
     end
     -- highlight current phase
-    love.graphics.setFont(gFonts['medium'])
+    love.graphics.setFont(gFonts['large'])
     love.graphics.setColor(0,1,0,1) -- green
     -- TODO turn color red for opponents turn
-    love.graphics.print('Main', VIRTUAL_WIDTH - 40, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP * 3)
+    love.graphics.printf('Main', 0, VIRTUAL_HEIGHT/2 + PHASE_TEXT_GAP, VIRTUAL_WIDTH, 'right')
 end
 
 function MainPhaseState:determineCallableCards()

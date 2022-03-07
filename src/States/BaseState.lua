@@ -35,7 +35,7 @@ function BaseState:chooseCircle(_card)
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
-                    _outputTable = self.fields[1].rearguard.frontLeft -- and here
+                    _outputTable = "R-F-L"
                 })
                 gStateStack:pop()
             end
@@ -48,7 +48,7 @@ function BaseState:chooseCircle(_card)
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
-                    _outputTable = self.fields[1].rearguard.backLeft -- and here
+                    _outputTable = "R-B-L"
                 })
                 gStateStack:pop()
             end
@@ -61,7 +61,7 @@ function BaseState:chooseCircle(_card)
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
-                    _outputTable = self.fields[1].rearguard.backCenter -- and here
+                    _outputTable = "R-B-C"
                 })
                 gStateStack:pop()
             end
@@ -74,7 +74,7 @@ function BaseState:chooseCircle(_card)
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
-                    _outputTable = self.fields[1].rearguard.backRight -- and here
+                    _outputTable = "R-B-R"
                 })
             gStateStack:pop()
             end
@@ -87,7 +87,7 @@ function BaseState:chooseCircle(_card)
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
-                    _outputTable = self.fields[1].rearguard.fronRight -- and here
+                    _outputTable = "R-F-R"
                 })
                 gStateStack:pop()
             end
@@ -147,10 +147,20 @@ function BaseState:moveCard(request)
 	elseif _inputTable == "vanguard" then
 		_card = table.remove(self.fields[_field].vanguard, _inputIndex)
 
-	elseif _inputTable == "rearguard" then
-		_card = table.remove(self.fields[_field].rearguard, _inputIndex)
+	elseif _inputTable == "R-F-L" then
+		_card = table.remove(self.fields[_field].rearguard.frontLeft, _inputIndex)
+    
+    elseif _inputTable == "R-B-L" then
+		_card = table.remove(self.fields[_field].rearguard.backLeft, _inputIndex)
 
-	-- insert front/back row, ect here
+    elseif _inputTable == "R-C-B" then
+		_card = table.remove(self.fields[_field].rearguard.backCenter, _inputIndex)
+
+    elseif _inputTable == "R-B-R" then
+		_card = table.remove(self.fields[_field].rearguard.backRight, _inputIndex)
+
+    elseif _inputTable == "R-F-R" then
+		_card = table.remove(self.fields[_field].rearguard.frontRight, _inputIndex)
 	end
 
 	-- move _card to it's destination
@@ -224,12 +234,26 @@ function BaseState:moveCard(request)
         else
             table.insert(self.fields[_field].vanguard, _card)
         end
-	elseif _outputTable == "rearguard" then
-        if _outputIndex then
-            table.insert(self.fields[_field].rearguard, _outputIndex, _card)
-        else
-            table.insert(self.fields[_field].rearguard, _card)
-        end
-	-- insert front/back row, ect here
+	-- elseif _outputTable == "rearguard" then
+    --     if _outputIndex then
+    --         table.insert(self.fields[_field].rearguard, _outputIndex, _card)
+    --     else
+    --         table.insert(self.fields[_field].rearguard, _card)
+    --     end
+
+    elseif _outputTable == "R-F-L" then
+		table.insert(self.fields[_field].rearguard.frontLeft, _card)
+    
+    elseif _outputTable == "R-B-L" then
+		table.insert(self.fields[_field].rearguard.backLeft, _card)
+
+    elseif _outputTable == "R-C-B" then
+		table.insert(self.fields[_field].rearguard.backCenter, _card)
+
+    elseif _outputTable == "R-B-R" then
+		table.insert(self.fields[_field].rearguard.backRight, _card)
+
+    elseif _outputTable == "R-F-R" then
+		table.insert(self.fields[_field].rearguard.frontRight, _card)
 	end
 end

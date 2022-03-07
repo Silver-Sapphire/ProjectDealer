@@ -124,6 +124,7 @@ function Field:render()
     end
     --cards
     if #self.rearguard.frontLeft ~= 0 then
+        love.graphics.rectangle('fill',100,100, 1000,1000)
     --     local rX =
     --     local rY =
     --     for k, card in pairs(self.rearguard.frontLeft) do
@@ -161,6 +162,8 @@ function Field:render()
         -- legion rendering
     end
     -- Render G
+
+    --gzone
     --zone
     love.graphics.setColor(6/10, 6/10, 6/10, 6/10)--trans.gray
     love.graphics.rectangle('fill', VIRTUAL_WIDTH/8,VIRTUAL_HEIGHT/2, CARD_WIDTH*2.5,CARD_HEIGHT*1.25)
@@ -197,6 +200,7 @@ function Field:render()
     -- draw phase indicators
     love.graphics.setFont(gFonts['large'])
     love.graphics.setColor(1,1,1,1)
+    love.graphics.print(self.turn, 10,10)
 
     love.graphics.printf('Stand', 0, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP * 2, VIRTUAL_WIDTH, 'right')
     love.graphics.printf('Draw', 0, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP, VIRTUAL_WIDTH, 'right')

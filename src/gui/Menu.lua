@@ -31,6 +31,7 @@ function Menu:init(def)
         width = def.width,
         height = def.height,
         font = def.font or gFonts['medium'],
+        currentSelection = def.selection or 1,
         onSubmitFunction = def.onSubmitFunction or function () end
     }
 end

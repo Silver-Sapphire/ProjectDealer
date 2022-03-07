@@ -34,4 +34,8 @@ function DrawPhaseState:render()
     for k, field in pairs(self.fields) do
         field:render()
     end
+    love.graphics.setFont(gFonts['large'])
+    love.graphics.setColor(0,1,0,1) -- green
+    -- TODO turn color red for opponents turn
+    love.graphics.printf('Draw', 0, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP, VIRTUAL_WIDTH, 'right')
 end
