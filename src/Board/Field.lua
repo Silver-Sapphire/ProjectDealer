@@ -36,7 +36,6 @@ function Field:init(decklist, flipped)
     }
 
     self.damageZone = {
-        --[[
         ['1'] = {},
         ['2'] = {},
         ['3'] = {},
@@ -124,7 +123,6 @@ function Field:render()
     end
     --cards
     if #self.rearguard.frontLeft ~= 0 then
-        love.graphics.rectangle('fill',100,100, 1000,1000)
     --     local rX =
     --     local rY =
     --     for k, card in pairs(self.rearguard.frontLeft) do
@@ -169,13 +167,30 @@ function Field:render()
     love.graphics.rectangle('fill', VIRTUAL_WIDTH/8,VIRTUAL_HEIGHT/2, CARD_WIDTH*2.5,CARD_HEIGHT*1.25)
     --cards
 
-    -- Render damage
+    -- Render damage -------------
     -- zone
     love.graphics.setColor(7/10, 6/10, 6/10, 8/10)--trans.gray
-    love.graphics.rectangle('fill', VIRTUAL_WIDTH/8,VIRTUAL_HEIGHT*5/8, CARD_HEIGHT*2,CARD_WIDTH*7)
+    love.graphics.rectangle('fill', VIRTUAL_WIDTH/8,VIRTUAL_HEIGHT*5/8, CARD_HEIGHT*2,CARD_WIDTH*6)
     -- cards
-
-
+    if #self.damageZone > 0 then
+        for i = 1, #self.damageZone do
+            -- rotate cards
+            love.graphics.push()
+            love.graphics.translate(VIRTUAL_WIDTH, 0)
+            love.graphics.rotate(math.pi/2) -- 90* rotation
+            -- stager cards to make count more apparent
+            if i % 2 == 1 then
+                local staggerGap_ = CARD_HEIGHT/2
+                local xpos_ = VIRTUAL_HEIGHT/16 + CARD_WIDTH/2*i
+                RenderCard(self.damageZone[i], xpos_, VIRTUAL_WIDTH/10 + staggerGap_)
+            else
+                local staggerGap_ = CARD_HEIGHT
+                local xpos_ = VIRTUAL_HEIGHT/16 + CARD_WIDTH/2*i -- x pos ends up as y pos
+                RenderCard(self.damageZone[i], xpos_, VIRTUAL_WIDTH/10 + staggerGap_)
+            end
+            love.graphics.pop()
+        end
+    end
     -- display avalaible CB / dmg
 
 
