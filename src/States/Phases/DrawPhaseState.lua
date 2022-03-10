@@ -1,21 +1,22 @@
 DrawPhaseState = Class{__includes = BaseState}
 
-function DrawPhaseState:enter(fields, turnPlayer)
-    self.fields = fields
-    self.turnPlayer = turnPlayer
+function DrawPhaseState:enter(pass)
+    self.fields = pass.fields
+    self.turnPlayer = pass.turnPlayer
+    local turnPlayer = pass.turnPlayer
     -- trigger at the beggining of the draw phase effect
-end
 
---     -- draw for turn
---     Event.dispatch('draw', {['player']=turnPlayer, ['qty']=1})
+    -- draw for turn
+    Event.dispatch('draw', {['player']=turnPlayer, ['qty']=1})
     
---     -- G assist Step
---     -- if not ride deck then
---         self:gAssistCheck(self.fields[turnPlayer].hand)
+    -- G assist Step
+    -- if not ride deck then
+        self:gAssistCheck(self.fields[turnPlayer].hand)
 
---     -- change phase
---     vStateMachine:change('ride', self.fields, turnPlayer)
--- end
+    -- change phase
+    vStateMachine:change('ride', {['fields']=self.fields, 
+                                  ['turnPlayer']=turnPlayer})
+end
 
 function DrawPhaseState:update(dt)
     --[[
@@ -37,9 +38,6 @@ function DrawPhaseState:render()
     love.graphics.setColor(0,1,0,1) -- green
     -- TODO turn color red for opponents turn
     love.graphics.printf('Draw', 0, VIRTUAL_HEIGHT/2 - PHASE_TEXT_GAP, VIRTUAL_WIDTH, 'right')
-
-    love.graphics.setFont(gFonts['xl'])
-    love.graphics.print(self.turnPlayer, 10, 10)
 end
 
 function DrawPhaseState:gAssistCheck(hand)

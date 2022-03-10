@@ -1,9 +1,15 @@
 RedrawState = Class{__includes = BaseState}
 
-function RedrawState:enter(fields)
+function RedrawState:enter(pass)
     --TODO make work for both players FOR EVERY STATE w/ network events
     -- until then, use process ai instead
-    self.fields = fields
+    self.fields = pass.fields
+    self.turnPlayer = pass.turnPlayer
+
+    -- draw initial 5 cards -- needs netcode tuneup
+    Event.dispatch('draw', {['player']=1, ['qty']=5})
+    Event.dispatch('draw', {['player']=2, ['qty']=5})
+
     local handsize = #self.fields[1].hand
     if handsize ~= 0 then
         -- create a table of cards, with their
@@ -47,7 +53,7 @@ function RedrawState:enter(fields)
                         Event.dispatch('draw', {['player']=1, ['qty']=1})
                     end
                 end
-                -- TODO shuffle deck
+                -- shuffle deck
                 --self.fields.player1Field.deck:shuffle()
         
                 -- TODO dispatch prepared event to server
@@ -55,7 +61,11 @@ function RedrawState:enter(fields)
         
                 -- proceed to rest of game
                 gStateStack:pop()
-                vStateMachine:change('stand', self.fields)
+                -- change logic to go away in multiplayer
+                self:processAI({['hand']=self.fields[2].hand})
+                
+                vStateMachine:change('stand', {['fields']=self.fields, 
+                                               ['turnPlayer']=self.turnPlayer})
             end
         }))
     end
@@ -85,19 +95,127 @@ function RedrawState:render()
     end
 end
 
--- AI redraw functinallity
-function RedrawState:processAI(context)
-    local keepIndicies = {} -- store index of a card to keep
-    -- redraw all triggers
+-- AI redraw functinallity (without ride deck)
 
-    -- redraw any sentinels after the first
+-- could be optimised by doing more things per loop through options, 
+-- but the readability of this code seems to be far more useful than any 1 or 2 frames saved
+
+-- very basic for vanilla gameplay, and needs a tune up later
+function RedrawState:processAI(context)
+    local options = makeAIRedrawOptions(context.hand)
+    local numBack = 0 -- record how many cards we're going to put back
+    
+    -- determine grade to dig for
+    local missingGrade = false
+    for i = 1, 3 do -- for each grade we need to ride...
+        local flag_ = true 
+        for k, card in pairs(options) do
+            if card.grade == i then -- if we don't have a card of that grade...
+                flag_ = false
+            end
+        end
+        if flag_ then
+            missingGrade = i -- then we flag that as our primary grade to dig for.
+            break
+        end
+    end
+    
+    -------- trigger/ sentinel logic
+
+    -- redraw all triggers (change to keep a g3 heal guard / s.f. crit / sentiel trigger)
+    for k, option in pairs(options) do
+        if option.card.trigger and not option.selected then
+            option.selected = true
+            numBack = numBack + 1
+        end
+    end
+
+    -- redraw any sentinels after the first (change to count g3 heal guards and rollock type cards as sentiels)
+    local sentinelCount = 0
+    for k, option in pairs(options) do
+        if option.card.sentinel and not option.selected then
+            sentinelCount = sentinelCount + 1
+            if sentinelCount > 1 then
+                option.selected = true
+                numBack = numBack + 1
+            end
+        end
+    end
+
+    -------- grade logic
 
     -- keep a non sentinel 1
+    local g1flag_ = false
+    if missingGrade ~= 1 then
+        for k, option in pairs(options) do
+            if not option.selected and option.card.grade == 1 then
+                if not g1flag_ then
+                    g1flag_ = true -- change our flag to signify we found a g1 to keep
+                else
+                    option.selected = true
+                    numBack = numBack + 1
+                end
+            end
+        end
+    end
 
     -- redraw 3's to dig for 1's
+    local g3Count = 0
+    if missingGrade ~= 3 then
+        for k, option in pairs(options) do
+            if not option.selected and option.card.grade == 3 then
+                if missingGrade == 1 then
+                    option.selected = true -- redraw all 3's looking for a g1
+                    numBack = numBack + 1
+                else
+                    g3Count = g3Count + 1
+                    if g3Count > 1 then -- only keep 1 g3 if we keep any
+                        option.selected = true 
+                        numBack = numBack + 1
+                    end
+                end
+            end
+        end
+    end
 
     -- keep as many 2's as possible
+    local g2Count = 0
+    if missingGrade and missingGrade ~= 2 then
+        for k, option in pairs(options) do
+            if not option.selected and option.card.grade == 2 then
+                g2Count = g2Count + 1
+                if missingGrade == 1 and g2Count > 1 then
+                    option.selected = true
+                    numBack = numBack + 1
+                elseif g2Count > 2 then -- digging for a 3 implied
+                    option.selected = true
+                    numBack = numBack + 1
+                end
+            end
+        end
+    end
 
-    -- for i = 1, 5 do
-        
+    -- submit redraw selections
+    for i = #options, 1, -1 do
+        if options[i].selected then
+            local _ = table.remove(self.fields[2].hand, i)
+            table.insert(self.fields[2].deck, 1, _)
+        end
+    end
+    if numBack > 0 then
+        for i = 1, numBack do
+            Event.dispatch('draw', {['player']=2, ['qty']=1})
+        end
+    end
+end
+
+function makeAIRedrawOptions(hand)
+    local options = {}
+    for i = 1, #hand do
+        local option = {['card'] = hand[i],
+                        ['index'] = i,
+                        ['selected'] = false }
+        table.insert(options, option)
+    end
+    return options
 end

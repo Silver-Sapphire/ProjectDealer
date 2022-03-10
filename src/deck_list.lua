@@ -1,6 +1,12 @@
 function shuffle(deck)
     local shuffledDeck = {}
-    local cardsToShuffle = deck
+    local cardsToShuffle = {}
+    
+    -- copy deck into cards to shuffle
+    for k, card in pairs(deck) do
+        local _ = card
+        table.insert(cardsToShuffle, _)
+    end
 
     -- put a random card from the old 'pile' and put it in the new one
     -- Hypothises: running this once and eleven times should be identicly random

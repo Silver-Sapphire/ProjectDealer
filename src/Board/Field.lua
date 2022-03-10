@@ -1,8 +1,9 @@
 Field = Class{}
 
-function Field:init(decklist, flipped)
+function Field:init(decklist, flipped, player)
     self.turn = 0
     self.flipped = flipped
+    self.player = player
     -- self.deck = Deck(decklist)
     self.deck = decklist
 
@@ -37,8 +38,8 @@ function Field:init(decklist, flipped)
                         ['column'] = 'middle',
                         ['row'] = 'front',
                         ['x'] = VX, ['y'] = VY,
-                        ['units'] = {  ['grade'] = 0,
-                                       ['power'] = 7} },
+                        ['units'] = {  {['grade'] = 0,
+                                       ['power'] = 7}} },
                         
         ['frontLeft'] = {['type'] = 'R',
                          ['column'] = 'left',
@@ -97,6 +98,10 @@ function Field:update(dt)
     -- if flipped then
 
     -- end
+    if #self.deck == 0 then
+        Event.dispatch('game-over', {['player']=self.player,
+                                    ['cause']="deckout"})
+    end
 end
 
 -- Both fields are intially drawn on the bottom half of the screen,
@@ -154,13 +159,13 @@ function Field:render()
     --cards
     for k, circle in pairs(self.circles) do
         if #circle.units ~= 0 then
-            local x = circle.x
-            local y = circle.y
+            local x = circle.x or VIRTUAL_WIDTH
+            local y = circle.y or VIRTUAL_HEIGHT
             if circle.type ~= 'G' then
                 for k, unit in pairs(circle.units) do
                     RenderCard(unit, x, y)
                     x = x + CARD_WIDTH/2
-                    y = y + CARD_HEIGHT/4
+                    y = y - CARD_HEIGHT/4
                 end
             else--if 'G' then rotate
                 love.graphics.push()

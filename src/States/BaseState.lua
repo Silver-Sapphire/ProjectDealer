@@ -153,7 +153,7 @@ function BaseState:moveCard(request)
     elseif _inputTable == "R-B-L" then
 		_card = table.remove(self.fields[_field].circles.backLeft.units, _inputIndex)
 
-    elseif _inputTable == "R-C-B" then
+    elseif _inputTable == "R-B-C" then
 		_card = table.remove(self.fields[_field].circles.backCenter.units, _inputIndex)
 
     elseif _inputTable == "R-B-R" then
@@ -243,7 +243,7 @@ function BaseState:moveCard(request)
     elseif _outputTable == "R-B-L" then
 		table.insert(self.fields[_field].circles.backLeft.units, _card)
 
-    elseif _outputTable == "R-C-B" then
+    elseif _outputTable == "R-B-C" then
 		table.insert(self.fields[_field].circles.backCenter.units, _card)
 
     elseif _outputTable == "R-B-R" then

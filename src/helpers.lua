@@ -2,7 +2,7 @@ function displayFPS()
     -- simple FPS display across all states
     love.graphics.setFont(gFonts["large"])
     love.graphics.setColor(0, 255/255, 0, 255/255)
-    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, VIRTUAL_HEIGHT - 10)
+    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), VIRTUAL_WIDTH*2/3, 50)
     love.graphics.setColor(1, 1, 1, 1)
 end
 

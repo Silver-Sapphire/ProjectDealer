@@ -16,12 +16,15 @@ function Card:init(def)
     self.clan = def.clan or "Cray Elemental"
     self.race = def.race or "Elemental"
 
+    self.sentinel = def.sentinel or false
     self.trigger = def.trigger or false
     self.type = def.type of "Normal Unit"
     self.skillIcon = def.skillIcon or "boost"
     self.text = def.text or "_"
     self.flavor = def.flavor or "_"
     self.specialIcon = def.specialIcon or false
+
+    self.skillFunctions = def.skillFunctions or {function()end}
 
     self.art = def.art or false
     self.setData = def.setData or "_"

@@ -1,6 +1,10 @@
 EndPhaseState = Class{__includes = BaseState}
 
-function EndPhaseState:init()
+function EndPhaseState:enter(pass)
+    self.fields = pass.fields
+    self.turnPlayer = pass.turnPlayer
+    local turnPlayer = pass.turnPlayer
+
     -- return all G units, unlock cards, spin astral plane unit, ect
 
     -- unlock triggers
@@ -12,7 +16,7 @@ function EndPhaseState:init()
     -- recursivly check there are no triggers left (recursive)
 
     -- pass turn
-    vStateMachine:change('stand', self.fields)
+    vStateMachine:change('stand', {['fields']=self.fields})
 end
 
 function EndPhaseState:update(dt)

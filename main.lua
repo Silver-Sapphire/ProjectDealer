@@ -43,6 +43,10 @@ function love.keypressed(key)
         love.event.quit()
     end
 
+    if key == "L" then
+        Event.dispatch("log-toggle")
+    end
+
     love.keyboard.keysPressed[key] = true
 end
 

@@ -1,8 +1,10 @@
 BattlePhaseState = Class{__includes = BaseState}
 
-function BattlePhaseState:enter(fields, turnPlayer)
-    self.fields = fields
-    self.turnPlayer = turnPlayer
+function BattlePhaseState:enter(pass)
+    self.fields = pass.fields
+    self.turnPlayer = pass.turnPlayer
+    local turnPlayer = pass.turnPlayer
+
     -- determine possible attacks
     -- local 
     
@@ -37,6 +39,8 @@ function BattlePhaseState:enter(fields, turnPlayer)
             -- drive checks
 
     -- move to end phase
+    vStateMachine:change('end', {['fields']=self.fields,
+                                 ['turnPlayer']=self.turnPlayer})
 end
 
 function BattlePhaseState:update(dt)

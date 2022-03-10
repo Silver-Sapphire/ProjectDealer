@@ -6,9 +6,17 @@ MENU_DEFS = {
     ['main-menu'] = {
         {
             text = 'Field Test',
-            onSelect = function()
-                -- gStateStack:pop()
-                gStateStack:push(VanguardState())
+            onSelect = function() -- push a game of CFV over our main menu
+                gStateStack:push(FadeInState({
+                    r = 0, g = 0, b = 0 -- fade to black
+                }, 0.5,
+                function ()
+                    gStateStack:push(VanguardState())
+                    gStateStack:push(FadeOutState({
+                        r = 0, g = 0, b = 0
+                    }, 0.5, 
+                    function() end))
+                end))
             end
         },
         {

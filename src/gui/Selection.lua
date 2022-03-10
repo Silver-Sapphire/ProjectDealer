@@ -74,7 +74,9 @@ function Selection:update(dt)
                 self.onSubmitFunction()
             end
         -- elseif self.minSel == 0 and self.maxSel == 1 then
-        --     _selection.onSelect()            
+        --     if _selection.onSelect() then
+        --         _selection.onSelect()
+        --     end        
 
         else
             -- prime to submit mutliple items
@@ -123,7 +125,11 @@ function Selection:render()
                     love.graphics.rectangle('fill', paddedX - CARD_WIDTH/2, self.y + CARD_HEIGHT/2, CARD_WIDTH,CARD_HEIGHT)
                 end
             else -- render text if not cards
-                love.graphics.setColor(1,1,1,1)
+                if self.items[i].selected then
+                    love.graphics.setColor(1/2, 1/2, 1, 1)
+                else
+                    love.graphics.setColor(1,1,1,1)
+                end
                 love.graphics.setFont(self.font)
                 love.graphics.printf(self.items[i].text, self.x, paddedY, self.width, 'center')
             end
@@ -145,8 +151,12 @@ function Selection:render()
                 end
 
             else -- render text if not cards
+                if self.items[i].selected then
+                    love.graphics.setColor(1/2, 1/2, 1, 1)
+                else
+                    love.graphics.setColor(1,1,1,1)
+                end
                 love.graphics.setFont(self.font)
-                love.graphics.setColor(1,1,1,1)
                 love.graphics.print(self.items[i].text, paddedX, self.y + self.height/2)
             end
             -- draw selection marker if we're at the right index

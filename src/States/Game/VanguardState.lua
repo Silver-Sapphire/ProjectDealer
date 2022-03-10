@@ -6,9 +6,10 @@ function VanguardState:enter()
 
     -- setup a state machine for keeing track of game phases
     vStateMachine = StateMachine {
+        ['RPS'] = function() return RPSState() end,
         ['redraw'] = function() return RedrawState() end,
         ['stand-up'] = function() return StandUpState() end,
-        
+
         ['stand'] = function() return StandPhaseState() end,
         ['draw'] = function() return DrawPhaseState() end,
         ['ride'] = function() return RidePhaseState() end,
@@ -20,25 +21,30 @@ function VanguardState:enter()
     -- setup game actions, with self discriptive name
     Event.on('draw', function(t)
         for i = 1, t.qty do
-            local _ = table.remove(self.fields[t.player].deck)
-            table.insert(self.fields[t.player].hand, _)
+            if #self.fields[t.player].deck ~= 0 then
+                local _ = table.remove(self.fields[t.player].deck)
+                table.insert(self.fields[t.player].hand, _)
+            else
+                Event.dispatch('game-over', {['player']=t.player,
+                                             ['cause']="deckout"} )
+            end
         end
     end)
     
     Event.on('ride', function (selection)
         -- move selected card to V
         self:moveCard({
-            _field = 1, -- todo make dynamic
+            _field = selection.player,
             _inputTable = selection.table,
             _inputIndex = selection.index,
 
-            _outputTable = "vanguard"-- and here
+            _outputTable = "vanguard"
             -- output to end of table implied
         })
 
         -- move older vanguard unit to soul
         self:moveCard({
-            _field = 1, -- todo make dynamic
+            _field = selection.player,
             _inputTable = "vanguard",
             _inputIndex = 1,
 
@@ -51,21 +57,17 @@ function VanguardState:enter()
     _DECKLIST2 = shuffle(DECKLIST)
     -- initialize boards
     self.fields = {}
-    -- local player [1]
-    local player1Field = Field(_DECKLIST, false)
+    -- local player [1]       --decklist, flip, player
+    local player1Field = Field(_DECKLIST, false, 1)
     table.insert(self.fields, player1Field)
     -- peer player [2]
-    local player2Field = Field(_DECKLIST2, true)
+    local player2Field = Field(_DECKLIST2, true, 2)
     table.insert(self.fields, player2Field)
 
-    -- draw initial 5 cards -- needs netcode tuneup
-    Event.dispatch('draw', {['player']=1, ['qty']=5})
-    Event.dispatch('draw', {['player']=2, ['qty']=5})
-
     -- setup global access to state
-    GVanguardState = self
+    -- GVanguardState = self
 
-    vStateMachine:change('redraw', self.fields)
+    vStateMachine:change('RPS', self.fields)
 end
 
 function VanguardState:update(dt)

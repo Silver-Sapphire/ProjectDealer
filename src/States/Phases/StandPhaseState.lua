@@ -1,23 +1,24 @@
 StandPhaseState = Class{__includes = BaseState}
 
-function StandPhaseState:enter(fields)
-    self.fields = fields
+function StandPhaseState:enter(pass)
+    self.fields = pass.fields
     -- incriment turn count
-    local turn = false
     for k, field in pairs(self.fields) do
         field.turn = field.turn + 1
-        turn = field.turn
+        self.turn = field.turn
     end
-    -- determine turn player
-    self.turnPlayer = 1
-    if turn % 2 == 0 then
+    -- determine turn player (work into determin 1st system)
+    
+    if self.turn % 2 == TURNCONSTANT then
+        self.turnPlayer = 1
+    else
         self.turnPlayer = 2
     end
     
     -- trigger at start of turn/stand phase effects
     Event.dispatch('begin-turn', self.turnPlayer)
     --check timing
-    Event.dispatch('checktiming')
+    Event.dispatch('check-timing')
 
     -- stand all units
     -- local stoodUnits_ = {}
@@ -34,7 +35,8 @@ function StandPhaseState:enter(fields)
     -- check timing
     Event.dispatch('check-timing')
 
-    vStateMachine:change('draw', self.fields, self.turnPlayer)
+    vStateMachine:change('draw', {['fields']=self.fields, 
+                                  ['turnPlayer']=self.turnPlayer})
 end
 
 function StandPhaseState:update(dt)
