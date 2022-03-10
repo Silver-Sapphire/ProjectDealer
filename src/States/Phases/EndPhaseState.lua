@@ -1,9 +1,18 @@
 EndPhaseState = Class{__includes = BaseState}
 
 function EndPhaseState:init()
-    -- end phase triggers
-    -- remove all "unitl end of turn" effect
+    -- return all G units, unlock cards, spin astral plane unit, ect
+
+    -- unlock triggers
+
+    -- trigger untriggered at the beginning of the end phase/at end of turn triggers (recursive)
+
+    -- remove all "unitl end of turn" effect (recursive)
+    
+    -- recursivly check there are no triggers left (recursive)
+
     -- pass turn
+    vStateMachine:change('stand', self.fields)
 end
 
 function EndPhaseState:update(dt)

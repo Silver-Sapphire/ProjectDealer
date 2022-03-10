@@ -1,18 +1,23 @@
 RidePhaseState = Class{__includes = BaseState}
 
-function RidePhaseState:enter(fields)
+function RidePhaseState:enter(fields, turnPlayer)
     self.fields = fields
-    if #self.fields[1].hand ~= 0 then
+    self.turnPlayer = turnPlayer
+
+    -- trigger beginning of ride phase effects
+
+    -- make ride menu
+    if #self.fields[turnPlayer].hand ~= 0 then
         local options = {}
-        local _vGrade = self.fields[1].vanguard[1].grade
+        local _vGrade = self.fields[turnPlayer].vanguard[1].grade
         -- determine ridable cards
-        for i=1, #self.fields[1].hand do
-            local _card = self.fields[1].hand[i]
+        for i=1, #self.fields[turnPlayer].hand do
+            local _card = self.fields[turnPlayer].hand[i]
             if _card.grade == _vGrade or 
                _card.grade == _vGrade + 1 then
                 local option = {
                     card = _card,
-                    player = 1,
+                    player = turnPlayer,
                     table = 'hand',
                     index = i
                 }
@@ -39,17 +44,16 @@ function RidePhaseState:enter(fields)
                 if #selection > 0 then
                     Event.dispatch('ride', selection[1]) -- there should only be one selectin, but its still in a table, so we need to index into it
                 end
-                -- todo, trigger on ride skills
-                gStateStack:pop()
-                vStateMachine:change('main', self.fields)
+                -- todo, trigger on ride skills and add stride step
+                gStateStack:pop()                
+                vStateMachine:change('main', self.fields, turnPlayer)
             end
         }))
     end
-    self.flag_ = false
-    self.selection = false
 end
 
 function RidePhaseState:update(dt)
+        -- trigger check timing
 
 end
 
@@ -59,21 +63,9 @@ function RidePhaseState:render()
         field:render()
     end
 
-    if self.flag_ then
-        if self.selection then
-            love.graphics.setFont(gFonts['large'])
-            love.graphics.setColor(1,1,0,1)
-            RenderCard(self.selection.card, 10, 10)
-        end
-    end
     -- highlight current phase
     love.graphics.setFont(gFonts['large'])
     love.graphics.setColor(0,1,0,1) -- green
     -- TODO turn color red for opponents turn
     love.graphics.printf('Ride', 0, VIRTUAL_HEIGHT/2, VIRTUAL_WIDTH, 'right')
-end
-
-function RidePhaseState:debugPrint(selection)
-    self.selection = selection
-    self.flag_ = true
 end

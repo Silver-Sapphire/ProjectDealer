@@ -9,7 +9,6 @@ function Field:init(decklist, flipped)
     -- self.rideDeck = self.deck.rideDeck
     -- self.deck.shuffle()
 
-
     self.hand = {}
 
     self.dropZone = {}
@@ -20,22 +19,8 @@ function Field:init(decklist, flipped)
 
     self.orderZone = {}
 
-    self.vanguard = {{['grade'] = 0,
-                      ['power'] = 7}}
-
-    self.soul = {}
-
-    self.guardianCircle = {}
-
-    self.rearguard = {
-        ['frontLeft'] = {},
-        ['backLeft'] = {},
-        ['backCenter'] = {},
-        ['backRight'] = {},
-        ['frontRight'] = {}
-    }
-
     self.damageZone = {
+        --[[
         ['1'] = {},
         ['2'] = {},
         ['3'] = {},
@@ -43,6 +28,51 @@ function Field:init(decklist, flipped)
         ['5'] = {},
         ['6'] = {}
         --]]
+    }
+
+    self.soul = {}
+
+    self.circles = {
+        ['vanguard'] = {['type'] = 'V',
+                        ['column'] = 'middle',
+                        ['row'] = 'front',
+                        ['x'] = VX, ['y'] = VY,
+                        ['units'] = {  ['grade'] = 0,
+                                       ['power'] = 7} },
+                        
+        ['frontLeft'] = {['type'] = 'R',
+                         ['column'] = 'left',
+                         ['row'] = 'front',
+                         ['x'] = FLX, ['y'] = FLY,
+                         ['units'] = {} },
+
+        ['backLeft'] = {['type'] = 'R',
+                        ['column'] = 'left',
+                        ['row'] = 'back',
+                        ['x'] = BLX, ['y'] = BLY,
+                        ['units'] = {} },
+        
+        ['backCenter'] = {['type'] = 'R',
+                          ['column'] = 'middle',
+                          ['row'] = 'back',
+                          ['x'] = BCX, ['y'] = BCY,
+                          ['units'] = {} },
+        
+        ['backRight'] = {['type'] = 'R',
+                         ['column'] = 'right',
+                         ['row'] = 'back',
+                         ['x'] = BRX, ['y'] = BRY,
+                         ['units'] = {} },
+        
+        ['frontRight'] = {['type'] = 'R',
+                          ['column'] = 'right',
+                          ['row'] = 'front',
+                          ['x'] = FRX, ['y'] = FRY,
+                          ['units'] = {} },
+
+        ['guardian'] = {['type'] = 'G',
+                        ['x'] = GX, ['y'] = GY,
+                        ['units'] = {} }
     }
 end
 
@@ -122,14 +152,26 @@ function Field:render()
         rX = rX + VIRTUAL_WIDTH/6
     end
     --cards
-    if #self.rearguard.frontLeft ~= 0 then
-    --     local rX =
-    --     local rY =
-    --     for k, card in pairs(self.rearguard.frontLeft) do
-            RenderCard(self.rearguard.frontLeft[1], VIRTUAL_WIDTH*2/5, VIRTUAL_HEIGHT *3/5)
-    --         rX = rX +
-    --         rY = rY -
-    --     end
+    for k, circle in pairs(self.circles) do
+        if #circle.units ~= 0 then
+            local x = circle.x
+            local y = circle.y
+            if circle.type ~= 'G' then
+                for k, unit in pairs(circle.units) do
+                    RenderCard(unit, x, y)
+                    x = x + CARD_WIDTH/2
+                    y = y + CARD_HEIGHT/4
+                end
+            else--if 'G' then rotate
+                love.graphics.push()
+                for k, unit in pairs(circle.units) do
+                    RenderCard(unit, y, x)
+                    x = x + CARD_WIDTH/2
+                    y = y + CARD_HEIGHT/4
+                end
+                love.graphics.pop()
+            end
+        end
     end
 
     -- draw soul stack
@@ -153,12 +195,12 @@ function Field:render()
 	love.graphics.setFont(gFonts['small'])
     love.graphics.print('Soul:'.. #self.soul, self.vX, self.vY + CARD_HEIGHT)
 
-    -- Render V(s?)
-    if #self.vanguard == 1 then
-        RenderCard(self.vanguard[1], self.vX + math.floor(self.soulOffset/2), self.vY - self.soulOffset)
-    else
-        -- legion rendering
-    end
+    -- -- Render V(s?)
+    -- if #self.circles.vanguard == 1 then
+    --     RenderCard(self.circles.vanguard[1], self.vX + math.floor(self.soulOffset/2), self.vY - self.soulOffset)
+    -- else
+    --     -- legion rendering
+    -- end
     -- Render G
 
     --gzone

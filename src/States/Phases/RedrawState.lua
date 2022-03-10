@@ -55,7 +55,7 @@ function RedrawState:enter(fields)
         
                 -- proceed to rest of game
                 gStateStack:pop()
-                vStateMachine:change('draw', self.fields)
+                vStateMachine:change('stand', self.fields)
             end
         }))
     end

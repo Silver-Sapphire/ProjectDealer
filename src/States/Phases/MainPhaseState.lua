@@ -1,7 +1,10 @@
 MainPhaseState = Class{__includes = BaseState}
 
-function MainPhaseState:enter(fields)
+function MainPhaseState:enter(fields, turnPlayer)
     self.fields = fields
+    self.turnPlayer = turnPlayer
+
+    -- turn player gets a play timing
     local actions = {
         {
             text = 'Call',
@@ -12,13 +15,13 @@ function MainPhaseState:enter(fields)
             end
         }
     }
-    if self.fields[1].turn ~= 1 then
+    if self.fields[turnPlayer].turn ~= 1 then
         local action = {
             text = "Battle",
             onSelect = function()
                 -- confirmation menu here
                 gStateStack:pop()
-                vStateMachine:change('battle', self.fields)
+                vStateMachine:change('battle', self.fields, turnPlayer)
             end
         }
         table.insert(actions, action)
@@ -67,13 +70,13 @@ end
 function MainPhaseState:determineCallableCards()
     local options = {}
     -- todo make work for both players
-    local _vGrade = self.fields[1].vanguard[1].grade
-    for i=1, #self.fields[1].hand do
-        local _card = self.fields[1].hand[i]
+    local _vGrade = self.fields[turnPlayer].vanguard[1].grade
+    for i=1, #self.fields[turnPlayer].hand do
+        local _card = self.fields[turnPlayer].hand[i]
         if _card.grade <= _vGrade then
             local option = {
                 card = _card,
-                player = 1,
+                player = turnPlayer,
                 table = 'hand',
                 index = i
             }

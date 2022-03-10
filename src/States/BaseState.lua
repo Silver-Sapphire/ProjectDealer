@@ -138,30 +138,33 @@ function BaseState:moveCard(request)
 	elseif _inputTable == "damage" then
 		_card = table.remove(self.fields[_field].damage, _inputIndex)
 
-	elseif _inputTable == "guard" then
-		_card = table.remove(self.fields[_field].guard, _inputIndex)
-
 	elseif _inputTable == "soul" then
 		_card = table.remove(self.fields[_field].soul, _inputIndex)
 
+	elseif _inputTable == "guard" then
+		_card = table.remove(self.fields[_field].circles.guardian.units, _inputIndex)
+
 	elseif _inputTable == "vanguard" then
-		_card = table.remove(self.fields[_field].vanguard, _inputIndex)
+		_card = table.remove(self.fields[_field].circles.vanguard.units, _inputIndex)
 
 	elseif _inputTable == "R-F-L" then
-		_card = table.remove(self.fields[_field].rearguard.frontLeft, _inputIndex)
+		_card = table.remove(self.fields[_field].circles.frontLeft.units, _inputIndex)
     
     elseif _inputTable == "R-B-L" then
-		_card = table.remove(self.fields[_field].rearguard.backLeft, _inputIndex)
+		_card = table.remove(self.fields[_field].circles.backLeft.units, _inputIndex)
 
     elseif _inputTable == "R-C-B" then
-		_card = table.remove(self.fields[_field].rearguard.backCenter, _inputIndex)
+		_card = table.remove(self.fields[_field].circles.backCenter.units, _inputIndex)
 
     elseif _inputTable == "R-B-R" then
-		_card = table.remove(self.fields[_field].rearguard.backRight, _inputIndex)
+		_card = table.remove(self.fields[_field].circles.backRight.units, _inputIndex)
 
     elseif _inputTable == "R-F-R" then
-		_card = table.remove(self.fields[_field].rearguard.frontRight, _inputIndex)
-	end
+		_card = table.remove(self.fields[_field].circles.frontRight.units, _inputIndex)
+	
+    elseif _inputTable == "accel" then
+        _card = table.remove(self.fields[_field].circles.accel[_inputIndex].units, 1)
+    end
 
 	-- move _card to it's destination
     -- -- using a fancier method
@@ -216,44 +219,41 @@ function BaseState:moveCard(request)
         else
             table.insert(self.fields[_field].damage, _card)
         end
-	elseif _outputTable == "guard" then
-        if _outputIndex then
-            table.insert(self.fields[_field].guard, _outputIndex, _card)
-        else
-            table.insert(self.fields[_field].guard, _card)
-        end
 	elseif _outputTable == "soul" then
         if _outputIndex then
             table.insert(self.fields[_field].soul, _outputIndex, _card)
         else
             table.insert(self.fields[_field].soul, _card)
         end
+	elseif _outputTable == "guardian" then
+        -- if _outputIndex then
+        --     table.insert(self.fields[_field].circles.guardian, _outputIndex, _card)
+        -- else
+            table.insert(self.fields[_field].circles.guardian.units, _card)
+        -- end
 	elseif _outputTable == "vanguard" then
-        if _outputIndex then
-            table.insert(self.fields[_field].vanguard, _outputIndex, _card)
-        else
-            table.insert(self.fields[_field].vanguard, _card)
-        end
-	-- elseif _outputTable == "rearguard" then
-    --     if _outputIndex then
-    --         table.insert(self.fields[_field].rearguard, _outputIndex, _card)
-    --     else
-    --         table.insert(self.fields[_field].rearguard, _card)
-    --     end
-
+        -- if _outputIndex then
+        --     table.insert(self.fields[_field].circles.vanguard, _outputIndex, _card)
+        -- else
+            table.insert(self.fields[_field].circles.vanguard.units, _card)
+        -- end
     elseif _outputTable == "R-F-L" then
-		table.insert(self.fields[_field].rearguard.frontLeft, _card)
+		table.insert(self.fields[_field].circles.frontLeft.units, _card)
     
     elseif _outputTable == "R-B-L" then
-		table.insert(self.fields[_field].rearguard.backLeft, _card)
+		table.insert(self.fields[_field].circles.backLeft.units, _card)
 
     elseif _outputTable == "R-C-B" then
-		table.insert(self.fields[_field].rearguard.backCenter, _card)
+		table.insert(self.fields[_field].circles.backCenter.units, _card)
 
     elseif _outputTable == "R-B-R" then
-		table.insert(self.fields[_field].rearguard.backRight, _card)
+		table.insert(self.fields[_field].circles.backRight.units, _card)
 
     elseif _outputTable == "R-F-R" then
-		table.insert(self.fields[_field].rearguard.frontRight, _card)
-	end
+		table.insert(self.fields[_field].circles.frontRight.units, _card)
+
+    -- note: accel REQUIRES an output index (the circle #)
+    elseif _outputTable == "accel" then
+        table.insert(self.fields[_field].circles.accel[_outputIndex].units, _card)
+    end
 end

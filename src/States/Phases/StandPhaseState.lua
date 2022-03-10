@@ -8,21 +8,39 @@ function StandPhaseState:enter(fields)
         field.turn = field.turn + 1
         turn = field.turn
     end
-    local turnPlayer = 1
+    -- determine turn player
+    self.turnPlayer = 1
     if turn % 2 == 0 then
-        turnPlayer = 2
+        self.turnPlayer = 2
     end
+    
     -- trigger at start of turn/stand phase effects
+    Event.dispatch('begin-turn', self.turnPlayer)
+    --check timing
+    Event.dispatch('checktiming')
 
     -- stand all units
+    -- local stoodUnits_ = {}
+    for k, circle in pairs(self.fields[self.turnPlayer].circles) do
+        if #circle.units ~= 0 then
+            if circle.units[1].state == 'rest' then
+                circle.units[1].state = 'stand'
+                -- table.insert(stoodUnits_, circle.units[1])
+                Event.dispatch('stand', circle.units[1])
+            end
+        end
+    end
 
     -- check timing
+    Event.dispatch('check-timing')
 
-    vStateMachine:change('draw', self.fields, turnPlayer)
+    vStateMachine:change('draw', self.fields, self.turnPlayer)
 end
 
 function StandPhaseState:update(dt)
-    
+    for k, field in pairs(self.fields) do
+        field:update(dt)
+    end
 end
 
 function StandPhaseState:render()

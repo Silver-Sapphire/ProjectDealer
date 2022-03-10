@@ -1,5 +1,5 @@
-enet = require "enet"
-socket = require "socket"
+-- enet = require "enet"
+-- socket = require "socket"
 Class = require 'lib/class'
 Event = require 'lib/knife.event'
 push = require 'lib/push'
@@ -41,7 +41,7 @@ require 'src/states/Game/VanguardState'
 
 require 'src/states/phases/RedrawState'
 -- require 'src/states/phases/StandUpPhaseState'
--- require 'src/states/phases/StandPhaseState'
+require 'src/states/phases/StandPhaseState'
 require 'src/states/phases/DrawPhaseState'
 require 'src/states/phases/RidePhaseState'
 require 'src/states/phases/MainPhaseState'

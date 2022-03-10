@@ -8,7 +8,8 @@ function VanguardState:enter()
     vStateMachine = StateMachine {
         ['redraw'] = function() return RedrawState() end,
         ['stand-up'] = function() return StandUpState() end,
-        -- ['stand'] = function() return StandPhaseState() end,
+        
+        ['stand'] = function() return StandPhaseState() end,
         ['draw'] = function() return DrawPhaseState() end,
         ['ride'] = function() return RidePhaseState() end,
         ['main'] = function() return MainPhaseState() end,
