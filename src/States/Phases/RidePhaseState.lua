@@ -32,7 +32,7 @@ function RidePhaseState:enter(pass)
                 onSelect = function() end
             }
             table.insert(options, option)
-
+            -- Ride phase menu
             gStateStack:push(MenuState(Menu{
                 orientation = 'horizontal',
                 text = 'Select a card to ride w/enter, and submit w/space',
@@ -49,8 +49,10 @@ function RidePhaseState:enter(pass)
                 height = VIRTUAL_HEIGHT/4,
 
                 onSubmitFunction = function (selection)
-                    if #selection > 0 and selection.card then
-                        Event.dispatch('ride', selection[1]) -- there should only be one selectin, but its still in a table, so we need to index into it
+                    if #selection > 0 and selection[1].card then
+                        Event.dispatch('ride', {['player'] = selection[1].player,
+                                                ['table'] = selection[1].table,
+                                                ['index'] = selection[1].index} ) -- there should only be one selectin, but its still in a table, so we need to index into it
                     end
                     -- todo, trigger on ride skills and add stride step
                     gStateStack:pop()                
@@ -104,7 +106,8 @@ function RidePhaseState:processAI(hand)
         for i = 1, #self.fields[2].hand do
             local card_ = self.fields[2].hand[i]
             if card_.grade == vGrade_ + 1 and card_.sentinel then
-                Event.dispatch('ride', {['table'] = "hand",
+                Event.dispatch('ride', {['player'] = 2,
+                                        ['table'] = "hand",
                                         ['index'] = i} )
                 return 0
             end

@@ -31,7 +31,7 @@ function BaseState:chooseCircle(_card)
             text = 'Front Left',
             onSelect = function()
                 self:moveCard({
-                    _field = 1, -- needs to be dynamic
+                    _field = _card.player,
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
@@ -44,7 +44,7 @@ function BaseState:chooseCircle(_card)
             text = 'Back Left',
             onSelect = function()
                 self:moveCard({
-                    _field = 1, -- needs to be dynamic
+                    _field = _card.player,
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
@@ -57,7 +57,7 @@ function BaseState:chooseCircle(_card)
             text = 'Back Center',
             onSelect = function()
                 self:moveCard({
-                    _field = 1, -- needs to be dynamic
+                    _field = _card.player,
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
@@ -70,7 +70,7 @@ function BaseState:chooseCircle(_card)
             text = 'Back Right',
             onSelect = function()
                 self:moveCard({
-                    _field = 1, -- needs to be dynamic
+                    _field = _card.player,
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
@@ -83,7 +83,7 @@ function BaseState:chooseCircle(_card)
             text = 'Front Right',
             onSelect = function()
                 self:moveCard({
-                    _field = 1, -- needs to be dynamic
+                    _field = _card.player,
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
@@ -107,8 +107,10 @@ end
 function BaseState:moveCard(request)
 	-- setup variables
 	local _field = request._field
+    
 	local _inputTable = request._inputTable
 	local _inputIndex = request._inputIndex
+
 	local _outputTable = request._outputTable
 	local _outputIndex = request._outputIndex or false
 

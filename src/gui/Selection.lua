@@ -58,28 +58,25 @@ function Selection:update(dt)
         gSounds['blip']:stop()
         gSounds['blip']:play()
 
+        -- different behaviors for different menu types
         local _selection = self.items[self.currentSelection]
+        -- max selection being 0 is a sort of nonsense way to skip confirmation...
         if self.maxSel == 0 then
             -- confirmation/wait type functionallity
             _selection.onSelect()
     
         elseif self.maxSel == 1 and self.minSel == 1 then
-            -- submit a single item
-            -- TODO add confirmation feature (and at bottom)
+            -- submit a single item w/o confirmation
+            -- TODO add confirmation feature
             if self.areCards and _selection.card then
                 _selection.selected = true
                 self:subimtSelections()
             else 
                 _selection.onSelect()
                 self.onSubmitFunction()
-            end
-        -- elseif self.minSel == 0 and self.maxSel == 1 then
-        --     if _selection.onSelect() then
-        --         _selection.onSelect()
-        --     end        
-
+            end  
         else
-            -- prime to submit mutliple items
+            -- prime to submit or more items
             if not _selection.selected and self.numSelected < self.maxSel then
                 _selection.selected = true
                 self.numSelected = self.numSelected + 1
@@ -126,7 +123,7 @@ function Selection:render()
                 end
             else -- render text if not cards
                 if self.items[i].selected then
-                    love.graphics.setColor(1/2, 1/2, 1, 1)
+                    love.graphics.setColor(3/4, 3/4, 1, 1)
                 else
                     love.graphics.setColor(1,1,1,1)
                 end

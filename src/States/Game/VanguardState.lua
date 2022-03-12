@@ -37,7 +37,6 @@ function VanguardState:enter()
             _field = selection.player,
             _inputTable = selection.table,
             _inputIndex = selection.index,
-
             _outputTable = "vanguard"
             -- output to end of table implied
         })
