@@ -55,26 +55,34 @@ end
 -- display a card
 function RenderCard(card, x, y)
 	-- set color based on attribute ("art")
-	local sentinelFlag = false
+	local bTxFlag = false
 	if card.trigger == 'crit' then
-		love.graphics.setColor(7/8, 7/8, 1/4,1)--darker yellow
+		bTxFlag = true
+		love.graphics.setColor(8/8, 7/8, 1/3, 1)--darker yellow
 	elseif card.trigger == 'heal' then
-		love.graphics.setColor(1/4, 1, 1/4, 1)--green
+		bTxFlag = true
+		love.graphics.setColor(1/4, 3/4, 3/8, 1)--green
 	elseif card.sentinel then
-		sentinelFlag = true
-		love.graphics.setColor(7/8, 7/8, 1/2, 1)--brighter yellow
+		bTxFlag = true
+		love.graphics.setColor(8/8, 7/8, 1/2, 1)--brighter yellow
 	else
 		love.graphics.setColor(0, 0, 0, 1)--black
 	end
 
 	-- card ""art"""
 	love.graphics.rectangle('fill', x,y, CARD_WIDTH,CARD_HEIGHT)
-	-- card grade
-	if sentinelFlag then
+	-- card text color setting
+	if bTxFlag then
 		love.graphics.setColor(0,0,0,1)
 	else
 		love.graphics.setColor(1,1,1,1)--white
 	end
+
+	-- draw card info
 	love.graphics.setFont(gFonts['small'])
 	love.graphics.print(card.grade, x+1, y+1)
+	if card.shield then
+		love.graphics.printf(card.shield, x+15, y+1, CARD_HEIGHT -2, 'center', math.pi/2) -- rotate 90*
+	end
+	love.graphics.printf(card.power or 0, x+1, y+CARD_HEIGHT-15, CARD_WIDTH-2, 'right')
 end

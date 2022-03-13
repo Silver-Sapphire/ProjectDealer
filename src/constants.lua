@@ -11,7 +11,9 @@ BACKGROUND_SCROLL_SPEED = 50
 
 PHASE_TEXT_GAP = 60
 
--- circle x pos
+-- field rendering constants ------------------
+
+-- circle x poss'
 FLX = VIRTUAL_WIDTH*3/8 -CARD_WIDTH/2 
 BLX = FLX
 
@@ -22,7 +24,7 @@ GX = VX
 FRX = VIRTUAL_WIDTH*5/8 -CARD_WIDTH/2
 BRX = FRX
 
--- circle y pos
+-- circle y poss'
 FLY = VIRTUAL_HEIGHT*5/8 - CARD_HEIGHT/2
 VY = FLY
 FRY = FLY
@@ -32,3 +34,7 @@ BCY = BLY
 BRY = BLY
 
 GY = VIRTUAL_HEIGHT/2 - CARD_HEIGHT/2
+
+-- deck
+DECKX = VIRTUAL_WIDTH*3/4
+DECKY = VIRTUAL_HEIGHT*5/8

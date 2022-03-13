@@ -23,7 +23,10 @@ function RedrawState:enter(pass)
             }
             table.insert(options, option)
         end
-        -- redraw menu
+        -- a request for our tween state
+        -- local request_ = 
+
+        -- redraw menu  
         gStateStack:push(MenuState(Menu{
             orientation = 'horizontal',
             text = 'Select cards to redraw w/enter, and submit w/space',
@@ -35,7 +38,7 @@ function RedrawState:enter(pass)
             items = options,
 
             x = VIRTUAL_WIDTH/4,
-            y = VIRTUAL_HEIGHT*3/4,
+            y = VIRTUAL_HEIGHT *3/4,
             width = VIRTUAL_WIDTH/2,
             height = VIRTUAL_HEIGHT/4,
 
@@ -67,7 +70,12 @@ function RedrawState:enter(pass)
                 vStateMachine:change('stand', {['fields']=self.fields, 
                                                ['turnPlayer']=self.turnPlayer})
             end
-        }))
+        }
+        -- , 
+        -- {['destY']=VIRTUAL_HEIGHT*3/4, ['time']=1/2}, 
+
+        -- function () end
+        ))
     end
 end
 

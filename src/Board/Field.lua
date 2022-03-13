@@ -5,9 +5,18 @@ function Field:init(decklist, flipped, player)
     self.flipped = flipped
     self.player = player
     -- self.deck = Deck(decklist)
-    self.deck = decklist
+    self.mainSleeveArt = decklist.sleeveArt or false
+    self.deck = decklist or self:CancelMatch('Missing Deck') -- todo tuneup with decklist rework
 
-    -- self.rideDeck = self.deck.rideDeck
+    self.rideSleeveArt = decklist.rideSleeveArt or false
+    self.rideDeck = decklist.rideDeck or false
+    
+    self.gSleeveArt = decklist.gSleeveArt or false
+    self.gDeck = decklist.gDeck or false
+
+    self.markerSleeveArt = decklist.markerSleeveArt or false
+    self.markerArt = decklist.markerArt or false
+
     -- self.deck.shuffle()
 
     self.hand = {}
@@ -100,7 +109,7 @@ function Field:update(dt)
     -- end
     if #self.deck == 0 then
         Event.dispatch('game-over', {['player']=self.player,
-                                    ['cause']="deckout"})
+                                     ['cause']="deckout"})
     end
 end
 
@@ -125,11 +134,11 @@ function Field:render()
 
     -- Render deck
     -- make a larger deck thicker by drawing a rectangle for every 4 cards in our deck
-    self.deckX = VIRTUAL_WIDTH*3/4
-    self.deckY = VIRTUAL_HEIGHT*5/8
+    self.deckX = DECKX
+    self.deckY = DECKY
     love.graphics.setColor(0,0,7/10,1)
     for i=1, math.floor(#self.deck/4) do
-        love.graphics.rectangle('fill', self.deckX + i,self.deckY - math.floor(i/2), CARD_WIDTH,CARD_HEIGHT)
+        love.graphics.rectangle('fill', self.deckX + i*2,self.deckY - i*2, CARD_WIDTH,CARD_HEIGHT)
     end
     -- display deck count
 	love.graphics.setColor(1,1,1,1)--white
@@ -144,7 +153,7 @@ function Field:render()
 
     -- display bind count
 
-    -- Render R
+    -- Render R-----------
     --circles
     local rR = 50
     local rX = VIRTUAL_WIDTH/3
@@ -179,17 +188,18 @@ function Field:render()
         end
     end
 
+    -- V and Soul ------------------------------------
     -- draw soul stack
     -- vanguard xy coords
     self.vX = VIRTUAL_WIDTH/2 - CARD_WIDTH/2
     self.vY = VIRTUAL_HEIGHT*5/8 - CARD_HEIGHT/2
     self.soulOffset = 0
-    if #self.soul > 2 then
+    if #self.soul > 1 then
         self.soulOffset = 0
-        for i=1, math.floor(#self.soul/3) do
+        for i=1, math.floor(#self.soul/2) do
             love.graphics.setColor(0,0,0,1)--black
-            love.graphics.rectangle('fill', self.vX,self.vY, CARD_WIDTH,CARD_HEIGHT)
-            self.soulOffset = self.soulOffset + 1
+            love.graphics.rectangle('fill', self.vX + self.soulOffset,self.vY - self.soulOffset, CARD_WIDTH,CARD_HEIGHT)
+            self.soulOffset = self.soulOffset + 2
         end
     else
         self.soulOffset = 0
@@ -201,9 +211,9 @@ function Field:render()
     love.graphics.print('Soul:'.. #self.soul, self.vX, self.vY + CARD_HEIGHT)
 
     -- -- Render V(s?)
-    -- if #self.circles.vanguard == 1 then
-    --     RenderCard(self.circles.vanguard[1], self.vX + math.floor(self.soulOffset/2), self.vY - self.soulOffset)
-    -- else
+    if #self.circles.vanguard.units == 1 then
+        RenderCard(self.circles.vanguard.units[1], self.vX + self.soulOffset, self.vY - self.soulOffset)
+    end
     --     -- legion rendering
     -- end
     -- Render G
