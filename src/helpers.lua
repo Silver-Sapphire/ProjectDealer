@@ -86,3 +86,7 @@ function RenderCard(card, x, y)
 	end
 	love.graphics.printf(card.power or 0, x+1, y+CARD_HEIGHT-15, CARD_WIDTH-2, 'right')
 end
+
+function CraftMenu(template, items, onSubmitFunction)
+	local craftMenu = Menu{}
+end

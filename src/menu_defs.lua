@@ -38,3 +38,30 @@ MENU_DEFS = {
         -- 5 in hand again, then shuffles the deck.
     }
 }
+
+MENU_PROTOS = {
+    ['small'] = {
+        font = gFonts['small'],
+
+        x = VIRTUAL_WIDTH*11/16,
+        y = VIRTUAL_HEIGHT*13/16,
+        width = VIRTUAL_WIDTH/8,
+        height = VIRTUAL_HEIGHT/8
+    },
+    ['medium'] = {
+        font = gFonts['medium'],
+
+        x = VIRTUAL_WIDTH/4,
+        y = VIRTUAL_HEIGHT*3/4,
+        width = VIRTUAL_WIDTH/2,
+        height = VIRTUAL_HEIGHT/4
+    },
+    ['large'] = {
+        font = gFonts['large'],
+
+        x = VIRTUAL_WIDTH/8,
+        y = VIRTUAL_HEIGHT/2,
+        width = VIRTUAL_WIDTH*3/4,
+        height = VIRTUAL_HEIGHT/2
+    }
+}
