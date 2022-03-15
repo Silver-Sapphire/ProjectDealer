@@ -35,7 +35,7 @@ function BaseState:chooseCircle(_card)
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
-                    _outputTable = "R-F-L"
+                    _outputTable = "frontLeft"
                 })
                 gStateStack:pop()
             end
@@ -48,7 +48,7 @@ function BaseState:chooseCircle(_card)
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
-                    _outputTable = "R-B-L"
+                    _outputTable = "backLeft"
                 })
                 gStateStack:pop()
             end
@@ -61,7 +61,7 @@ function BaseState:chooseCircle(_card)
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
-                    _outputTable = "R-B-C"
+                    _outputTable = "backCenter"
                 })
                 gStateStack:pop()
             end
@@ -74,7 +74,7 @@ function BaseState:chooseCircle(_card)
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
-                    _outputTable = "R-B-R"
+                    _outputTable = "backRight"
                 })
             gStateStack:pop()
             end
@@ -87,7 +87,7 @@ function BaseState:chooseCircle(_card)
                     _inputTable = _card.table,
                     _inputIndex = _card.index,
 
-                    _outputTable = "R-F-R"
+                    _outputTable = "frontRight"
                 })
                 gStateStack:pop()
             end
@@ -100,6 +100,23 @@ function BaseState:chooseCircle(_card)
         }
     }
     return circles
+end
+
+function BaseState:determinePossibleAttacks(player)
+    local possibleAttacks = {}
+    for table_, circle in pairs(self.fields[player].circles) do
+        if circle.row == "front" and #circle.units > 0 then
+            local atk = {
+                card = cricle.units[1],
+                player = player,
+                circle = circle,
+                table = table_,
+                index = 1
+            }
+            table.insert(possibleAttacks, atk)
+        end
+    end
+    return possibleAttacks
 end
 
 -- a powerful multipurpose function that moves a card
@@ -149,19 +166,19 @@ function BaseState:moveCard(request)
 	elseif _inputTable == "vanguard" then
 		_card = table.remove(self.fields[_field].circles.vanguard.units, _inputIndex)
 
-	elseif _inputTable == "R-F-L" then
+	elseif _inputTable == "frontLeft" then
 		_card = table.remove(self.fields[_field].circles.frontLeft.units, _inputIndex)
     
-    elseif _inputTable == "R-B-L" then
+    elseif _inputTable == "backLeft" then
 		_card = table.remove(self.fields[_field].circles.backLeft.units, _inputIndex)
 
-    elseif _inputTable == "R-B-C" then
+    elseif _inputTable == "backCenter" then
 		_card = table.remove(self.fields[_field].circles.backCenter.units, _inputIndex)
 
-    elseif _inputTable == "R-B-R" then
+    elseif _inputTable == "backRight" then
 		_card = table.remove(self.fields[_field].circles.backRight.units, _inputIndex)
 
-    elseif _inputTable == "R-F-R" then
+    elseif _inputTable == "frontRight" then
 		_card = table.remove(self.fields[_field].circles.frontRight.units, _inputIndex)
 	
     elseif _inputTable == "accel" then
@@ -239,19 +256,19 @@ function BaseState:moveCard(request)
         -- else
             table.insert(self.fields[_field].circles.vanguard.units, _card)
         -- end
-    elseif _outputTable == "R-F-L" then
+    elseif _outputTable == "frontLeft" then
 		table.insert(self.fields[_field].circles.frontLeft.units, _card)
     
-    elseif _outputTable == "R-B-L" then
+    elseif _outputTable == "backLeft" then
 		table.insert(self.fields[_field].circles.backLeft.units, _card)
 
-    elseif _outputTable == "R-B-C" then
+    elseif _outputTable == "backCenter" then
 		table.insert(self.fields[_field].circles.backCenter.units, _card)
 
-    elseif _outputTable == "R-B-R" then
+    elseif _outputTable == "backRight" then
 		table.insert(self.fields[_field].circles.backRight.units, _card)
 
-    elseif _outputTable == "R-F-R" then
+    elseif _outputTable == "frontRight" then
 		table.insert(self.fields[_field].circles.frontRight.units, _card)
 
     -- note: accel REQUIRES an output index (the circle #)

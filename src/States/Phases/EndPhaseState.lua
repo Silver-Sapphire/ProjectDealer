@@ -1,13 +1,26 @@
 EndPhaseState = Class{__includes = BaseState}
 
 function EndPhaseState:enter(pass)
+    -- cleanup a global variable used in battle phase
+    PastFirstStartStep = false
+    
     self.fields = pass.fields
     self.turnPlayer = pass.turnPlayer
     local turnPlayer = pass.turnPlayer
-
+    
     -- return all G units, unlock cards, spin astral plane unit, ect
 
     -- unlock triggers
+    for k, circle in pairs(self.fields.circles) do
+        card_=circle.units[1]
+        if card_.locked then
+            card_.locked = false
+            -- event??
+        elseif card_.oLocked then
+            card_.locked = true
+            card_.oLocked = false
+        end
+    end
 
     -- trigger untriggered at the beginning of the end phase/at end of turn triggers (recursive)
 
