@@ -1,6 +1,9 @@
 StandPhaseState = Class{__includes = BaseState}
 
 function StandPhaseState:enter(pass)
+    -- cringe global reset
+    AttackNum = 0
+
     self.fields = pass.fields
     -- incriment turn count
     for k, field in pairs(self.fields) do

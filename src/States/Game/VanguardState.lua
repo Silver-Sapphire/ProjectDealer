@@ -17,7 +17,35 @@ function VanguardState:enter()
         ['battle'] = function() return BattlePhaseState() end,
         ['end'] = function() return EndPhaseState() end
     }    
+    -- setup stand/draw, ect event handlers
+    self:settupEvents()
 
+    _DECKLIST = shuffle(DECKLIST)
+    _DECKLIST2 = shuffle(DECKLIST)
+    -- initialize boards
+    self.fields = {}
+    -- local player [1]       --decklist, flip, player
+    local player1Field = Field(_DECKLIST, false, 1)
+    table.insert(self.fields, player1Field)
+    -- peer player [2]
+    local player2Field = Field(_DECKLIST2, true, 2)
+    table.insert(self.fields, player2Field)
+
+    -- setup global access to state
+    -- GVanguardState = self
+
+    vStateMachine:change('RPS', self.fields)
+end
+
+function VanguardState:update(dt)
+    vStateMachine:update(dt)
+end
+
+function VanguardState:render()
+    vStateMachine:render()
+end
+
+function VanguardState:settupEvents()
     -- setup game actions, with self discriptive name
     Event.on('draw', function(t)
         for i = 1, t.qty do
@@ -50,29 +78,18 @@ function VanguardState:enter()
             _outputTable = "soul"
             -- output to end of table implied
         })
-   end)
+    end)
 
-    _DECKLIST = shuffle(DECKLIST)
-    _DECKLIST2 = shuffle(DECKLIST)
-    -- initialize boards
-    self.fields = {}
-    -- local player [1]       --decklist, flip, player
-    local player1Field = Field(_DECKLIST, false, 1)
-    table.insert(self.fields, player1Field)
-    -- peer player [2]
-    local player2Field = Field(_DECKLIST2, true, 2)
-    table.insert(self.fields, player2Field)
+    Event.on('stand', function(unit)
+        unit.state = "stand"
+    end)
 
-    -- setup global access to state
-    -- GVanguardState = self
+    Event.on('rest', function(unit)
+        unit.state = "rest"
+    end)
 
-    vStateMachine:change('RPS', self.fields)
-end
+    Event.on('battle-boost', function(request)
+        request.attacker.battleBoost = request.attacker.battleBoost + request.power
+    end)
 
-function VanguardState:update(dt)
-    vStateMachine:update(dt)
-end
-
-function VanguardState:render()
-    vStateMachine:render()
 end

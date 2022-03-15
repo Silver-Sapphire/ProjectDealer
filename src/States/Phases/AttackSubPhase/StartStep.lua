@@ -13,9 +13,9 @@ function StartStep:enter(pass)
     if not PastFirstStartStep then
         -- beggining of battle phase/start step triggers
         Event.dispatch("begin-battle-phase")
-        Event.distapch("begin-start-step")
+        Event.dispatch("begin-start-step")
         -- check timing
-        Event.disptach("check-timing")
+        Event.dispatch("check-timing")
         PastFirstStartStep = true
     end
     -- assume the player will atk and move to atk step

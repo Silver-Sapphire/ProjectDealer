@@ -42,7 +42,7 @@ MENU_DEFS = {
 MENU_PROTOS = {
     ['small'] = {
         font = gFonts['small'],
-
+        orientation = "horizontal",
         x = VIRTUAL_WIDTH*11/16,
         y = VIRTUAL_HEIGHT*13/16,
         width = VIRTUAL_WIDTH/8,
@@ -50,15 +50,23 @@ MENU_PROTOS = {
     },
     ['medium'] = {
         font = gFonts['medium'],
-
+        orientation = "horizontal",
         x = VIRTUAL_WIDTH/4,
         y = VIRTUAL_HEIGHT*3/4,
         width = VIRTUAL_WIDTH/2,
         height = VIRTUAL_HEIGHT/4
     },
+    ['edium-2'] = {
+        font = gFonts['medium'],
+        orientation = "vertical",
+        x = VIRTUAL_WIDTH*3/4,
+        y = VIRTUAL_HEIGHT/2,
+        width = VIRTUAL_WIDTH/4,
+        height = VIRTUAL_HEIGHT/2
+    },
     ['large'] = {
         font = gFonts['large'],
-
+        orientation = "horizontal",
         x = VIRTUAL_WIDTH/8,
         y = VIRTUAL_HEIGHT/2,
         width = VIRTUAL_WIDTH*3/4,

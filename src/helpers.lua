@@ -88,5 +88,19 @@ function RenderCard(card, x, y)
 end
 
 function CraftMenu(template, items, onSubmitFunction)
-	local craftMenu = Menu{}
+	if not items or not template then
+		return false
+	end
+	proto = MENU_PROTOS[template]
+	local craftMenu = Menu{
+		font = proto.font,
+		orientation = proto.orientation,
+		x = proto.x,
+		y = proto.y,
+		width = proto.width,
+		height = proto.height,
+		items = items,
+		onSubmitFunction = onSubmitFunction or function() end
+	}
+	return craftMenu
 end

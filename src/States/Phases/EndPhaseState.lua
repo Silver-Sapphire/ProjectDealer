@@ -11,14 +11,15 @@ function EndPhaseState:enter(pass)
     -- return all G units, unlock cards, spin astral plane unit, ect
 
     -- unlock triggers
-    for k, circle in pairs(self.fields.circles) do
-        card_=circle.units[1]
-        if card_.locked then
-            card_.locked = false
-            -- event??
-        elseif card_.oLocked then
-            card_.locked = true
-            card_.oLocked = false
+    for k, circle in pairs(self.fields[turnPlayer].circles) do
+        if #circle.units > 0 then
+            card_ = circle.units[1]
+            if card_.locked then
+                Event.dispatch('unlock', card_)
+            elseif card_.oLocked then
+                card_.locked = true
+                card_.oLocked = false
+            end
         end
     end
 

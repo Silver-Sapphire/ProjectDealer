@@ -19,11 +19,11 @@ function BattlePhaseState:enter(pass)
 end
 
 function BattlePhaseState:update(dt)
-    self.bStateMachine:update(dt)
+    bStateMachine:update(dt)
 end
 
 function BattlePhaseState:render()
-    self.bStateMachine:render()
+    bStateMachine:render()
     
     -- highlight current phase
     love.graphics.setFont(gFonts['large'])

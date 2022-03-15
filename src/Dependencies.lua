@@ -7,7 +7,6 @@ Timer = require 'lib/knife.timer'
 
 require 'src/constants'
 require 'src/helpers'
-require 'src/menu_defs'
 require 'src/Shuffler'
 require 'src/deck_list'
 require 'src/StateMachine'
@@ -50,6 +49,13 @@ require 'src/states/phases/MainPhaseState'
 require 'src/states/phases/BattlePhaseState'
 require 'src/states/phases/EndPhaseState'
 
+require 'src/states/phases/AttackSubPhase/StartStep'
+require 'src/states/phases/AttackSubPhase/AttackStep'
+require 'src/states/phases/AttackSubPhase/GuardStep'
+require 'src/states/phases/AttackSubPhase/DriveStep'
+require 'src/states/phases/AttackSubPhase/DamageStep'
+require 'src/states/phases/AttackSubPhase/CloseStep'
+
 -- require 'src/states/Actions/'
 
 gTextures = {
@@ -70,3 +76,5 @@ gFonts = {
 gSounds = {
     ['blip'] = love.audio.newSource('sounds/blip.wav', 'static')
 }
+-- very lame placment to solve font indexing issues
+require 'src/menu_defs'

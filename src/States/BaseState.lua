@@ -106,18 +106,29 @@ function BaseState:determinePossibleAttacks(player)
     local possibleAttacks = {}
     for table_, circle in pairs(self.fields[player].circles) do
         if circle.row == "front" and #circle.units > 0 then
-            local atk = {
-                card = cricle.units[1],
-                player = player,
-                circle = circle,
-                table = table_,
-                index = 1
-            }
-            table.insert(possibleAttacks, atk)
+            unit_ = circle.units[1]
+            if unit_.state ~= "rest" and not unit_.cantAtk then
+                local atk = {
+                    card = unit_,
+                    player = player,
+                    circle = circle,
+                    table = table_,
+                    index = 1
+                }
+                table.insert(possibleAttacks, atk)
+            end
         end
     end
     return possibleAttacks
 end
+
+-- a function that finds a list of cards in a zone, to be later screened for target viability
+-- function BaseState:findTargets(zones)
+--     local targets = {}
+--     for table_, zone in pairs(zones) do
+
+--     end
+-- end
 
 -- a powerful multipurpose function that moves a card
 -- from a given location at a given index, to another specified location, at at an option index
