@@ -56,7 +56,7 @@ MENU_PROTOS = {
         width = VIRTUAL_WIDTH/2,
         height = VIRTUAL_HEIGHT/4
     },
-    ['edium-2'] = {
+    ['medium-2'] = {
         font = gFonts['medium'],
         orientation = "vertical",
         x = VIRTUAL_WIDTH*3/4,

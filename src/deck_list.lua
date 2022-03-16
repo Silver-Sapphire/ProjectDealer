@@ -69,7 +69,8 @@ end
 
 for i=1, 8 do
     table.insert(DECKLIST, {['grade'] = 3,
-                            ['power'] = 11})
+                            ['power'] = 11,
+                            ['skill'] = function() end})
 end
 
 --[[

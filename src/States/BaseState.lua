@@ -20,8 +20,19 @@ BaseState = Class{}
 function BaseState:init() end
 function BaseState:enter() end
 function BaseState:exit() end
-function BaseState:update(dt) end
-function BaseState:render() end
+
+-- this behaviour got used in almost every state, so putting it here seemed fitting
+function BaseState:update(dt)
+    for k, field in pairs(self.fields) do
+        field:update(dt)
+    end
+end
+
+function BaseState:render()
+    for k, field in pairs(self.fields) do
+        field:render()
+    end
+end
 
 -- functions we want for all our vanguard game states
 
@@ -106,17 +117,17 @@ function BaseState:determinePossibleAttacks(player)
     local possibleAttacks = {}
     for table_, circle in pairs(self.fields[player].circles) do
         if circle.row == "front" and #circle.units > 0 then
-            unit_ = circle.units[1]
-            if unit_.state ~= "rest" and not unit_.cantAtk then
+            unit_ = circle.units[1] -- TODO change to stand with card ovehaul
+            -- if unit_.state ~= "rest" and not unit_.cantAtk then
                 local atk = {
-                    card = unit_,
-                    player = player,
-                    circle = circle,
-                    table = table_,
-                    index = 1
+                    ['card'] = unit_,
+                    ['player'] = player,
+                    ['circle'] = circle,
+                    ['table'] = table_,
+                    ['index'] = 1
                 }
                 table.insert(possibleAttacks, atk)
-            end
+            -- end
         end
     end
     return possibleAttacks
@@ -151,8 +162,12 @@ function BaseState:moveCard(request)
 		_card = table.remove(self.fields[_field].hand, _inputIndex)
 	
     elseif _inputTable == "deck" then
-		_card = table.remove(self.fields[_field].deck, _inputIndex)
-	
+        if _inputIndex then
+            _card = table.remove(self.fields[_field].deck, _inputIndex)
+        else
+            _card = table.remove(self.fields[_field].deck)
+        end
+
     elseif _inputTable == "drop" then
 		_card = table.remove(self.fields[_field].drop, _inputIndex)
 
@@ -160,11 +175,19 @@ function BaseState:moveCard(request)
 		_card = table.remove(self.fields[_field].bind, _inputIndex)
 
 	elseif _inputTable == "trigger" then
-		_card = table.remove(self.fields[_field].trigger, _inputIndex)
+        if _inputIndex then
+            _card = table.remove(self.fields[_field].trigger, _inputIndex)
+        else
+            _card = table.remove(self.fields[_field].trigger)
+        end
 
 	elseif _inputTable == "order" then
-		_card = table.remove(self.fields[_field].order, _inputIndex)
-
+        if _inputIndex then
+            _card = table.remove(self.fields[_field].order, _inputIndex)
+        else
+            _card = table.remove(self.fields[_field].order)
+        end
+        
 	elseif _inputTable == "damage" then
 		_card = table.remove(self.fields[_field].damage, _inputIndex)
 

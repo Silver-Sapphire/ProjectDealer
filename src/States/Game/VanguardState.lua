@@ -18,7 +18,7 @@ function VanguardState:enter()
         ['end'] = function() return EndPhaseState() end
     }    
     -- setup stand/draw, ect event handlers
-    self:settupEvents()
+    -- self:settupEvents() -- now in self:init
 
     _DECKLIST = shuffle(DECKLIST)
     _DECKLIST2 = shuffle(DECKLIST)
@@ -45,7 +45,7 @@ function VanguardState:render()
     vStateMachine:render()
 end
 
-function VanguardState:settupEvents()
+function VanguardState:init()
     -- setup game actions, with self discriptive name
     Event.on('draw', function(t)
         for i = 1, t.qty do
@@ -92,4 +92,11 @@ function VanguardState:settupEvents()
         request.attacker.battleBoost = request.attacker.battleBoost + request.power
     end)
 
+    Event.on('critical-trigger', function(player, power)
+        -- TODO 
+    end)
+
+    Event.on('heal-trigger', function()
+    
+    end)
 end

@@ -1,11 +1,24 @@
 
 
+CloseStep = Class{__includes = BaseState}
+
+function CloseStep:enter(pass, battles)
+    --boiler plate
+
+    -- Event.dispatch()
+    Event.dispatch("recursive-check-timing", "begin-close-step")
+
+    bStateMachine:change("start", pass)
+end
+
 -- Close step
--- trigger at the end of battle/beginning of the close step effects
+-- trigger untriggered  'at the end of battle/beginning of the close step' effects
 
 -- check timing
 
--- imideatly remove all until end of battle effects, and stop all boosting/atking references
+-- imideatly remove all until end of battle effects 
+
+-- stop all boosting/atking references
 
 -- recur check timing
 

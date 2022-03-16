@@ -54,44 +54,46 @@ end
 
 -- display a card
 function RenderCard(card, x, y)
-	-- set color based on attribute ("art")
-	local bTxFlag = false
-	if card.trigger == 'crit' then
-		bTxFlag = true
-		love.graphics.setColor(8/8, 7/8, 1/3, 1)--darker yellow
-	elseif card.trigger == 'heal' then
-		bTxFlag = true
-		love.graphics.setColor(1/4, 3/4, 3/8, 1)--green
-	elseif card.sentinel then
-		bTxFlag = true
-		love.graphics.setColor(8/8, 7/8, 1/2, 1)--brighter yellow
-	else
-		love.graphics.setColor(0, 0, 0, 1)--black
-	end
+	if card then
+		-- set color based on attribute ("art")
+		local bTxFlag = false
+		if card.trigger == 'crit' then
+			bTxFlag = true
+			love.graphics.setColor(8/8, 7/8, 1/3, 1)--darker yellow
+		elseif card.trigger == 'heal' then
+			bTxFlag = true
+			love.graphics.setColor(1/4, 3/4, 3/8, 1)--green
+		elseif card.sentinel then
+			bTxFlag = true
+			love.graphics.setColor(8/8, 7/8, 1/2, 1)--brighter yellow
+		else
+			love.graphics.setColor(0, 0, 0, 1)--black
+		end
 
-	-- card ""art"""
-	love.graphics.rectangle('fill', x,y, CARD_WIDTH,CARD_HEIGHT)
-	-- card text color setting
-	if bTxFlag then
-		love.graphics.setColor(0,0,0,1)
-	else
-		love.graphics.setColor(1,1,1,1)--white
-	end
+		-- card ""art"""
+		love.graphics.rectangle('fill', x,y, CARD_WIDTH,CARD_HEIGHT)
+		-- card text color setting
+		if bTxFlag then
+			love.graphics.setColor(0,0,0,1)
+		else
+			love.graphics.setColor(1,1,1,1)--white
+		end
 
-	-- draw card info
-	love.graphics.setFont(gFonts['small'])
-	love.graphics.print(card.grade, x+1, y+1)
-	if card.shield then
-		love.graphics.printf(card.shield, x+15, y+1, CARD_HEIGHT -2, 'center', math.pi/2) -- rotate 90*
+		-- draw card info
+		love.graphics.setFont(gFonts['small'])
+		love.graphics.print(card.grade, x+1, y+1)
+		if card.shield then
+			love.graphics.printf(card.shield, x+15, y+1, CARD_HEIGHT -2, 'center', math.pi/2) -- rotate 90*
+		end
+		love.graphics.printf(card.power or 0, x+1, y+CARD_HEIGHT-15, CARD_WIDTH-2, 'right')
 	end
-	love.graphics.printf(card.power or 0, x+1, y+CARD_HEIGHT-15, CARD_WIDTH-2, 'right')
 end
 
-function CraftMenu(template, items, onSubmitFunction)
-	if not items or not template then
-		return false
+function CraftMenu(template_, items_, onSubmitFunction_)
+	if not items_ or not template_ then
+		return false -- TODO push error menu
 	end
-	proto = MENU_PROTOS[template]
+	proto = MENU_PROTOS[template_]
 	local craftMenu = Menu{
 		font = proto.font,
 		orientation = proto.orientation,
@@ -99,8 +101,8 @@ function CraftMenu(template, items, onSubmitFunction)
 		y = proto.y,
 		width = proto.width,
 		height = proto.height,
-		items = items,
-		onSubmitFunction = onSubmitFunction or function() end
+		items = items_,
+		onSubmitFunction = onSubmitFunction_ or function() end
 	}
 	return craftMenu
 end

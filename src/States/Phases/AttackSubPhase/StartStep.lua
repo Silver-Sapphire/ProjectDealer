@@ -18,8 +18,10 @@ function StartStep:enter(pass)
         Event.dispatch("check-timing")
         PastFirstStartStep = true
     end
-    -- assume the player will atk and move to atk step
+
+    -- assume the player will atk and move to atk step (this may cause some issues down the road...)
     -- the player may decide not to atk in the attack step if they don't trigger any "start of atk step" effects
+    Event.dispatch("check-timing")
     bStateMachine:change("attack", pass)
 end
 

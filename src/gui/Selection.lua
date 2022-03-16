@@ -12,7 +12,7 @@ function Selection:init(def) -- defaults
     self.minSel = def.minSel --or 1,
     self.maxSel = def.maxSel --or 1,
 
-    self.items = def.items
+    self.items = def.items or {0}
 
     self.x = def.x
     self.y = def.y
@@ -121,9 +121,9 @@ function Selection:render()
                     love.graphics.setColor(1/2, 1/2, 2/2, 1/3)
                     love.graphics.rectangle('fill', paddedX - CARD_WIDTH/2, self.y + CARD_HEIGHT/2, CARD_WIDTH,CARD_HEIGHT)
                 end
-            else -- render text if not cards
+            elseif self.items[i].text then -- render text if not cards
                 if self.items[i].selected then
-                    love.graphics.setColor(3/4, 3/4, 1, 1)
+                    love.graphics.setColor(2/4, 3/4, 1, 1)
                 else
                     love.graphics.setColor(1,1,1,1)
                 end
@@ -140,14 +140,14 @@ function Selection:render()
         else--if self.orientation --'horizontal' then
             -- same as above section, but with the relvant x and y swaps
              -- draw cards if they are the items
-            if self.areCards and self.items[i].card then
+            if self.items[i].card then
                 RenderCard(self.items[i].card, paddedX - CARD_WIDTH/2, self.y + CARD_HEIGHT/2)
                 if self.items[i].selected then
                     love.graphics.setColor(1/2, 1/1, 2/2, 2/3)
                     love.graphics.rectangle('fill', paddedX - CARD_WIDTH/2, self.y + CARD_HEIGHT/2, CARD_WIDTH,CARD_HEIGHT)
                 end
 
-            else -- render text if not cards
+            elseif self.items[i].text then -- render text if not cards
                 if self.items[i].selected then
                     love.graphics.setColor(1/2, 1/2, 1, 1)
                 else
@@ -161,7 +161,6 @@ function Selection:render()
                 love.graphics.setColor(1, 1, 1, 1)--white
                 love.graphics.draw(gTextures['cursor'], paddedX - CARD_WIDTH*2/3 - 4, self.y + CARD_HEIGHT*2/3, 0, 3, 3) -- +9 to avoid overlap
             end
-
            
             currentX = currentX + self.gapWidth
         end

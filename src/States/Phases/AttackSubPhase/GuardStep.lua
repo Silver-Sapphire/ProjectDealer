@@ -2,29 +2,32 @@
 GuradStep = Class{__includes = BaseState}
 
 function GuradStep:enter(pass, battles)
-
-end
-
-function AttackStep:update(dt)
-    for k, field in pairs(self.fields) do
-        field:update(dt)
+    self.pass = pass
+    self.fields = pass.fields
+    self.turnPlayer = pass.turnPlayer
+    local turnPlayer = pass.turnPlayer
+    if turnPlayer == 1 then
+        self.op = 2
+    else
+        self.op = 1
     end
+
+    -- trigger guard step skills
+    Event.dispatch("begin-guard-step")
+    Event.dispatch("check-timing") -- TODO ensure its for op only
+
+    -- TODO guard/no guard menu
+
+    -- TODO only go to drive step if unit has drive checks instead of checking in drive step
+    bStateMachine:change('drive', pass, battles)
 end
 
-function AttackStep:render()
-    -- draw fields
-    for k, field in pairs(self.fields) do
-        field:render()
-    end
-end
-
--- trigger beginning of guard step effects
 
 -- non-turn player gets a play timing (begin recursion)
 
     -- pass?
 
-    -- force pass if they can't guard (also counts unit atk'd no longer existing)
+    -- force pass if they can't guard (also counts unit being atk'd no longer existing)
 
     -- call cards from hand to G
 
@@ -32,7 +35,7 @@ end
 
     -- check intercepts
 
-        -- trigger intercpet effects
+        -- trigger intercpet effects (needs to be on G stay on standby)
 
     -- play blitz order
 
