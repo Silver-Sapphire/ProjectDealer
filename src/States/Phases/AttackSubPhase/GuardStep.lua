@@ -1,8 +1,9 @@
 
-GuradStep = Class{__includes = BaseState}
+GuardStep = Class{__includes = BaseState}
 
-function GuradStep:enter(pass, battles)
+function GuardStep:enter(pass)
     self.pass = pass
+    self.battles = pass.battles
     self.fields = pass.fields
     self.turnPlayer = pass.turnPlayer
     local turnPlayer = pass.turnPlayer
@@ -19,7 +20,7 @@ function GuradStep:enter(pass, battles)
     -- TODO guard/no guard menu
 
     -- TODO only go to drive step if unit has drive checks instead of checking in drive step
-    bStateMachine:change('drive', pass, battles)
+    bStateMachine:change('drive', pass)
 end
 
 

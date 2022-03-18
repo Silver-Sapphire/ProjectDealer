@@ -1,11 +1,12 @@
 
-DamageStep = Class{__includes = BaseState}
+DriveStep = Class{__includes = BaseState}
 
-function DamageStep:enter(pass, battles)
+function DriveStep:enter(pass)
     self.fields = pass.fields
-    self.attacker = battles[1].attacker
-    self.turnPlayer = attacker.player
-    -- TODO check for dive amount instead of just checking V and grade
+    self.battles = pass.battles
+    self.attacker = self.battles[1].attacker
+    self.turnPlayer = self.attacker.player
+    -- TODO check for drive amount instead of just checking V and grade
 
     -- trigger beginning of drive step effect
     Event.dispatch("begin-drive-step")
@@ -13,8 +14,8 @@ function DamageStep:enter(pass, battles)
 
     -- determine number of checks to make
     local drive = 0
-    if attacker.table == "vanguard" then
-        if attacker.card.grade == 3 then
+    if self.attacker.table == "vanguard" then
+        if self.attacker.card.grade == 3 then
             drive = 2
         else
             drive = 1
@@ -26,31 +27,23 @@ function DamageStep:enter(pass, battles)
     end
 
     Event.dispatch("check-timing")
-    bStateMachine:change("damage", pass, battles)
+    bStateMachine:change("damage", pass)
 end
 
-function DamageStep:init()
+function DriveStep:init()
     Event.on("drive-check", function ()
-        -- put each card in trigger zone
-        -- TODO animation
-        self:moveCard({
-            _field = self.attacker.player,
-            _inputTable = "deck",
-            _outputTable = "trigger"
-        })
-
+        -- put each card in trigger zone (moved to trigger check dispatch)
         -- trigger trigger effects
-        self:triggerCheck(self.fields[self.turnPlayer].trigger[1])
-
+        Event.dispatch("trigger-check", self.turnPlayer)
         Event.dispatch("check-timing")
 
         -- add drive to hand
         self:moveCard({
             _field = self.attacker.player,
             _inputTable = "trigger",
+
             _outputTable = "hand"
         })
-
         Event.dispatch("check-timing")
     end)
 end

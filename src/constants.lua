@@ -11,6 +11,8 @@ BACKGROUND_SCROLL_SPEED = 50
 
 PHASE_TEXT_GAP = 60
 
+CRITCONS = 1
+
 -- field rendering constants ------------------
 
 -- circle x poss'

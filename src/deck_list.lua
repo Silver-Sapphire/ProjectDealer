@@ -33,45 +33,36 @@ end
 
 -- initialize and shuffle both players decks
 -- a deck making hack for prototyping
-DECKLIST = {}
-for i=1, 16 do
-    if i%4 == 0 then
-        table.insert(DECKLIST, {['grade'] = 0,
-                                ['trigger'] = 'heal',
-                                ['power'] = 5,
-                                ['shield'] = 20})
-    else
-        table.insert(DECKLIST, {['grade'] = 0,
-                                ['trigger'] = 'crit',
-                                ['power'] = 5,
-                                ['shield'] = 15})
+function MakeDeck()
+    local deck = {}
+    --G0
+    for i=1, 16 do
+        if i%4 == 0 then -- 4
+            table.insert(deck, Card(CARD_IDS['test-heal']))
+        else             -- 12
+            table.insert(deck, Card(CARD_IDS['test-crit']))
+        end
     end
-end
-
-for i=1, 14 do
-    if i < 11 then
-        table.insert(DECKLIST, {['grade'] = 1,
-                                ['power'] = 8,
-                                ['shield'] = 10})
-    else
-        table.insert(DECKLIST, {['grade'] = 1,
-                                ['power'] = 7,
-                                ['shield'] = 0,
-                                ['sentinel'] = true})
+    --G1
+    for i=1, 14 do
+        if i < 11 then -- 10
+            table.insert(deck, Card(CARD_IDS['test-1']))
+        else           -- 4
+            table.insert(deck, Card(CARD_IDS['test-sentinel']))
+        end
     end
+    --G2
+    for i=1, 11 do
+        table.insert(deck, Card(CARD_IDS['test-2']))
+    end
+    --G3
+    for i=1, 8 do
+        table.insert(deck, Card(CARD_IDS['test-3']))
+    end
+
+    return deck
 end
 
-for i=1, 11 do
-    table.insert(DECKLIST, {['grade'] = 2,
-                            ['power'] = 10,
-                            ['shield'] = 5})
-end
-
-for i=1, 8 do
-    table.insert(DECKLIST, {['grade'] = 3,
-                            ['power'] = 11,
-                            ['skill'] = function() end})
-end
 
 --[[
 DECK_LIST = {

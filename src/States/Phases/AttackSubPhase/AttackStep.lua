@@ -80,7 +80,7 @@ function AttackStep:pushAtkTargetMenu(attacker)
     if attacker and attacker.state ~= "stand" and not attacker.cantAtk then
         -- create a table of options to target for attacks
         self.targets = self:findAtkTargets(attacker.bonus) or {}
-        local callback = function (targets_) if targets_ then self:atkCallback(targets_) end end
+        local callback = function (targets_) if targets_ then self:atkCallback(targets_, attacker) end end
         local cancel = {
             ['text'] = "Cancel",
             onSelect = function()
@@ -130,7 +130,7 @@ function AttackStep:findBooster(attacker)
     end
 end
 
-function AttackStep:atkCallback(targets)
+function AttackStep:atkCallback(targets_, attacker)
     -- TODO make boosting optional ----------------------
     
     -- IMPORTANT EVENT 1/2 -----
@@ -145,11 +145,16 @@ function AttackStep:atkCallback(targets)
         local battle = {
             attacker = attacker,
             booster = self:findBooster(attacker), -- TODO- work with dynamic boosters
-            defender = target
+            
+            defender = target,
+            guardians = {}
         }
+        table.insert(battles, battle)
     end
+    self.pass.battles = battles
+
     -- CHECK TIMING --------------
     Event.dispatch("check-timing")
 
-    bStateMachine:change('guard', pass, battles)
+    bStateMachine:change('guard', self.pass)
 end

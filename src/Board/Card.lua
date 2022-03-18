@@ -6,19 +6,30 @@ function Card:init(def)
     self.width = CARD_WIDTH
     self.height = CARD_HEIGHT
     self.state = def.state or "stand"
+    ----------------   CARD INFO    ---------------------
+    self.names = {def.name} or {"_"}
 
-    self.name = def.name "_"
+    self.baseGrade = def.grade or 0
     self.grade = def.grade or 0
+
+    self.baseShield = def.shield or 0
     self.shield = def.shield or 0
-    self.power = def.power or 0
+
+    self.basePower = def.power or 0
+    self.turnBoost = 0
+    self.battleBoost = 0
+    self.currentPower = def.power or 0
+
+    self.baseCrit = def.baseCrit or 1
     self.crit = def.crit or 1
+
     self.nation = def.nation or "Cray Elemental"
     self.clan = def.clan or "Cray Elemental"
     self.race = def.race or "Elemental"
 
     self.sentinel = def.sentinel or false
     self.trigger = def.trigger or false
-    self.type = def.type of "Normal Unit"
+    self.type = def.type or "Normal Unit"
     self.skillIcon = def.skillIcon or "boost"
     self.text = def.text or "_"
     self.flavor = def.flavor or "_"
@@ -29,7 +40,9 @@ function Card:init(def)
     self.art = def.art or false
     self.setData = def.setData or "_"
 
+    self.oLocked = false
     self.locked = false
+
     self.table = false
     self.index = false
 end

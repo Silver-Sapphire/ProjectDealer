@@ -23,8 +23,10 @@ function BaseState:exit() end
 
 -- this behaviour got used in almost every state, so putting it here seemed fitting
 function BaseState:update(dt)
-    for k, field in pairs(self.fields) do
-        field:update(dt)
+    if self.fields then
+        for k, field in pairs(self.fields) do
+            field:update(dt)
+        end
     end
 end
 
@@ -113,6 +115,8 @@ function BaseState:chooseCircle(_card)
     return circles
 end
 
+-- function BseState:chooseOpenCircle(_card) end
+
 function BaseState:determinePossibleAttacks(player)
     local possibleAttacks = {}
     for table_, circle in pairs(self.fields[player].circles) do
@@ -189,7 +193,11 @@ function BaseState:moveCard(request)
         end
         
 	elseif _inputTable == "damage" then
-		_card = table.remove(self.fields[_field].damage, _inputIndex)
+        if _inputIndex then
+            _card = table.remove(self.fields[_field].damage, _inputIndex)
+        else
+            _card = table.remove(self.fields[_field].damage)
+        end
 
 	elseif _inputTable == "soul" then
 		_card = table.remove(self.fields[_field].soul, _inputIndex)
@@ -309,4 +317,5 @@ function BaseState:moveCard(request)
     elseif _outputTable == "accel" then
         table.insert(self.fields[_field].circles.accel[_outputIndex].units, _card)
     end
+    return _card or false
 end

@@ -11,7 +11,6 @@
 
 ]]
 
-
 require 'src/Dependencies'
 
 function love.load()
@@ -41,6 +40,10 @@ end
 function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
+    end
+
+    if key == "q" then
+        gStateStack:pop()
     end
 
     if key == "L" then

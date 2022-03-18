@@ -1,8 +1,9 @@
 
 DamageStep = Class{__includes = BaseState}
 
-function DamageStep:enter(pass, battles)
-    self.pass = pass
+function DamageStep:enter(pass)
+    self.pass = pass    
+    self.battles = pass.battles
     self.fields = pass.fields
     self.turnPlayer = pass.turnPlayer
     local turnPlayer = pass.turnPlayer
@@ -18,54 +19,64 @@ function DamageStep:enter(pass, battles)
     -- check to see if each attack hits
     self.whiffs = {}
     self.hits = {}
-    self:determineHits(battles)
+    self:determineHits()
     Event.dispatch("check-timing")
 
-    -- resolve a dmg check/reitre for each hit
-    for k, hit in pairs(hits) do
-        self:hitHandler(hit)
+    -- resolve a dmg check / mark for reitre for each hit
+    if #self.hits > 0 then 
+        self:hitHandler()
     end
     Event.dispatch("check-timing")
 
-    Event.dispatch("attack-hit", self.hits)
-    Event.dispatch("attack-whiff", self.whiffs)
+    if #self.hits > 0 then
+        Event.dispatch("attack-hit", self.hits)
+    end
+    if #self.whiffs > 0 then
+        Event.dispatch("attack-whiff", self.whiffs)
+    end
     Event.dispatch("check-timing")
 
     self:cleanup()
     Event.dispatch("check-timing")
 
-    bStateMachine:change("close", pass, battles)
+    bStateMachine:change("close", pass)
 end
 
-function DamageStep:determineHits(battles) -- TODO remove VG from hits when dmg resolves or something else
-    -- compare battling units total power
-
-    -- cancel atk if a battling unit dissapears / master changes / moves circle
-
-
-    -- no dmg is inflicted if a unit dissapears / master changes / moves circle
-
-    -- if atkP >= defP then
-        -- if atkTarget.table == 'vanguard' then
-            -- begin apropriate amt of dmg checks
-
-            -- check timing
-
-            -- event.dispatch('hit', 'vanguard')
-
-        -- else (rearguard)
-            -- retire rearguard
-
-            -- check timing
-
-            -- event.dispatch('hit', 'rearguard')
-
-        -- end
-    -- else (atk dosn't hit)
+function DamageStep:determineHits()
+    for i = 1, #self.battles do
+        local battle = self.battles[i]
+        local shield = 0
+        for k, guardian in pairs(battle.guardians) do
+            shield = shield + guardian.shield
+        end
+        -- compare battling units total power
+        if battle.attacker.currentPower >= battle.defender.currentPower + shield then 
+            local _ = table.remove(self.battles, i)
+            table.insert(self.hits, _)
+        else --(atk dosn't hit)
+            local _ = table.remove(self.battles, i)
+            table.insert(self.whiffs, _)
+        end
+    end
 end
 
-function DamageStep:hitHandler(hit)
+function DamageStep:hitHandler() 
+    for i = 1, #self.hits do
+        local hit = self.hits[i]
+        if hit.defender.table == "vanguard" then
+            local crit = hit.attacker.crit
+            if crit > 0 then
+                for i = 1, crit do
+                    Event.dispatch("damage-check", self.op)
+                end
 
+            table.remove(self.hits, i) -- remove hit from table, now that its resolved.
+            -- rearugards are retired during the cleanup function later
+            
+            break -- the vanguard won't be in the table twice
+            end
+        end
+    end
 end
 
 function DamageStep:cleanup()
@@ -83,8 +94,7 @@ function DamageStep:cleanup()
                     _outputTable = "drop"
                 })
 
-            -- return g gurads
-            else
+            else -- return g gurads
 
             end
         end
@@ -101,4 +111,3 @@ function DamageStep:cleanup()
         })
     end
 end
-
