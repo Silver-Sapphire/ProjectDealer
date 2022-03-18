@@ -122,7 +122,7 @@ function BaseState:determinePossibleAttacks(player)
     for table_, circle in pairs(self.fields[player].circles) do
         if circle.row == "front" and #circle.units > 0 then
             unit_ = circle.units[1] -- TODO change to stand with card ovehaul
-            -- if unit_.state ~= "rest" and not unit_.cantAtk then
+            if unit_.state == "stand" and not unit_.cantAtk then
                 local atk = {
                     ['card'] = unit_,
                     ['player'] = player,
@@ -131,16 +131,16 @@ function BaseState:determinePossibleAttacks(player)
                     ['index'] = 1
                 }
                 table.insert(possibleAttacks, atk)
-            -- end
+            end
         end
     end
     return possibleAttacks
 end
 
--- a function that finds a list of cards in a zone, to be later screened for target viability
--- function BaseState:findTargets(zones)
+-- a function that finds a list of cards in a z one, to be later screened for target viability
+-- function BaseState:findTargets(z ones)
 --     local targets = {}
---     for table_, zone in pairs(zones) do
+--     for table_, z one in pairs(z ones) do
 
 --     end
 -- end
@@ -161,7 +161,7 @@ function BaseState:moveCard(request)
 
 	-- get _card by removing it from the specified table index
 
-	-- todo add ride deck and gzone
+	-- todo add ride deck and g z one
 	if _inputTable == "hand" then
 		_card = table.remove(self.fields[_field].hand, _inputIndex)
 	
@@ -263,41 +263,47 @@ function BaseState:moveCard(request)
             table.insert(self.fields[_field].bind, _card)
         end
 	elseif _outputTable == "trigger" then
-        if _outputIndex then
-            table.insert(self.fields[_field].trigger, _outputIndex, _card)
-        else
+        -- if _outputIndex then
+        --     table.insert(self.fields[_field].trigger, _outputIndex, _card)
+        -- else
             table.insert(self.fields[_field].trigger, _card)
-        end
+        -- end
+
 	elseif _outputTable == "order" then
         if _outputIndex then
             table.insert(self.fields[_field].order, _outputIndex, _card)
         else
             table.insert(self.fields[_field].order, _card)
         end
+
 	elseif _outputTable == "damage" then
         if _outputIndex then
             table.insert(self.fields[_field].damage, _outputIndex, _card)
         else
             table.insert(self.fields[_field].damage, _card)
         end
+
 	elseif _outputTable == "soul" then
         if _outputIndex then
             table.insert(self.fields[_field].soul, _outputIndex, _card)
         else
             table.insert(self.fields[_field].soul, _card)
         end
+
 	elseif _outputTable == "guardian" then
         -- if _outputIndex then
         --     table.insert(self.fields[_field].circles.guardian, _outputIndex, _card)
         -- else
             table.insert(self.fields[_field].circles.guardian.units, _card)
         -- end
+
 	elseif _outputTable == "vanguard" then
         -- if _outputIndex then
         --     table.insert(self.fields[_field].circles.vanguard, _outputIndex, _card)
         -- else
             table.insert(self.fields[_field].circles.vanguard.units, _card)
         -- end
+
     elseif _outputTable == "frontLeft" then
 		table.insert(self.fields[_field].circles.frontLeft.units, _card)
     

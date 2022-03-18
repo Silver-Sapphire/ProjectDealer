@@ -59,10 +59,10 @@ MENU_PROTOS = {
     ['medium-2'] = {
         font = gFonts['medium'],
         orientation = "vertical",
-        x = VIRTUAL_WIDTH*3/4,
+        x = VIRTUAL_WIDTH*5/8,
         y = VIRTUAL_HEIGHT/2,
         width = VIRTUAL_WIDTH/4,
-        height = VIRTUAL_HEIGHT/2
+        height = VIRTUAL_HEIGHT/3
     },
     ['large'] = {
         font = gFonts['large'],

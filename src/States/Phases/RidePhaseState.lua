@@ -6,6 +6,8 @@ function RidePhaseState:enter(pass)
     local turnPlayer = pass.turnPlayer
 
     -- trigger beginning of ride phase effects
+    Event.dispatch("begin-ride")
+    Event.dispatch("check-timing")
 
     -- make ride menu
     if turnPlayer == 1 then
@@ -50,14 +52,12 @@ function RidePhaseState:enter(pass)
 
                 onSubmitFunction = function (selection)
                     if #selection > 0 and selection[1].card then
-                        Event.dispatch('ride', {['player'] = selection[1].player,
-                                                ['table'] = selection[1].table,
-                                                ['index'] = selection[1].index} ) -- there should only be one selectin, but its still in a table, so we need to index into it
+                        Event.dispatch('ride', selection[1]) -- there should only be one selectin, but its still in a table, so we need to index into it
+                        Event.dispatch("check-timing")
                     end
-                    -- todo, trigger on ride skills and add stride step
+                    -- TODO stride step
                     gStateStack:pop()                
-                    vStateMachine:change('main', {['fields']=self.fields, 
-                                                  ['turnPlayer']=self.turnPlayer})
+                    vStateMachine:change('main', pass)
                 end
             }))
         end
@@ -66,8 +66,7 @@ function RidePhaseState:enter(pass)
         self:processAI(self.fields[2].hand)
 
         -- proceed to op main phase
-        vStateMachine:change('main', {['fields']=self.fields, 
-                                     ['turnPlayer']=self.turnPlayer})
+        vStateMachine:change('main', pass)
     end
 end
 

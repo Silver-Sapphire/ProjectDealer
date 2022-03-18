@@ -31,19 +31,23 @@ function DriveStep:enter(pass)
 end
 
 function DriveStep:init()
-    Event.on("drive-check", function ()
-        -- put each card in trigger zone (moved to trigger check dispatch)
-        -- trigger trigger effects
-        Event.dispatch("trigger-check", self.turnPlayer)
-        Event.dispatch("check-timing")
+    -- wierdchamp. moving this event handles would get rid of this weird singlton logic, 
+    -- but it being here makes thing more readable from my perspective
+    if not DriveCheckHandler then
+        DriveCheckHandler = Event.on("drive-check", function ()
+            -- put each card in trigger z one (moved to trigger check dispatch)
+            -- trigger trigger effects
+            Event.dispatch("trigger-check", self.turnPlayer)
+            Event.dispatch("check-timing")
 
-        -- add drive to hand
-        self:moveCard({
-            _field = self.attacker.player,
-            _inputTable = "trigger",
+            -- add drive check to hand
+            self:moveCard({
+                _field = self.attacker.player,
+                _inputTable = "trigger",
 
-            _outputTable = "hand"
-        })
-        Event.dispatch("check-timing")
-    end)
+                _outputTable = "hand"
+            })
+            Event.dispatch("check-timing")
+        end)
+    end
 end

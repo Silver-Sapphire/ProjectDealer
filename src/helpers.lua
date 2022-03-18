@@ -59,10 +59,10 @@ function RenderCard(card, x, y)
 		local bTxFlag = false
 		if card.trigger == 'crit' then
 			bTxFlag = true
-			love.graphics.setColor(8/8, 7/8, 1/3, 1)--darker yellow
+			love.graphics.setColor(8/8, 6/8, 1/3, 1)--darker yellow
 		elseif card.trigger == 'heal' then
 			bTxFlag = true
-			love.graphics.setColor(1/4, 3/4, 3/8, 1)--green
+			love.graphics.setColor(3/8, 7/8, 7/16, 1)--green
 		elseif card.sentinel then
 			bTxFlag = true
 			love.graphics.setColor(8/8, 7/8, 1/2, 1)--brighter yellow
@@ -82,10 +82,10 @@ function RenderCard(card, x, y)
 		-- draw card info
 		love.graphics.setFont(gFonts['small'])
 		love.graphics.print(card.grade, x+1, y+1)
-		if card.shield then
+		if card.shield ~= 0 or card.sentinel then
 			love.graphics.printf(card.shield, x+15, y+1, CARD_HEIGHT -2, 'center', math.pi/2) -- rotate 90*
 		end
-		love.graphics.printf(card.power or 0, x+1, y+CARD_HEIGHT-15, CARD_WIDTH-2, 'right')
+		love.graphics.printf(card.currentPower or 0, x+1, y+CARD_HEIGHT-15, CARD_WIDTH-2, 'right')
 	end
 end
 

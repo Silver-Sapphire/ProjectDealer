@@ -57,7 +57,7 @@ require 'src/states/phases/AttackSubPhase/DriveStep'
 require 'src/states/phases/AttackSubPhase/DamageStep'
 require 'src/states/phases/AttackSubPhase/CloseStep'
 
--- require 'src/states/Actions/'
+require 'src/states/Actions/CheckTiming'
 
 gTextures = {
     ['cursor'] = love.graphics.newImage('graphics/cursor.png'),
@@ -67,7 +67,7 @@ gTextures = {
 }
 
 gFonts = {
-    ['small'] = love.graphics.newFont('fonts/font.ttf', 16),
+    ['small'] = love.graphics.newFont('fonts/font.ttf', 24),
     ['medium'] = love.graphics.newFont('fonts/font.ttf', 32),
     ['large'] = love.graphics.newFont('fonts/font.ttf', 48),
     ['xl'] = love.graphics.newFont('fonts/font.ttf', 64),

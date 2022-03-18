@@ -3,10 +3,10 @@
 VanguardState = Class{__includes = BaseState}
 
 function VanguardState:enter()
-
+    self.numHeldStates = #gStateStack - 1
     -- setup a state machine for keeing track of game phases
     vStateMachine = StateMachine {
-        ['RPS'] = function() return RPSState() end,
+        ['rps'] = function() return RPSState() end,
         ['redraw'] = function() return RedrawState() end,
         ['stand-up'] = function() return StandUpState() end,
 
@@ -21,7 +21,14 @@ function VanguardState:enter()
     -- self:settupEvents() -- now in self:init
 
     _DECKLIST = shuffle(MakeDeck())
+    for k, card in pairs(_DECKLIST) do
+        card.player = 1 
+    end
+
     _DECKLIST2 = shuffle(MakeDeck())
+    for k, card in pairs(_DECKLIST2) do
+        card.player = 2 
+    end
     -- initialize boards
     self.fields = {}
     -- local player [1]       --decklist, flip, player
@@ -31,10 +38,14 @@ function VanguardState:enter()
     local player2Field = Field(_DECKLIST2, true, 2)
     table.insert(self.fields, player2Field)
 
-    -- setup global access to state
-    -- GVanguardState = self
-
-    vStateMachine:change('RPS', self.fields)
+        -- DEBUG LINES ------------
+    local card = Card(CARD_IDS['test-1'])
+    for i = 1, 5 do
+        table.insert(self.fields[1].damage, card)
+        table.insert(self.fields[2].damage, card)
+    end
+    --------
+    vStateMachine:change('rps', self.fields)
 end
 
 function VanguardState:update(dt)
@@ -81,6 +92,10 @@ function VanguardState:init()
         })
     end)
 
+    Event.on('call', function(units)
+        -- TODO make work with call to open R AND skills that call to any R
+    end)
+
     Event.on('stand', function(unit)
         unit.state = "stand"
         --animate
@@ -103,7 +118,7 @@ function VanguardState:init()
         request.attacker.battleBoost = request.attacker.battleBoost + request.power
     end)
 
-    Event.on('critical-trigger', function(player, power)
+    Event.on('critical-trigger', function(card_)
         if player == 1 then
             -- set up crit effects for our menu
             local callbackP = function(unit) 
@@ -123,11 +138,11 @@ function VanguardState:init()
                     end
                 },
                 ['power'] = {
-                    text = 'Power +'..power,
+                    text = 'Power +10',
                     callback = callbackP
                 },
                 ['crit'] = {
-                    text = 'Crit + 1',
+                    text = 'Crit +1',
                     callback = callbackC
                 },
                 ['cancel'] = {
@@ -148,14 +163,14 @@ function VanguardState:init()
                             -- push another menu for crit gain
                             gStateStack:pop()
                             gStateStack:pop()
-                            self:pushTriggerMenu(player, callbackC)
+                            self:pushTriggerMenu(card_.player, callbackC)
 
                         elseif key == 'crit' then
                             selection.callback(unitPass)
                             -- push another menu for power gain   
                             gStateStack:pop()
                             gStateStack:pop()
-                            self:pushTriggerMenu(player, callbackP)
+                            self:pushTriggerMenu(card_.player, callbackP)
 
                         elseif key == 'both' then 
                             selection.callback(unitPass)
@@ -172,7 +187,7 @@ function VanguardState:init()
                 gStateStack:push(MenuState(critMenu2))
             end
 
-            self:pushTriggerMenu(player, critMenu1Callback)
+            self:pushTriggerMenu(card_.player, critMenu1Callback)
         else
             -- AI / P2 
             
@@ -191,16 +206,16 @@ function VanguardState:init()
         end
     end)
 
-    Event.on('heal-trigger', function(player, power)
+    Event.on('heal-trigger', function(card_)
         --recover 1
-        Event.dispatch('heal', player)
+        Event.dispatch('heal', card_.player)
 
         if player == 1 then
             -- heal power menu
             local effectCallback = function(selection)
                 Event.dispatch('turn-boost', {selection[1].unit, 10}) -- TODO base off heal trigger instead of magic #
             end
-            self:pushTriggerMenu(player, effectCallback)
+            self:pushTriggerMenu(card_.player, effectCallback)
         else -- AI / P2
 
         end
@@ -214,11 +229,12 @@ function VanguardState:init()
 
             _outputTable = "trigger"
         })
-
-        local trigger = check.trigger
-        if trigger then
-            local triggerDispatch = "".. trigger.."-trigger"
-            Event.dispatch(triggerDispatch, {player, 10})-- TODO fix magic #
+        if check then
+            local trigger = check.trigger
+            if trigger then
+                local triggerDispatch = "".. trigger.."-trigger"
+                Event.dispatch(triggerDispatch, check)-- TODO fix magic #
+            end
         end
     end)
 
@@ -233,6 +249,67 @@ function VanguardState:init()
             _outputTable = "damage"
         })
         Event.dispatch("check-timing") -- check timing just to see if the player lost. needs tuneup
+    end)
+
+    Event.on("retire", function(unit)
+        self:moveCard({
+            _field = card.player,
+            _inputTable = card.table,
+            _inputIndex = 1,
+
+            _outputTable = "drop"
+        })
+        Event.dispatch("retired", unit)
+    end)
+
+    Event.on("game-over", function(pass)
+        local pass = pass
+        -- local player = cause_.player
+        -- local cause = cause_.cause
+
+        while #gStateStack > self.numHeldStates do
+            gStateStack:pop()
+        end
+        vStateMachine = nil
+        gStateStack:push(ResultsState(pass))
+    end)
+
+    Event.on("check-timing", function()
+        -- resolve all rule actions ---------------
+        for i = 1, 2 do
+            -- check to see if a player lost the game
+            if #self.fields[i].damage > 5 then -- TODO work with greedun
+                Event.dispatch('game-over', {['player'] = i,
+                                             ['cause'] = "lethal"} )
+            elseif #self.fields[i].deck == 0 then
+                Event.dispatch('game-over', {['player'] = i,
+                                             ['cause'] = "deckout"} )
+            end
+            -- retire R that were called over
+            for k, circle in pairs(self.fields[i].circles) do
+                if #circle.units > 1 then
+                    if #circle.units == 2 then
+                        local unit = circle.units[1]
+                        unit.table = k
+                        Event.dispatch("retire", unit)
+                    else -- if more than 1 card were called over something, the player picks one to keep
+                
+                    end
+                end
+            end
+        end
+    
+        -- turn player imaginary gift resolution----------
+        -- resolve all rule actions
+    
+        -- nonturn player imaginary gift resolution---------
+        -- resolve all rule actions
+       
+        -- turn player auto skill resolution-------------
+        -- resolve all rule actions
+        
+        -- nonturn player auto skill resolution----------
+        -- resolve all rule actions
     end)
 end
 

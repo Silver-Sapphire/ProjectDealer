@@ -50,7 +50,11 @@ function DamageStep:determineHits()
             shield = shield + guardian.shield
         end
         -- compare battling units total power
-        if battle.attacker.currentPower >= battle.defender.currentPower + shield then 
+        local attacker = battle.attacker.card or false
+        local totalAtkPower = attacker.basePower + attacker.battleBoost
+                           + attacker.turnBoost + attacker.contBoost or 0
+
+        if totalAtkPower >= battle.defender.card.currentPower + shield then 
             local _ = table.remove(self.battles, i)
             table.insert(self.hits, _)
         else --(atk dosn't hit)
@@ -63,15 +67,15 @@ end
 function DamageStep:hitHandler() 
     for i = 1, #self.hits do
         local hit = self.hits[i]
+        -- rearugards are retired during the cleanup function later
         if hit.defender.table == "vanguard" then
-            local crit = hit.attacker.crit
+            local crit = hit.attacker.card.crit 
             if crit > 0 then
                 for i = 1, crit do
                     Event.dispatch("damage-check", self.op)
                 end
 
             table.remove(self.hits, i) -- remove hit from table, now that its resolved.
-            -- rearugards are retired during the cleanup function later
             
             break -- the vanguard won't be in the table twice
             end
@@ -82,8 +86,8 @@ end
 function DamageStep:cleanup()
     -- clear G
     local G = self.fields[self.op].circles.guardian.units
-    if G > 0 then
-        for i = 1, G do
+    if #G > 0 then
+        for i = 1, #G do
             -- retire all normal guardians
             if G[i].type ~= 'gGuard' then
                 self:moveCard({

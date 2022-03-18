@@ -5,6 +5,7 @@ function Card:init(def)
     self.y = def.y or VIRTUAL_HEIGHT
     self.width = CARD_WIDTH
     self.height = CARD_HEIGHT
+
     self.state = def.state or "stand"
     ----------------   CARD INFO    ---------------------
     self.names = {def.name} or {"_"}
@@ -16,6 +17,7 @@ function Card:init(def)
     self.shield = def.shield or 0
 
     self.basePower = def.power or 0
+    self.contBoost = 0
     self.turnBoost = 0
     self.battleBoost = 0
     self.currentPower = def.power or 0
@@ -42,6 +44,13 @@ function Card:init(def)
 
     self.oLocked = false
     self.locked = false
+    self.cantAtk = false
+
+    -- a way of storing if a unit can attack multiple (bonus) units
+    self.bonus = false
+
+    self.player = 0
+    self.master = 0
 
     self.table = false
     self.index = false
@@ -79,7 +88,7 @@ function Card:flip()
 
 end
 
--- move cards to other zones
+-- move cards to other z ones
 function Card:move(request)
 
 end

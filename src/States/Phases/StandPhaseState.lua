@@ -1,31 +1,31 @@
 StandPhaseState = Class{__includes = BaseState}
 
 function StandPhaseState:enter(pass)
-    -- cringe global reset
+    -- cringe global var reset
     AttackNum = 0
-
+    self.pass = pass
     self.fields = pass.fields
     -- incriment turn count
     for k, field in pairs(self.fields) do
         field.turn = field.turn + 1
         self.turn = field.turn
     end
-    -- determine turn player (work into determin 1st system)
-    
+
+    -- determine turn player (work into extra turn functionallity)
     if self.turn % 2 == TURNCONSTANT then
-        self.turnPlayer = 1
+        self.pass.turnPlayer = 1
     else
-        self.turnPlayer = 2
+        self.pass.turnPlayer = 2
     end
+    local turnPlayer = self.pass.turnPlayer
     
     -- trigger at start of turn/stand phase effects
-    Event.dispatch('begin-turn', self.turnPlayer)
-    --check timing
+    Event.dispatch('begin-turn', turnPlayer)
     Event.dispatch('check-timing')
 
     -- stand all units
-    -- local stoodUnits_ = {}
-    for k, circle in pairs(self.fields[self.turnPlayer].circles) do
+    for k, circle in pairs(self.fields[
+        turnPlayer].circles) do
         if #circle.units ~= 0 then
             if circle.units[1].state == 'rest' then
                 circle.units[1].state = 'stand'
@@ -34,12 +34,9 @@ function StandPhaseState:enter(pass)
             end
         end
     end
-
-    -- check timing
     Event.dispatch('check-timing')
 
-    vStateMachine:change('draw', {['fields']=self.fields, 
-                                  ['turnPlayer']=self.turnPlayer})
+    vStateMachine:change('draw', self.pass)
 end
 
 function StandPhaseState:update(dt)

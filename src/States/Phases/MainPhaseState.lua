@@ -5,6 +5,9 @@ function MainPhaseState:enter(pass)
     self.turnPlayer = pass.turnPlayer
     local turnPlayer = pass.turnPlayer
 
+    Event.dispatch('begin-main')
+    Event.dispatch('check-timing')-- c.t. associated with play timing
+
     -- turn player gets a play timing
     if turnPlayer == 1 then
         local actions = {
@@ -23,8 +26,7 @@ function MainPhaseState:enter(pass)
                 onSelect = function()
                     -- confirmation menu here
                     gStateStack:pop()
-                    vStateMachine:change('battle', {['fields']=self.fields, 
-                                                    ['turnPlayer']=self.turnPlayer})
+                    vStateMachine:change('battle', pass)
                 end
             }
             table.insert(actions, action)
@@ -35,13 +37,14 @@ function MainPhaseState:enter(pass)
                 onSelect = function()
                     -- confirmation menu here
                     gStateStack:pop()
-                    vStateMachine:change('end', {['fields']=self.fields,
-                                                ['turnPlayer']=self.turnPlayer})
+                    vStateMachine:change('end', pass)
                 end
             }
             table.insert(actions, action)
         end
-        -- insert ACT skills into actions menu
+        -- TODO insert ACT skills into actions menu
+
+        -- TODO move units
 
         gStateStack:push(MenuState(Menu{
             font = gFonts['medium'],
@@ -49,14 +52,13 @@ function MainPhaseState:enter(pass)
             items = actions,
 
             x = VIRTUAL_WIDTH/32,
-            y = VIRTUAL_HEIGHT*3/4,
+            y = VIRTUAL_HEIGHT*5/8,
             width = VIRTUAL_WIDTH/3,
-            height = VIRTUAL_HEIGHT/4
+            height = VIRTUAL_HEIGHT*3/8
         }))
     else -- allow opponent a play timing
         self:processAI()
-        vStateMachine:change('battle', {['fields']=self.fields,
-                                        ['turnPlayer']=self.turnPlayer})
+        vStateMachine:change('battle', pass)
     end
 end
 
@@ -134,6 +136,7 @@ function MainPhaseState:createCallMenu(options)
                         -- this menu is popped by the item,
                         -- so we pop the call menu here and reinstatiate it without the called card
                         gStateStack:pop()
+                        Event.dispatch("check-timing") -- c.t. associated with play timing
                         local callableCards = self:determineCallableCards()
                         self:createCallMenu(callableCards)
                     end
@@ -144,5 +147,53 @@ function MainPhaseState:createCallMenu(options)
 end
 
 function MainPhaseState:processAI()
+    -- AI currently only cards cards, and doesn't move them or use skills
+    -- The AI is desighned to play reactivly, and wait for the opponent to call rears,
+    -- so it can then swing at them to try and build tempo. Only goes aggro when the opponent is at 4/5 dmg
+    
+    -- check to see how many R's the op has
+    local opAtkTargets = 0
+    for k, circle in pairs(self.fields[1].circles) do
+        if circle.row == "front" and #circle.units > 1 then
+            opAtkTargets = opAtkTargets + 1
+        end
+    end
 
+    -- decide how many attacks were going to make
+    local opDmg = #self.fields[1].damage
+    local aiDmg = #self.fields[2].damage
+
+    local opHandAmt = #self.fields[1].hand
+    local aiHand = self.fields[2].hand
+
+    local potentialBeaters = {}
+    local potentialBoosters = {}
+    local desperationCalls = {}
+    -- determing which cards are reasonable to call
+    for k, card in pairs(aiHand) do
+        if card.grade == 1 and not card.sentinel then
+            table.insert(potentialBoosters, card)
+        elseif card.grade > 1 then
+            table.insert(potentialBeaters, card)
+        else
+            table.insert(desperationCalls, card)
+        end
+    end
+
+    local aiAtks = 0
+    for k, circle in pairs(self.fields[2].circles) do
+        if #circle.units > 1 then
+            aiAtks = aiAtks + 1
+        end
+    end
+
+    -- determing cards in hand to call
+
+    if opDmg < 4 and aiDmg < 4 then -- if were not in the late game...
+
+    elseif opDmg == 4 or aiDmg == 4 then -- late game desiction making...
+
+    else -- 5 dmg means we push for game
+
+    end
 end

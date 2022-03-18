@@ -4,7 +4,7 @@ AttackStep = Class{__includes = BaseState}
 function AttackStep:init()
     -- a global scope, as a priemptive debug effort to avoid more than one handler existing
     BoostHandler = BoostHandler or Event.on("boost", function(attacker)
-        booster_ = self:findBooster(attacker)
+        self.booster_ = self:findBooster(attacker)
         if booster_ then
             Event.dispatch("rest", booster_)
             Event.dispatch("battle-boost", {attacker=attacker, power=booster_.currentPower or 0})
@@ -42,7 +42,7 @@ function AttackStep:enter(pass)
             -- AI /p2 input TODO--------
             vStateMachine:change("end", self.pass)
         end
-    else
+    else -- turn ends if we can't attack
         vStateMachine:change("end", self.pass)
     end
 end
@@ -61,9 +61,10 @@ function AttackStep:pushAtkMenu()
         table.insert(self.possibleAttacks, option)
     end
     local callback = function(selection)
-        if selection and #selection > 0 and selection[1].card then
-            card_ = selection[1].card
-            self:pushAtkTargetMenu(card_)
+        if selection and #selection > 0 then 
+            if selection[1].card then
+                self:pushAtkTargetMenu(selection[1])
+            end
         end
     end
     -- Begin battle with chosen unit
@@ -75,16 +76,17 @@ function AttackStep:pushAtkMenu()
     gStateStack:push(MenuState(atkMenu))
 end
 
+-- this whole function is part of a callback to a menu, so popping it is still mandatory
 function AttackStep:pushAtkTargetMenu(attacker)
     -- ensure attcker can attack    --  TODO change to stand with card overhaul
-    if attacker and attacker.state ~= "stand" and not attacker.cantAtk then
+    if attacker and attacker.card.state == "stand" and not attacker.card.cantAtk then
         -- create a table of options to target for attacks
-        self.targets = self:findAtkTargets(attacker.bonus) or {}
+        self.targets = self:findAtkTargets(attacker.card.bonus) or {}
         local callback = function (targets_) if targets_ then self:atkCallback(targets_, attacker) end end
         local cancel = {
             ['text'] = "Cancel",
             onSelect = function()
-                gStateStack:pop()
+                gStateStack:pop() -- popping the atkTarget menu to return to orignal menu
             end
         }
         table.insert(self.targets, cancel)
@@ -92,11 +94,12 @@ function AttackStep:pushAtkTargetMenu(attacker)
         local targetMenu = CraftMenu("medium-2", self.targets, callback)
         targetMenu.selection.areCards = true
         targetMenu.selection.text = "Select a unit to attack"
-        targetMenu.selection.maxSel = attacker.aoeAtks or 1
+        targetMenu.selection.maxSel = attacker.card.aoeAtks or 1
 
         gStateStack:push(MenuState(targetMenu))
     else
         -- proceed to the close step if we can't atk for some reason
+        gStateStack:pop() -- aformentioned pop
         bStateMachine:change('close', self.pass)
     end
 end
@@ -120,7 +123,15 @@ function AttackStep:findAtkTargets(bonus)
 end
 
 function AttackStep:findBooster(attacker)
-    local column = attacker.column
+    local atkrCircle = attacker.table
+    local column = ''
+    -- determine atkr column
+    for k, circle in pairs(self.fields[attacker.player].circles) do
+        if k == atkrCircle then
+            column = circle.column
+        end
+    end
+
     for k, circle in pairs(self.fields[self.turnPlayer].circles) do
         if circle.row == "back" and circle.column == column and #circle.units > 0 then
             if circle.units[1].ability == "boost" then
@@ -132,11 +143,14 @@ end
 
 function AttackStep:atkCallback(targets_, attacker)
     -- TODO make boosting optional ----------------------
-    
+
     -- IMPORTANT EVENT 1/2 -----
-    Event.dispatch("boost", card_) -- auto finds the booster of card_ 
+    Event.dispatch("boost", attacker) -- auto finds the booster of card_ 
 
     -- IMPORTANT EVENT 2/2 ---------
+    -- the acutal attacking code isnt part of the event handler,
+    -- instead this allows skills with the "when this unit attacks/ is attacked" timing
+    Event.dispatch("rest", attacker.card)
     Event.dispatch("attack", {attacker=attacker, targets_=targets_})
 
     -- setup an individual battles for units that attack more than one unit at a time
@@ -144,7 +158,7 @@ function AttackStep:atkCallback(targets_, attacker)
     for k, target in pairs(targets_) do
         local battle = {
             attacker = attacker,
-            booster = self:findBooster(attacker), -- TODO- work with dynamic boosters
+            booster = self.booster or false, -- TODO- work with dynamic boosters
             
             defender = target,
             guardians = {}
@@ -155,6 +169,10 @@ function AttackStep:atkCallback(targets_, attacker)
 
     -- CHECK TIMING --------------
     Event.dispatch("check-timing")
+
+    -- pop atk menus
+    gStateStack:pop()
+    gStateStack:pop()
 
     bStateMachine:change('guard', self.pass)
 end

@@ -5,14 +5,16 @@ function BattlePhaseState:enter(pass)
     self.turnPlayer = pass.turnPlayer
     -- local turnPlayer = pass.turnPlayer
 
-    bStateMachine = StateMachine {
-        ['start'] = function() return StartStep() end,
-        ['attack'] = function() return AttackStep() end,
-        ['guard'] = function() return GuardStep() end,
-        ['drive'] = function() return DriveStep() end,
-        ['close'] = function() return CloseStep() end,
-        ['damage'] = function() return DamageStep() end
-    }
+    if not bStateMachine then
+        bStateMachine = StateMachine {
+            ['start'] = function() return StartStep() end,
+            ['attack'] = function() return AttackStep() end,
+            ['guard'] = function() return GuardStep() end,
+            ['drive'] = function() return DriveStep() end,
+            ['close'] = function() return CloseStep() end,
+            ['damage'] = function() return DamageStep() end
+        }
+    end
 
     -- enter our sub-phase state machine with our atk'r's table
     bStateMachine:change('start', pass)

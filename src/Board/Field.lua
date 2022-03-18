@@ -21,15 +21,15 @@ function Field:init(decklist, flipped, player)
 
     self.hand = {}
 
-    self.dropZone = {}
+    self.drop = {}
 
-    self.bindZone = {}
+    self.bind = {}
 
-    self.triggerZone = {}
+    self.trigger = {}
 
-    self.orderZone = {}
+    self.order = {}
 
-    self.damageZone = {
+    self.damage = {
         --[[
         ['1'] = {},
         ['2'] = {},
@@ -43,12 +43,6 @@ function Field:init(decklist, flipped, player)
     self.soul = {}
 
     self.circles = {
-        ['vanguard'] = {['type'] = 'V',
-                        ['column'] = 'middle',
-                        ['row'] = 'front',
-                        ['x'] = VX, ['y'] = VY,
-                        ['units'] = {  {['grade'] = 0,
-                                       ['power'] = 7}} },
                         
         ['frontLeft'] = {['type'] = 'R',
                          ['column'] = 'left',
@@ -61,6 +55,13 @@ function Field:init(decklist, flipped, player)
                         ['row'] = 'back',
                         ['x'] = BLX, ['y'] = BLY,
                         ['units'] = {} },
+                        
+        ['vanguard'] = {['type'] = 'V',
+                        ['column'] = 'middle',
+                        ['row'] = 'front',
+                        ['x'] = VX, ['y'] = VY,
+                        ['units'] = {Card(CARD_IDS['test-starter'])}
+                    },
         
         ['backCenter'] = {['type'] = 'R',
                           ['column'] = 'middle',
@@ -107,10 +108,6 @@ function Field:update(dt)
     -- if flipped then
 
     -- end
-    if #self.deck == 0 then
-        Event.dispatch('game-over', {['player']=self.player,
-                                     ['cause']="deckout"})
-    end
 end
 
 -- Both fields are intially drawn on the bottom half of the screen,
@@ -218,32 +215,32 @@ function Field:render()
     -- end
     -- Render G
 
-    --gzone
-    --zone
+    --g z one
+    --z one
     love.graphics.setColor(6/10, 6/10, 6/10, 6/10)--trans.gray
     love.graphics.rectangle('fill', VIRTUAL_WIDTH/8,VIRTUAL_HEIGHT/2, CARD_WIDTH*2.5,CARD_HEIGHT*1.25)
     --cards
 
     -- Render damage -------------
-    -- zone
+    -- z one
     love.graphics.setColor(7/10, 6/10, 6/10, 8/10)--trans.gray
     love.graphics.rectangle('fill', VIRTUAL_WIDTH/8,VIRTUAL_HEIGHT*5/8, CARD_HEIGHT*2,CARD_WIDTH*6)
     -- cards
-    if #self.damageZone > 0 then
-        for i = 1, #self.damageZone do
+    if #self.damage > 0 then
+        for i = 1, #self.damage do
             -- rotate cards
             love.graphics.push()
-            love.graphics.translate(VIRTUAL_WIDTH, 0)
+            love.graphics.translate(VIRTUAL_WIDTH*3/8 - CARD_HEIGHT/4, VIRTUAL_HEIGHT*13/16 + CARD_WIDTH/2)
             love.graphics.rotate(math.pi/2) -- 90* rotation
             -- stager cards to make count more apparent
             if i % 2 == 1 then
                 local staggerGap_ = CARD_HEIGHT/2
-                local xpos_ = VIRTUAL_HEIGHT/16 + CARD_WIDTH/2*i
-                RenderCard(self.damageZone[i], xpos_, VIRTUAL_WIDTH/10 + staggerGap_)
+                local xpos_ = VIRTUAL_HEIGHT/16 - CARD_WIDTH*17/32*i
+                RenderCard(self.damage[i], xpos_, VIRTUAL_WIDTH/10 + staggerGap_)
             else
                 local staggerGap_ = CARD_HEIGHT
-                local xpos_ = VIRTUAL_HEIGHT/16 + CARD_WIDTH/2*i -- x pos ends up as y pos
-                RenderCard(self.damageZone[i], xpos_, VIRTUAL_WIDTH/10 + staggerGap_)
+                local xpos_ = VIRTUAL_HEIGHT/16 - CARD_WIDTH*17/32*i -- x pos ends up as y pos
+                RenderCard(self.damage[i], xpos_, VIRTUAL_WIDTH/10 + staggerGap_)
             end
             love.graphics.pop()
         end
