@@ -1,6 +1,6 @@
 
 
-CloseStep = Class{__includes = BaseState}
+CloseStep = Class{__includes = BattlePhaseState}
 
 function CloseStep:enter(pass)
     --boiler plate
@@ -10,7 +10,7 @@ function CloseStep:enter(pass)
     Event.dispatch("recursive-check-timing", "begin-close-step")
 
     pass.battles = nil
-    bStateMachine:change("start", pass)
+    vStateMachine:change("start", pass)
 end
 
 -- Close step

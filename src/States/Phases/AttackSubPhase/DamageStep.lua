@@ -1,5 +1,5 @@
 
-DamageStep = Class{__includes = BaseState}
+DamageStep = Class{__includes = BattlePhaseState}
 
 function DamageStep:enter(pass)
     self.pass = pass    
@@ -39,7 +39,9 @@ function DamageStep:enter(pass)
     self:cleanup()
     Event.dispatch("check-timing")
 
-    bStateMachine:change("close", pass)
+    if not vStateMachine.current == "results" then
+        vStateMachine:change("close", pass)
+    end
 end
 
 function DamageStep:determineHits()

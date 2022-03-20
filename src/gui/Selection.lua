@@ -72,7 +72,9 @@ function Selection:update(dt)
                 _selection.selected = true
                 self:subimtSelections()
             else 
-                _selection.onSelect()
+                if _selection.onSelect then
+                    _selection.onSelect()
+                end
                 self.onSubmitFunction()
             end  
         else

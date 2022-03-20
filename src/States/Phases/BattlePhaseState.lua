@@ -5,27 +5,21 @@ function BattlePhaseState:enter(pass)
     self.turnPlayer = pass.turnPlayer
     -- local turnPlayer = pass.turnPlayer
 
-    if not bStateMachine then
-        bStateMachine = StateMachine {
-            ['start'] = function() return StartStep() end,
-            ['attack'] = function() return AttackStep() end,
-            ['guard'] = function() return GuardStep() end,
-            ['drive'] = function() return DriveStep() end,
-            ['close'] = function() return CloseStep() end,
-            ['damage'] = function() return DamageStep() end
-        }
-    end
+    -- if not vStateMachine then
+    --     vStateMachine = StateMachine {
+    --     }
+    -- end
 
     -- enter our sub-phase state machine with our atk'r's table
-    bStateMachine:change('start', pass)
+    vStateMachine:change('start', pass)
 end
 
 function BattlePhaseState:update(dt)
-    bStateMachine:update(dt)
+    vStateMachine:update(dt)
 end
 
 function BattlePhaseState:render()
-    bStateMachine:render()
+    vStateMachine:render()
     
     -- highlight current phase
     love.graphics.setFont(gFonts['large'])

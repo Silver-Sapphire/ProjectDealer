@@ -1,5 +1,5 @@
 
-GuardStep = Class{__includes = BaseState}
+GuardStep = Class{__includes = BattlePhaseState}
 
 function GuardStep:enter(pass)
     self.pass = pass
@@ -20,7 +20,7 @@ function GuardStep:enter(pass)
     -- TODO guard/no guard menu
 
     -- TODO only go to drive step if unit has drive checks instead of checking in drive step
-    bStateMachine:change('drive', pass)
+    vStateMachine:change('drive', pass)
 end
 
 

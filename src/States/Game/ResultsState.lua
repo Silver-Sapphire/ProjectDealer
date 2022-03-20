@@ -1,6 +1,7 @@
 ResultsState = Class{__includes = BaseState}
 
-function ResultsState:init(pass)
+function ResultsState:enter(pass)
+    self.fields = pass.fields
     self.log = pass.log
     local loser = pass.player
     self.resultString = "You "
@@ -12,14 +13,14 @@ function ResultsState:init(pass)
 end
 
 function ResultsState:update(dt)
-    if love.keyboard.wasPressed('enter') then
+    if love.keyboard.wasPressed('space') then
         gStateStack:pop()        
-        gStateStack:pop() -- an extra pop to get rid of the hidden vanguard state underneath
+        -- gStateStack:pop() -- an extra pop to get rid of the hidden vanguard state underneath
     end
 end
 
 function ResultsState:render()
-    love.graphics.setColor(1/2, 1/2, 1, 3/4)
+    love.graphics.setColor(2/3, 2/3, 1, 3/4)
     love.graphics.rectangle('fill', 0,0, VIRTUAL_WIDTH,VIRTUAL_HEIGHT)
 
     love.graphics.setColor(1,1,1,1)
@@ -27,6 +28,6 @@ function ResultsState:render()
     love.graphics.printf(self.resultString, 0, VIRTUAL_HEIGHT/5, VIRTUAL_WIDTH, 'center')
 
     love.graphics.setFont(gFonts['large'])
-    love.graphics.printf("Press Enter to return to main menu", 0, VIRTUAL_HEIGHT/3, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf("Press space to return to main menu", 0, VIRTUAL_HEIGHT/3, VIRTUAL_WIDTH, 'center')
 
 end

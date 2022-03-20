@@ -1,4 +1,4 @@
-AttackStep = Class{__includes = BaseState}
+AttackStep = Class{__includes = BattlePhaseState}
 
 -- establish boost event handler
 function AttackStep:init()
@@ -100,7 +100,7 @@ function AttackStep:pushAtkTargetMenu(attacker)
     else
         -- proceed to the close step if we can't atk for some reason
         gStateStack:pop() -- aformentioned pop
-        bStateMachine:change('close', self.pass)
+        vStateMachine:change('close', self.pass)
     end
 end
 
@@ -174,5 +174,5 @@ function AttackStep:atkCallback(targets_, attacker)
     gStateStack:pop()
     gStateStack:pop()
 
-    bStateMachine:change('guard', self.pass)
+    vStateMachine:change('guard', self.pass)
 end

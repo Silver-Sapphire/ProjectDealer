@@ -1,5 +1,5 @@
 
-DriveStep = Class{__includes = BaseState}
+DriveStep = Class{__includes = BattlePhaseState}
 
 function DriveStep:enter(pass)
     self.fields = pass.fields
@@ -27,7 +27,7 @@ function DriveStep:enter(pass)
     end
 
     Event.dispatch("check-timing")
-    bStateMachine:change("damage", pass)
+    vStateMachine:change("damage", pass)
 end
 
 function DriveStep:init()

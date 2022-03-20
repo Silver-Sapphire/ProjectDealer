@@ -6,16 +6,26 @@ function VanguardState:enter()
     self.numHeldStates = #gStateStack - 1
     -- setup a state machine for keeing track of game phases
     vStateMachine = StateMachine {
+        -- pre-game/setup
         ['rps'] = function() return RPSState() end,
         ['redraw'] = function() return RedrawState() end,
         ['stand-up'] = function() return StandUpState() end,
-
+        -- phases
         ['stand'] = function() return StandPhaseState() end,
         ['draw'] = function() return DrawPhaseState() end,
         ['ride'] = function() return RidePhaseState() end,
         ['main'] = function() return MainPhaseState() end,
         ['battle'] = function() return BattlePhaseState() end,
-        ['end'] = function() return EndPhaseState() end
+        ['end'] = function() return EndPhaseState() end,
+        -- attack sub phase
+        ['start'] = function() return StartStep() end,
+        ['attack'] = function() return AttackStep() end,
+        ['guard'] = function() return GuardStep() end,
+        ['drive'] = function() return DriveStep() end,
+        ['damage'] = function() return DamageStep() end,
+        ['close'] = function() return CloseStep() end,
+        -- game summary /log (win/lose state)
+        ['results'] = function() return ResultsState() end
     }    
     -- setup stand/draw, ect event handlers
     -- self:settupEvents() -- now in self:init
@@ -262,16 +272,15 @@ function VanguardState:init()
         Event.dispatch("retired", unit)
     end)
 
-    Event.on("game-over", function(pass)
-        local pass = pass
-        -- local player = cause_.player
-        -- local cause = cause_.cause
+    Event.on("retired", function(unit)
+        --
+    end)
 
-        while #gStateStack > self.numHeldStates do
-            gStateStack:pop()
-        end
-        vStateMachine = nil
-        gStateStack:push(ResultsState(pass))
+    Event.on("game-over", function(pass)
+        local finalPass = pass
+        finalPass.field = self.field
+        --finalPass.log = self.log
+        vStateMachine:change('results', finalPass)
     end)
 
     Event.on("check-timing", function()
@@ -291,9 +300,13 @@ function VanguardState:init()
                     if #circle.units == 2 then
                         local unit = circle.units[1]
                         unit.table = k
+                        unit.index = 1
                         Event.dispatch("retire", unit)
                     else -- if more than 1 card were called over something, the player picks one to keep
-                
+                        
+                        -- After re-reading the rules, this should never happen. I was cheating for years,
+                        -- but you /would/ chose the order in which they were called (affecting the one you keep)
+                        -- and prock both call events
                     end
                 end
             end

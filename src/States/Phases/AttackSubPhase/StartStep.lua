@@ -3,7 +3,7 @@
     where you move to the attack step without choosing who's batting
 ]]
 
-StartStep = Class{__includes = BaseState}
+StartStep = Class{__includes = BattlePhaseState}
 
 function StartStep:enter(pass)
     self.fields = pass.fields
@@ -22,7 +22,7 @@ function StartStep:enter(pass)
     -- assume the player will atk and move to atk step (this may cause some issues down the road...)
     -- the player may decide not to atk in the attack step if they don't trigger any "start of atk step" effects
     Event.dispatch("check-timing")
-    bStateMachine:change("attack", pass)
+    vStateMachine:change("attack", pass)
 end
 
 function StartStep:update(dt)
