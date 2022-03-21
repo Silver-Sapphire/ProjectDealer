@@ -227,23 +227,23 @@ function Field:render()
     love.graphics.rectangle('fill', VIRTUAL_WIDTH/8,VIRTUAL_HEIGHT*5/8, CARD_HEIGHT*2,CARD_WIDTH*6)
     -- cards
     if #self.damage > 0 then
+        -- rotate cards      ---- this whole bit is a mess.....
+        love.graphics.push()
+        love.graphics.rotate(math.pi*3/2) -- 90* rotation 
+        love.graphics.translate(-VIRTUAL_HEIGHT, CARD_HEIGHT/6)
+
         for i = 1, #self.damage do
-            -- rotate cards
-            love.graphics.push()
-            love.graphics.translate(VIRTUAL_WIDTH*3/8 - CARD_HEIGHT/4, VIRTUAL_HEIGHT*13/16 + CARD_WIDTH/2)
-            love.graphics.rotate(math.pi/2) -- 90* rotation
+            local xpos_ = VIRTUAL_HEIGHT/32 - CARD_WIDTH/2 + CARD_WIDTH*17/32*i -- x pos ends up as y pos
             -- stager cards to make count more apparent
             if i % 2 == 1 then
-                local staggerGap_ = CARD_HEIGHT/2
-                local xpos_ = VIRTUAL_HEIGHT/16 - CARD_WIDTH*17/32*i
+                local staggerGap_ = CARD_HEIGHT*3/8
                 RenderCard(self.damage[i], xpos_, VIRTUAL_WIDTH/10 + staggerGap_)
             else
                 local staggerGap_ = CARD_HEIGHT
-                local xpos_ = VIRTUAL_HEIGHT/16 - CARD_WIDTH*17/32*i -- x pos ends up as y pos
                 RenderCard(self.damage[i], xpos_, VIRTUAL_WIDTH/10 + staggerGap_)
             end
-            love.graphics.pop()
         end
+        love.graphics.pop()  --- end mess
     end
     -- display avalaible CB / dmg
 

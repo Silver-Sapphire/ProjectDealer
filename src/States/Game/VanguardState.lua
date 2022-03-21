@@ -3,6 +3,9 @@
 VanguardState = Class{__includes = BaseState}
 
 function VanguardState:enter()
+    -- a global flag to represent the end of the game
+    GameOver = false
+    -- the number of states under the game (to maintain whatever menu was underneath (options, deckbuilding, ect.))
     self.numHeldStates = #gStateStack - 1
     -- setup a state machine for keeing track of game phases
     vStateMachine = StateMachine {
@@ -48,12 +51,18 @@ function VanguardState:enter()
     local player2Field = Field(_DECKLIST2, true, 2)
     table.insert(self.fields, player2Field)
 
-        -- DEBUG LINES ------------
-    local card = Card(CARD_IDS['test-1'])
-    for i = 1, 5 do
-        table.insert(self.fields[1].damage, card)
-        table.insert(self.fields[2].damage, card)
-    end
+    ------- DEBUG LINES ------------
+    -- dmg rendering debug
+    -- for i = 1, 5 do
+    --     local card
+    --     if i%2 == 0 then
+    --         card = Card(CARD_IDS['test-crit'])
+    --     else
+    --         card = Card(CARD_IDS['test-heal'])
+    --     end
+    --     table.insert(self.fields[1].damage, card)
+    --     table.insert(self.fields[2].damage, card)
+    -- end
     --------
     vStateMachine:change('rps', self.fields)
 end
@@ -139,7 +148,7 @@ function VanguardState:init()
                 Event.dispatch('turn-boost', {unit, CRITCONS})
             end
 
-            local effects = {
+            local menu2effects = {
                 ['both'] = {
                     text = 'Both',
                     callback = function(unit)
@@ -280,6 +289,7 @@ function VanguardState:init()
         local finalPass = pass
         finalPass.field = self.field
         --finalPass.log = self.log
+        GameOver = true
         vStateMachine:change('results', finalPass)
     end)
 

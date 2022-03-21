@@ -25,42 +25,6 @@ function StartStep:enter(pass)
     vStateMachine:change("attack", pass)
 end
 
-function StartStep:update(dt)
-    for k, field in pairs(self.fields) do
-        field:update(dt)
-    end
-end
-
-function StartStep:render()
-    -- draw fields
-    for k, field in pairs(self.fields) do
-        field:render()
-    end
-end
-
-
+--TODO
     -- battle begins (incriment counter)
-    -- beggining of the attack step trigger
-
-    -- select a unit to attack with (from menu)
-
-    -- break if for whatever reason, at any point
-    -- (rules, wierdness, ect) no atks are possible
-
-    -- find valid atk targets
-    -- select a unit to target
-
-    -- apply multi-target effects
-
-    -- find booster 
-
-    -- boost? (ask via prompt)
-
-    -- trigger on atk/boost effects
-
-    -- another check timing
-
-    -- move to guard step
-
-    -- drive checks
 

@@ -6,6 +6,7 @@ function displayFPS()
     love.graphics.setColor(1, 1, 1, 1)
 end
 
+---------- NECTCODE GLOBALS ------------
 function ServerListen()
     hostevent = enethost:service()
 	
@@ -51,6 +52,8 @@ function ParseAddress(address)
 	return foo
 end
 
+---------------------------------------------
+----- FUTURE METHODS ---------
 
 -- display a card
 function RenderCard(card, x, y)
@@ -81,13 +84,19 @@ function RenderCard(card, x, y)
 
 		-- draw card info
 		love.graphics.setFont(gFonts['small'])
-		love.graphics.print(card.grade, x+1, y+1)
+		love.graphics.print(card.grade, x+1, y-1)
 		if card.shield ~= 0 or card.sentinel then
-			love.graphics.printf(card.shield, x+15, y+1, CARD_HEIGHT -2, 'center', math.pi/2) -- rotate 90*
+			love.graphics.printf(card.shield, x+20, y+1, CARD_HEIGHT -2, 'center', math.pi/2) -- rotate 90*
 		end
-		love.graphics.printf(card.currentPower or 0, x+1, y+CARD_HEIGHT-15, CARD_WIDTH-2, 'right')
+		love.graphics.printf(card.currentPower or 0, x+1, y+CARD_HEIGHT-20, CARD_WIDTH-2, 'right')
+		if card.state == 'rest' then
+			love.graphics.rectangle('fill', 1/2, 1/2, 1/2, 1/2)
+		end
 	end
 end
+
+-------------------
+---------------------- MENU GLOBALS -----------------------------
 
 function CraftMenu(template_, items_, onSubmitFunction_)
 	if not items_ or not template_ then
@@ -106,3 +115,24 @@ function CraftMenu(template_, items_, onSubmitFunction_)
 	}
 	return craftMenu
 end
+
+-----------------------------------------------------
+------- PHASE SUPPORT --------
+--[[
+	a simple function called in each phase of the game state, 
+	and run split on up pieces of the phases functionallity, and check to see
+	if the game has ended or something else castrophic happens; 
+	in order to avoid executing large, multi-phase chains of function calls,
+	stopping the execution of whatver phase routine we're in almost if not imideatly
+
+	a game ends durring a check timing (since that's when rule actions occur(I think))
+	so each phase is split into sections of functions between and including each check timing
+]]
+function PhaseSplitter(splits)
+	for k, split in pairs(splits) do
+		if not GameOver then
+			split()
+		end
+	end
+end
+---------------------

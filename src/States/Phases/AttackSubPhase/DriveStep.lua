@@ -51,3 +51,19 @@ function DriveStep:init()
         end)
     end
 end
+
+function DriveStep:render()
+    for k, field in pairs(self.fields) do
+        field:render()
+    end
+    -- highlight current phase
+    love.graphics.setFont(gFonts['large'])
+    if self.turnPlayer == 1 then
+        love.graphics.setColor(0,1,0,1) -- green
+    else
+        love.graphics.setColor(1,0,0,1) -- red
+    end
+    love.graphics.printf('Battle', 0, VIRTUAL_HEIGHT/2 + PHASE_TEXT_GAP * 2, VIRTUAL_WIDTH, 'right')
+    love.graphics.print('Drive Step', 200, 200)
+end
+

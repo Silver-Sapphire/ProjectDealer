@@ -1,26 +1,21 @@
+--[[
+    This state is a shell to represent (and parent) each of the battle sub phase states
+]]
+
 BattlePhaseState = Class{__includes = BaseState}
 
 function BattlePhaseState:enter(pass)
-    -- self.fields = pass.fields
-    self.turnPlayer = pass.turnPlayer
+    self.fields = pass.fields
+    -- self.turnPlayer = pass.turnPlayer
     -- local turnPlayer = pass.turnPlayer
 
-    -- if not vStateMachine then
-    --     vStateMachine = StateMachine {
-    --     }
-    -- end
-
-    -- enter our sub-phase state machine with our atk'r's table
     vStateMachine:change('start', pass)
 end
 
-function BattlePhaseState:update(dt)
-    vStateMachine:update(dt)
-end
-
 function BattlePhaseState:render()
-    vStateMachine:render()
-    
+    for k, field in pairs(self.fields) do
+        field:render()
+    end
     -- highlight current phase
     love.graphics.setFont(gFonts['large'])
     if self.turnPlayer == 1 then

@@ -16,7 +16,7 @@ require 'src/Dependencies'
 function love.load()
     math.randomseed(os.time())
     love.window.setTitle('ProjectDealer')
-    love.graphics.setDefaultFilter('nearest', 'nearest')
+    -- love.graphics.setDefaultFilter('nearest', 'nearest')
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT,{
         fullscreen = false,
@@ -45,6 +45,12 @@ function love.keypressed(key)
     if key == "q" then
         gStateStack:pop()
     end
+    -- damage debug
+    -- if key == "d" then
+    --     local card = Card(CARD_IDS['test-heal'])
+        
+    --     table.insert(vStateMachine.current.fields[1].damage, card)
+    -- end
 
     if key == "L" then
         Event.dispatch("log-toggle")

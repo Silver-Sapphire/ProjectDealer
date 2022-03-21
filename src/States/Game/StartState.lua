@@ -18,6 +18,10 @@ function StartState:init()
     }
 end
 
+function StartState:enter()
+    self.invisible = false
+end
+
 function StartState:update(dt)
     self.mainMenu:update(dt)
 end

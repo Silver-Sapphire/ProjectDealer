@@ -13,35 +13,8 @@ function DamageStep:enter(pass)
         self.op = 1
     end
 
-    Event.dispatch("begin-damage-step")
-    Event.dispatch("check-timing")
-
-    -- check to see if each attack hits
-    self.whiffs = {}
-    self.hits = {}
-    self:determineHits()
-    Event.dispatch("check-timing")
-
-    -- resolve a dmg check / mark for reitre for each hit
-    if #self.hits > 0 then 
-        self:hitHandler()
-    end
-    Event.dispatch("check-timing")
-
-    if #self.hits > 0 then
-        Event.dispatch("attack-hit", self.hits)
-    end
-    if #self.whiffs > 0 then
-        Event.dispatch("attack-whiff", self.whiffs)
-    end
-    Event.dispatch("check-timing")
-
-    self:cleanup()
-    Event.dispatch("check-timing")
-
-    if not vStateMachine.current == "results" then
-        vStateMachine:change("close", pass)
-    end
+    local splits = self:initSplits()
+    PhaseSplitter(splits)
 end
 
 function DamageStep:determineHits()
@@ -116,4 +89,69 @@ function DamageStep:cleanup()
             _outputTable = "drop"
         })
     end
+end
+
+function DamageStep:render()
+    for k, field in pairs(self.fields) do
+        field:render()
+    end
+    -- highlight current phase
+    love.graphics.setFont(gFonts['large'])
+    if self.turnPlayer == 1 then
+        love.graphics.setColor(0,1,0,1) -- green
+    else
+        love.graphics.setColor(1,0,0,1) -- red
+    end
+    love.graphics.printf('Battle', 0, VIRTUAL_HEIGHT/2 + PHASE_TEXT_GAP * 2, VIRTUAL_WIDTH, 'right')
+    love.graphics.print('Damage Step', 200, 200)
+end
+
+function DamageStep:initSplits()
+    local splits = {}
+    local split = function()
+        Event.dispatch("begin-damage-step")
+        Event.dispatch("check-timing")
+    end
+    table.insert(splits, split)
+
+    local split = function()
+        -- check to see if each attack hits
+        self.whiffs = {}
+        self.hits = {}
+        self:determineHits()
+        Event.dispatch("check-timing")
+    end
+    table.insert(splits, split)
+    
+    local split = function()
+        -- resolve a dmg check / mark for reitre for each hit
+        if #self.hits > 0 then 
+            self:hitHandler()
+        end
+        Event.dispatch("check-timing")
+    end
+    table.insert(splits, split)
+
+    local split = function()    
+        if #self.hits > 0 then
+            Event.dispatch("attack-hit", self.hits)
+        end
+        if #self.whiffs > 0 then
+            Event.dispatch("attack-whiff", self.whiffs)
+        end
+        Event.dispatch("check-timing")
+    end
+    table.insert(splits, split)
+    
+    local split = function()
+        self:cleanup()
+        Event.dispatch("check-timing")
+    end
+    table.insert(splits, split)
+
+    local split = function()
+        vStateMachine:change("close", self.pass)
+    end
+    table.insert(splits, split)
+    return splits
 end

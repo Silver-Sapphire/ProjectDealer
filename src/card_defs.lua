@@ -7,7 +7,7 @@ CARD_IDS = {
         ['grade'] = 0,
         ['trigger'] = 'crit',
         ['power'] = 5,
-        ['shield'] = 20
+        ['shield'] = 15
     },
     ['test-heal'] = {
         ['grade'] = 0,
@@ -34,6 +34,6 @@ CARD_IDS = {
     ['test-3'] = {
         grade = 3,
         power = 11,
-        skill = function() end
+        skill = function() end --+2pwr on atk
     }
 }

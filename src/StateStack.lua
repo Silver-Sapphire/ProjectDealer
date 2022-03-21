@@ -13,7 +13,16 @@ function StateStack:init()
 end
 
 function StateStack:update(dt)
-    self.states[#self.states]:update(dt)
+    -- customization to allow updating of all states we desire,
+    -- defaulting to only the top state
+    local topState = self.states[#self.states]
+    topState.active = true
+    for i, state in ipairs(self.states) do
+        local iState = self.states[i]
+        if iState.active then
+            iState:update(dt)
+        end
+    end
 end
 
 function StateStack:processAI(params, dt)
@@ -21,8 +30,12 @@ function StateStack:processAI(params, dt)
 end
 
 function StateStack:render()
+    -- customization to allow hiding of certain states,
+    -- with states defaulting to visible
     for i, state in ipairs(self.states) do
-        state:render()
+        if not state.invisible then
+            state:render()
+        end
     end
 end
 
