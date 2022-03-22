@@ -32,7 +32,7 @@ end
 function StateStack:render()
     -- customization to allow hiding of certain states,
     -- with states defaulting to visible
-    for i, state in ipairs(self.states) do
+    for k, state in pairs(self.states) do
         if not state.invisible then
             state:render()
         end

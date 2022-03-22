@@ -4,6 +4,7 @@ DriveStep = Class{__includes = BattlePhaseState}
 function DriveStep:enter(pass)
     self.fields = pass.fields
     self.battles = pass.battles
+    self.pass = pass
     self.attacker = self.battles[1].attacker
     self.turnPlayer = self.attacker.player
     local splits = {
@@ -15,49 +16,53 @@ function DriveStep:enter(pass)
         end,
         ['drive'] = function() -- further split in each drive check
             -- determine number of checks to make
-            local drive = 0
+            self.drive = 0
+            self.finishedChecks = 0
             if self.attacker.table == "vanguard" then
                 if self.attacker.card.grade == 3 then
-                    drive = 2
+                    self.drive = 2
                 else
-                    drive = 1
+                    self.drive = 1
                 end
             end
-            for i = drive, 1, -1 do -- reverse loop to do nothing when drive = 0
+            for i = self.drive, 1, -1 do -- reverse loop to do nothing when drive = 0
                 Event.dispatch("drive-check")
             end
             Event.dispatch("check-timing")
-        end,
-        ['change'] = function()
-            vStateMachine:change("damage", pass)
         end
     }
     PhaseSplitter(splits)
 end
 
-function DriveStep:init()
-    DriveCheckHandler = DriveCheckHandler or Event.on("drive-check", function ()
-        local driveSplits = {
-            ['check'] = function()
-                -- put each card in trigger z one (moved to trigger check dispatch)
-                -- trigger trigger effects
-                Event.dispatch("trigger-check", self.turnPlayer)
-                Event.dispatch("check-timing")
-            end,
-            ['move'] = function()
-                -- add drive check to hand
-                self:moveCard({
-                    _field = self.attacker.player,
-                    _inputTable = "trigger",
+-- move to the next state only after we finish our drive checks
+function DriveStep:update(dt)
+    local split = {
+        ['change'] = function()
+            vStateMachine:change("damage", self.pass)
+        end
+    }
+    if self.drive == self.finishedChecks then
+        PhaseSplitter(split)
+    end
+end
 
-                    _outputTable = "hand"
-                })
-                Event.dispatch("check-timing")
-            end
-        }
-        driveSplits.check()
-        driveSplits.move()
-        -- PhaseSplitter(driveSplits)
+function DriveStep:init()
+    DriveCheckStart = DriveCheckStart or Event.on("drive-check", function ()
+        -- put each card in trigger z|one (moved to trigger check dispatch)
+        -- trigger trigger effects
+        Event.dispatch("trigger-check", "drive", self.turnPlayer)
+        Event.dispatch("check-timing")
+    end)
+    DriveCheckFinish = DriveCheckFinish or Event.on('drive-check-finish', function(player)
+        -- add drive check to hand
+        self:moveCard({
+            _field = player,
+            _inputTable = "trigger",
+
+            _outputTable = "hand"
+        })
+        Event.dispatch("check-timing")
+        self.finishedChecks = self.finishedChecks + 1
     end)
 end
 

@@ -37,11 +37,11 @@ function MakeDeck()
     local deck = {}
     --G0
     for i=1, 49 do
-        if i%2 == 0 then -- 4
+        -- if i%2 == 0 then -- 4
             table.insert(deck, Card(CARD_IDS['test-heal']))
-        else             -- 12
-            table.insert(deck, Card(CARD_IDS['test-crit']))
-        end
+        -- else             -- 12
+        --     table.insert(deck, Card(CARD_IDS['test-crit']))
+        -- end
     end
     -- --G1
     -- for i=1, 14 do

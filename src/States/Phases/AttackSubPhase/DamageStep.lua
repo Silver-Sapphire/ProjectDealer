@@ -12,8 +12,28 @@ function DamageStep:enter(pass)
     else
         self.op = 1
     end
+    -- register phase change at the end(begging) of the event chain
+    ChangeHandler = ChangeHandler or Event.on("change", function()
+    
+    end)
+    local done = false
+    local _ = DamageCheckFinishHandler
+    while not done do
+        tmp = _.next
+        if tmp == nil then
+            done = true
+            _.next = ChangeHandler
+        else
+            _ = tmp
+        end
+    end
 
     PhaseSplitter(self:initSplits())
+end
+
+function DamageStep:exit()
+    ChangeHandler:remove()
+    ChangeHandler = nil
 end
 
 function DamageStep:determineHits()

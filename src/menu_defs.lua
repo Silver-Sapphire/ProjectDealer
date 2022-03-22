@@ -43,10 +43,10 @@ MENU_DEFS = {
 MENU_PROTOS = {
     ['small'] = {
         font = gFonts['small'],
-        orientation = "horizontal",
-        x = VIRTUAL_WIDTH*11/16,
+        orientation = "vertical",
+        x = VIRTUAL_WIDTH*7/16,
         y = VIRTUAL_HEIGHT*13/16,
-        width = VIRTUAL_WIDTH/8,
+        width = VIRTUAL_WIDTH/4,
         height = VIRTUAL_HEIGHT/8
     },
     ['medium'] = {

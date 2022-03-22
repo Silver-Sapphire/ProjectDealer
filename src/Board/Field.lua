@@ -25,7 +25,9 @@ function Field:init(decklist, flipped, player)
 
     self.bind = {}
 
-    self.trigger = {}
+    self.trigger = {
+        -- Card(CARD_IDS['test-1'])
+    }
 
     self.order = {}
 
@@ -222,9 +224,9 @@ function Field:render()
     --     -- legion rendering
     -- end
 
-    -- Render G -------
+    -- Render G -------                  R width (920) * 3 *scaleing cons(.15)          3*scale cons
     love.graphics.draw(gTextures['R'], VIRTUAL_WIDTH/2 - 207, VIRTUAL_HEIGHT/2 - 69, 0, 0.45, 0.15)
-    -- circle
+    -- circle                                                             
 
     --cards
 
@@ -234,16 +236,16 @@ function Field:render()
     love.graphics.rectangle('fill', VIRTUAL_WIDTH/8,VIRTUAL_HEIGHT/2, CARD_WIDTH*2.5,CARD_HEIGHT*1.25)
     --cards
 
-    -- trigger zone --------
+    ----------- trigger zone --------
     if #self.trigger > 0 then
         love.graphics.push()
         love.graphics.rotate(-math.pi/2)
         love.graphics.translate(-VIRTUAL_HEIGHT, 0)
-        RenderCard(self.trigger[1], DECKY + CARD_WIDTH*5/4, DECKX- CARD_WIDTH/2)
+        RenderCard(self.trigger[1], DECKY - CARD_HEIGHT*2, DECKX- CARD_WIDTH/2)
         love.graphics.pop()
     end
 
-    -- Render damage -------------
+    ---------- Render damage -------------
     -- z one
     love.graphics.setColor(7/10, 6/10, 6/10, 8/10)--trans.gray
     love.graphics.rectangle('fill', VIRTUAL_WIDTH/8,VIRTUAL_HEIGHT*5/8, CARD_HEIGHT*2,CARD_WIDTH*6)
