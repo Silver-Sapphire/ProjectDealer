@@ -13,8 +13,7 @@ function DamageStep:enter(pass)
         self.op = 1
     end
 
-    local splits = self:initSplits()
-    PhaseSplitter(splits)
+    PhaseSplitter(self:initSplits())
 end
 
 function DamageStep:determineHits()
@@ -107,51 +106,41 @@ function DamageStep:render()
 end
 
 function DamageStep:initSplits()
-    local splits = {}
-    local split = function()
-        Event.dispatch("begin-damage-step")
-        Event.dispatch("check-timing")
-    end
-    table.insert(splits, split)
-
-    local split = function()
-        -- check to see if each attack hits
-        self.whiffs = {}
-        self.hits = {}
-        self:determineHits()
-        Event.dispatch("check-timing")
-    end
-    table.insert(splits, split)
-    
-    local split = function()
-        -- resolve a dmg check / mark for reitre for each hit
-        if #self.hits > 0 then 
-            self:hitHandler()
+    local splits = {
+        ['begin'] = function()
+            Event.dispatch("begin-damage-step")
+            Event.dispatch("check-timing")
+        end,
+        ['pwr-cmpr'] = function()
+            -- check to see if each attack hits
+            self.whiffs = {}
+            self.hits = {}
+            self:determineHits()
+            Event.dispatch("check-timing")
+        end,
+        ['inflict-dmg'] = function()
+            -- resolve a dmg check / mark for reitre for each hit
+            if #self.hits > 0 then 
+                self:hitHandler()
+            end
+            Event.dispatch("check-timing")
+        end,
+        ['on-hits'] = function()    
+            if #self.hits > 0 then
+                Event.dispatch("attack-hit", self.hits)
+            end
+            if #self.whiffs > 0 then
+                Event.dispatch("attack-whiff", self.whiffs)
+            end
+            Event.dispatch("check-timing")
+        end,
+        ['cleanup'] = function()
+            self:cleanup()
+            Event.dispatch("check-timing")
+        end,
+        ['change'] = function()
+            vStateMachine:change("close", self.pass)
         end
-        Event.dispatch("check-timing")
-    end
-    table.insert(splits, split)
-
-    local split = function()    
-        if #self.hits > 0 then
-            Event.dispatch("attack-hit", self.hits)
-        end
-        if #self.whiffs > 0 then
-            Event.dispatch("attack-whiff", self.whiffs)
-        end
-        Event.dispatch("check-timing")
-    end
-    table.insert(splits, split)
-    
-    local split = function()
-        self:cleanup()
-        Event.dispatch("check-timing")
-    end
-    table.insert(splits, split)
-
-    local split = function()
-        vStateMachine:change("close", self.pass)
-    end
-    table.insert(splits, split)
+    }
     return splits
 end

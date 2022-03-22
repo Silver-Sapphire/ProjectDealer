@@ -123,14 +123,14 @@ function AttackStep:findAtkTargets(bonus)
 end
 
 function AttackStep:findBooster(attacker)
-    local atkrCircle = attacker.table
-    local column = ''
+    local atkrCircle = attacker.circle
+    local column = attacker.circle.column
     -- determine atkr column
-    for k, circle in pairs(self.fields[attacker.player].circles) do
-        if k == atkrCircle then
-            column = circle.column
-        end
-    end
+    -- for k, circle in pairs(self.fields[attacker.player].circles) do
+    --     if k == atkrCircle then
+    --         column = circle.column
+    --     end
+    -- end
 
     for k, circle in pairs(self.fields[self.turnPlayer].circles) do
         if circle.row == "back" and circle.column == column and #circle.units > 0 then

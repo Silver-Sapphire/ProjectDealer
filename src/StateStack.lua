@@ -44,6 +44,9 @@ function StateStack:clear()
 end
 
 function StateStack:push(state)
+    if #self.states > 0 then
+        self.states[#self.states].active = false
+    end
     table.insert(self.states, state)
     state:enter()
 end

@@ -19,3 +19,9 @@ end
 function MenuState:render()
     self.menu:render()
 end
+
+function MenuState:enter()
+    for k, item in pairs(self.menu.selection.items) do
+        item.selected = false
+    end
+end

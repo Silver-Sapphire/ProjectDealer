@@ -5,6 +5,7 @@ VanguardState = Class{__includes = BaseState}
 function VanguardState:enter()
     -- a global flag to represent the end of the game
     GameOver = false
+    Standby = {}
     -- the number of states under the game (to maintain whatever menu was underneath (options, deckbuilding, ect.))
     self.numHeldStates = #gStateStack - 1
     -- setup a state machine for keeing track of game phases
@@ -75,6 +76,28 @@ function VanguardState:render()
     vStateMachine:render()
 end
 
+function VanguardState:pushTriggerMenu(player, effects, text_) --effects = {type, callback}
+    local unitOptions = {}
+    for k, circle in pairs(self.fields[player].circles) do
+        if #circle.units > 0 then
+            -- for i = 1, #circle.units do
+            local option = { -- TODO work with legion?? maybe
+                card = circle.units[1],
+                player = player,
+                table = k,
+                index = 1
+            }
+            table.insert(unitOptions, option)
+        end
+    end
+    local tMenu = CraftMenu('medium', unitOptions, effects)
+    -- tMenu.selection.text = "Select a unit to give the ".. effects.type .." trigger effects to. "--(" .. effects.power..")"
+    tMenu.selection.text = text_
+    tMenu.areCards = true
+
+    gStateStack:push(MenuState(tMenu))
+end
+
 function VanguardState:init()
     -- setup game actions, with self discriptive name
     Event.on('draw', function(t)
@@ -130,14 +153,16 @@ function VanguardState:init()
     end)
 
     Event.on('turn-boost', function(request) -- {unit, power}
-        request.unit.turnBoost = request.unit.turnBoost + request.power
+        local unit = request.unit
+        unit.turnBoost = unit.turnBoost + request.power
+        unit.currentPower = unit.currentPower + request.power
     end)
 
     Event.on('battle-boost', function(request) -- {unit, power}
         request.attacker.battleBoost = request.attacker.battleBoost + request.power
     end)
 
-    Event.on('critical-trigger', function(card_)
+    Event.on('crit-trigger', function(card_)
         if player == 1 then
             -- set up crit effects for our menu
             local callbackP = function(unit) 
@@ -173,23 +198,24 @@ function VanguardState:init()
             }
 
             local critMenu1Callback = function(selection)
+                -- setup the 2nd menu
                 local unitPass = selection[1]
                 
-                local callback = function(selection)
+                local callback = function(selections)
                     for key, selection in pairs(selections) do
                         if key == 'power' then
                             selection.callback(unitPass)
                             -- push another menu for crit gain
                             gStateStack:pop()
                             gStateStack:pop()
-                            self:pushTriggerMenu(card_.player, callbackC)
+                            self:pushTriggerMenu(card_.player, callbackC, "And the crit?")
 
                         elseif key == 'crit' then
                             selection.callback(unitPass)
                             -- push another menu for power gain   
                             gStateStack:pop()
                             gStateStack:pop()
-                            self:pushTriggerMenu(card_.player, callbackP)
+                            self:pushTriggerMenu(card_.player, callbackP, "And the power?")
 
                         elseif key == 'both' then 
                             selection.callback(unitPass)
@@ -198,15 +224,16 @@ function VanguardState:init()
 
                         else -- cancel
                             gStateStack:pop()
+                            -- return to unit menu
                         end
                     end
                 end
-
-                local critMenu2 = CraftMenu('small', effects, callback)
-                gStateStack:push(MenuState(critMenu2))
+                cirtMenu2 = CraftMenu('small', effects, callback)
+                critMenu2.areCards = true -- not cards, but we need the functionallity (since the first menu was cards)
+                gStateStack:push(MenuState())
             end
 
-            self:pushTriggerMenu(card_.player, critMenu1Callback)
+            self:pushTriggerMenu(card_.player, critMenu1Callback, "Who will gain the effects?")
         else
             -- AI / P2 
             
@@ -226,15 +253,17 @@ function VanguardState:init()
     end)
 
     Event.on('heal-trigger', function(card_)
+        local player = card_.player
         --recover 1
-        Event.dispatch('heal', card_.player)
+        Event.dispatch('heal', player)
 
         if player == 1 then
             -- heal power menu
-            local effectCallback = function(selection)
-                Event.dispatch('turn-boost', {selection[1].unit, 10}) -- TODO base off heal trigger instead of magic #
+            local callback = function(selection)
+                gStateStack:pop()
+                Event.dispatch('turn-boost', {unit=selection[1].card, power=10}) -- TODO base off heal trigger instead of magic #
             end
-            self:pushTriggerMenu(card_.player, effectCallback)
+            self:pushTriggerMenu(player, callback, "Who will get the power?")
         else -- AI / P2
 
         end
@@ -249,10 +278,17 @@ function VanguardState:init()
             _outputTable = "trigger"
         })
         if check then
+            --debug line
+            -- Check = true
             local trigger = check.trigger
             if trigger then
-                local triggerDispatch = "".. trigger.."-trigger"
+                Check = true
+                local triggerDispatch = trigger.."-trigger"
+                CheckText = triggerDispatch
+                table.insert(Checks, CheckText)
                 Event.dispatch(triggerDispatch, check)-- TODO fix magic #
+            else
+                Check = false
             end
         end
     end)
@@ -272,8 +308,8 @@ function VanguardState:init()
 
     Event.on("retire", function(unit)
         self:moveCard({
-            _field = card.player,
-            _inputTable = card.table,
+            _field = unit.player,
+            _inputTable = unit.table,
             _inputIndex = 1,
 
             _outputTable = "drop"
@@ -281,78 +317,19 @@ function VanguardState:init()
         Event.dispatch("retired", unit)
     end)
 
-    Event.on("retired", function(unit)
+    RetiredHandler = RetiredHandler or Event.on("retired", function(unit)
         --
     end)
 
     Event.on("game-over", function(pass)
         local finalPass = pass
-        finalPass.field = self.field
+        finalPass.fields = self.fields
         --finalPass.log = self.log
-        GameOver = true
+        GameOver = true -- cringe global
         vStateMachine:change('results', finalPass)
     end)
 
-    Event.on("check-timing", function()
-        -- resolve all rule actions ---------------
-        for i = 1, 2 do
-            -- check to see if a player lost the game
-            if #self.fields[i].damage > 5 then -- TODO work with greedun
-                Event.dispatch('game-over', {['player'] = i,
-                                             ['cause'] = "lethal"} )
-            elseif #self.fields[i].deck == 0 then
-                Event.dispatch('game-over', {['player'] = i,
-                                             ['cause'] = "deckout"} )
-            end
-            -- retire R that were called over
-            for k, circle in pairs(self.fields[i].circles) do
-                if #circle.units > 1 then
-                    if #circle.units == 2 then
-                        local unit = circle.units[1]
-                        unit.table = k
-                        unit.index = 1
-                        Event.dispatch("retire", unit)
-                    else -- if more than 1 card were called over something, the player picks one to keep
-                        
-                        -- After re-reading the rules, this should never happen. I was cheating for years,
-                        -- but you /would/ chose the order in which they were called (affecting the one you keep)
-                        -- and prock both call events
-                    end
-                end
-            end
-        end
-    
-        -- turn player imaginary gift resolution----------
-        -- resolve all rule actions
-    
-        -- nonturn player imaginary gift resolution---------
-        -- resolve all rule actions
-       
-        -- turn player auto skill resolution-------------
-        -- resolve all rule actions
-        
-        -- nonturn player auto skill resolution----------
-        -- resolve all rule actions
-    end)
-end
 
-function VanguardState:pushTriggerMenu(player, effects) --effects = {type, callback}
-    local options = {}
-    for k, circle in pairs(self.fields[player].circles) do
-        if #circle.units > 0 then
-            -- for i = 1, #circle.units do
-            local option = { -- TODO work with legion?? maybe
-                card = circle.units[1],
-                player = player,
-                table = k,
-                index = 1
-            }
-            table.insert(options, option)
-        end
-    end
-    local tMenu = CraftMenu('medium', options, effects.callback)
-    tMenu.selection.text = "Select a unit to give the ".. effects.type .." trigger effects to. "--(" .. effects.power..")"
-    tMenu.areCards = true
 
-    gStateStack:push(MenuState(tMenu))
+
 end

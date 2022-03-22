@@ -36,29 +36,29 @@ end
 function MakeDeck()
     local deck = {}
     --G0
-    for i=1, 16 do
-        if i%4 == 0 then -- 4
+    for i=1, 49 do
+        if i%2 == 0 then -- 4
             table.insert(deck, Card(CARD_IDS['test-heal']))
         else             -- 12
             table.insert(deck, Card(CARD_IDS['test-crit']))
         end
     end
-    --G1
-    for i=1, 14 do
-        if i < 11 then -- 10
-            table.insert(deck, Card(CARD_IDS['test-1']))
-        else           -- 4
-            table.insert(deck, Card(CARD_IDS['test-sentinel']))
-        end
-    end
-    --G2
-    for i=1, 11 do
-        table.insert(deck, Card(CARD_IDS['test-2']))
-    end
-    --G3
-    for i=1, 8 do
-        table.insert(deck, Card(CARD_IDS['test-3']))
-    end
+    -- --G1
+    -- for i=1, 14 do
+    --     if i < 11 then -- 10
+    --         table.insert(deck, Card(CARD_IDS['test-1']))
+    --     else           -- 4
+    --         table.insert(deck, Card(CARD_IDS['test-sentinel']))
+    --     end
+    -- end
+    -- --G2
+    -- for i=1, 11 do
+    --     table.insert(deck, Card(CARD_IDS['test-2']))
+    -- end
+    -- --G3
+    -- for i=1, 8 do
+    --     table.insert(deck, Card(CARD_IDS['test-3']))
+    -- end
 
     return deck
 end

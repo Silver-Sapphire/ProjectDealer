@@ -10,8 +10,9 @@ function MainPhaseState:enter(pass)
 
     -- turn player gets a play timing
     if turnPlayer == 1 then
-        local actions = {
-            {
+        local actions = {}
+        if #self.fields[1].hand > 0 then
+            local action = {
                 text = 'Call',
                 onSelect = function()
                     -- pull up call menu
@@ -19,7 +20,32 @@ function MainPhaseState:enter(pass)
                     self:createCallMenu(callableCards)
                 end
             }
-        }
+            table.insert(actions, action)
+        end
+
+        -- determine if we have cards on R to swap
+        local leftC = 0
+        local rightC = 0
+        for k, circle in pairs(self.fields[turnPlayer].circles) do
+            if #circle.units > 0 then
+                local column = circle.column 
+                if column == "left" then
+                    leftC = leftC + 1
+                elseif column == "right" then
+                    rightC = rightC + 1
+                end
+            end
+        end
+        if rightC > 0 or leftC > 0 then
+            local action = {
+                text = "Move Units", 
+                onSelect = function()
+                    self:createMoveMenu(leftC, rightC)
+                end
+            }
+            table.insert(actions, action)
+        end
+
         if self.fields[turnPlayer].turn ~= 1 then
             local action = {
                 text = "Battle",
@@ -62,10 +88,6 @@ function MainPhaseState:enter(pass)
     end
 end
 
-function MainPhaseState:update(dt)
-    
-end
-
 function MainPhaseState:render()
     -- draw fields
     for k, field in pairs(self.fields) do
@@ -98,7 +120,7 @@ function MainPhaseState:determineCallableCards()
         text = 'Done',
         onSelect = function()
             -- a pop to return to actions menu
-            gStateStack:pop()
+            -- gStateStack:pop()
         end
     }
     
@@ -121,7 +143,7 @@ function MainPhaseState:createCallMenu(options)
         height = VIRTUAL_HEIGHT/4,
 
         onSubmitFunction = function (selection)
-            if selection then
+            if selection[1].card then
                 gStateStack:push(MenuState(Menu{
                     orientation = 'vertical',
                     font = gFonts['medium'],
@@ -141,9 +163,15 @@ function MainPhaseState:createCallMenu(options)
                         self:createCallMenu(callableCards)
                     end
                 }))
+            else
+                gStateStack:pop()
             end
         end
     }))
+end
+
+function MainPhaseState:createMoveMenu()
+
 end
 
 function MainPhaseState:processAI()

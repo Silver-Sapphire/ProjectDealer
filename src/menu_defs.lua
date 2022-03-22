@@ -11,7 +11,7 @@ MENU_DEFS = {
                     r = 0, g = 0, b = 0 -- fade to black
                 }, 0.5,
                 function ()
-                    gStateStack[1].invisible = true
+                    -- gStateStack[#gStateStack].invisible = true
                     gStateStack:push(VanguardState())
                     gStateStack:push(FadeOutState({
                         r = 0, g = 0, b = 0

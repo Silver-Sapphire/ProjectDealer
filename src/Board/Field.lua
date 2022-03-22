@@ -143,8 +143,16 @@ function Field:render()
     love.graphics.print('Deck:'..#self.deck, self.deckX, self.deckY + CARD_HEIGHT)
 
     -- Render drop
+    for i, card in ipairs(self.drop) do
+        RenderCard(card, DECKX +i*2, DECKY + CARD_HEIGHT*4/3 -i*2)
+    end
 
     -- display drop count
+	love.graphics.setColor(1,1,1,1)--white
+	love.graphics.setFont(gFonts['small'])
+    if #self.drop > 0 then
+        love.graphics.print('Drop:'..#self.drop, DECKX, DECKY + CARD_HEIGHT*7/3)
+    end
 
     -- Render bind
 
@@ -191,11 +199,11 @@ function Field:render()
     self.vX = VIRTUAL_WIDTH/2 - CARD_WIDTH/2
     self.vY = VIRTUAL_HEIGHT*5/8 - CARD_HEIGHT/2
     self.soulOffset = 0
-    if #self.soul > 1 then
+    if #self.soul > 0 then
         self.soulOffset = 0
-        for i=1, math.floor(#self.soul/2) do
+        for i=1, #self.soul do
             love.graphics.setColor(0,0,0,1)--black
-            love.graphics.rectangle('fill', self.vX + self.soulOffset,self.vY - self.soulOffset, CARD_WIDTH,CARD_HEIGHT)
+            RenderCard(self.soul[i], self.vX + self.soulOffset, self.vY - self.soulOffset)
             self.soulOffset = self.soulOffset + 2
         end
     else
@@ -213,13 +221,27 @@ function Field:render()
     end
     --     -- legion rendering
     -- end
-    -- Render G
+
+    -- Render G -------
+    love.graphics.draw(gTextures['R'], VIRTUAL_WIDTH/2 - 207, VIRTUAL_HEIGHT/2 - 69, 0, 0.45, 0.15)
+    -- circle
+
+    --cards
 
     --g z one
     --z one
     love.graphics.setColor(6/10, 6/10, 6/10, 6/10)--trans.gray
     love.graphics.rectangle('fill', VIRTUAL_WIDTH/8,VIRTUAL_HEIGHT/2, CARD_WIDTH*2.5,CARD_HEIGHT*1.25)
     --cards
+
+    -- trigger zone --------
+    if #self.trigger > 0 then
+        love.graphics.push()
+        love.graphics.rotate(-math.pi/2)
+        love.graphics.translate(-VIRTUAL_HEIGHT, 0)
+        RenderCard(self.trigger[1], DECKY + CARD_WIDTH*5/4, DECKX- CARD_WIDTH/2)
+        love.graphics.pop()
+    end
 
     -- Render damage -------------
     -- z one
@@ -229,7 +251,7 @@ function Field:render()
     if #self.damage > 0 then
         -- rotate cards      ---- this whole bit is a mess.....
         love.graphics.push()
-        love.graphics.rotate(math.pi*3/2) -- 90* rotation 
+        love.graphics.rotate(-math.pi/2) -- 90* rotation 
         love.graphics.translate(-VIRTUAL_HEIGHT, CARD_HEIGHT/6)
 
         for i = 1, #self.damage do

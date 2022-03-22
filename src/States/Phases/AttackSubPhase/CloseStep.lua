@@ -7,7 +7,7 @@ function CloseStep:enter(pass)
 
 
     -- Event.dispatch()
-    Event.dispatch("recursive-check-timing", "begin-close-step")
+    Event.dispatch("recursive-check-timing", "begin-close-step", function()end)
 
     pass.battles = nil
     vStateMachine:change("start", pass)

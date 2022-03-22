@@ -36,7 +36,60 @@ function BaseState:render()
     end
 end
 
--- functions we want for all our vanguard game states
+-- functions we want for all our vanguard game states    
+function BaseState:checkTiming()
+    -- resolve all rule actions ---------------
+    for i = 1, 2 do
+        -- check to see if a player lost the game
+        if #self.fields[i].damage > 5 then -- TODO work with greedun
+            Event.dispatch('game-over', {['player'] = i,
+                                            ['cause'] = "lethal"} )
+            break
+        elseif #self.fields[i].deck == 0 then
+            Event.dispatch('game-over', {['player'] = i,
+                                            ['cause'] = "deckout"} )
+            break
+        end
+        -- retire R that were called over
+        for k, circle in pairs(self.fields[i].circles) do
+            if #circle.units > 1 then
+                if #circle.units == 2 then
+                    local unit = circle.units[1]
+                    unit.table = k
+                    unit.index = 1
+                    Event.dispatch("retire", unit)
+                else -- if more than 1 card were called over something, the player picks one to keep
+                    
+                    -- After re-reading the rules, this should never happen. I was cheating for years,
+                    -- but you /would/ chose the order in which they were called (affecting the one you keep)
+                    -- and prock both call events
+                end
+            end
+        end
+    end
+
+    -- turn player imaginary gift resolution----------
+    -- resolve all rule actions
+
+    -- nonturn player imaginary gift resolution---------
+    -- resolve all rule actions
+    
+    -- turn player auto skill resolution-------------
+    -- resolve all rule actions
+    
+    -- nonturn player auto skill resolution----------
+    -- resolve all rule actions
+end
+
+function BaseState:recursiveCheckTiming(event, callback)
+    Event.dispatch(event)
+    self:checkTiming()
+    callback()
+    Event.dispatch(event)
+    if #Standby > 0 then
+        self:recursiveCheckTiming(event, callback)
+    end
+end
 
 function BaseState:chooseCircle(_card)
     local circles = {
@@ -179,11 +232,11 @@ function BaseState:moveCard(request)
 		_card = table.remove(self.fields[_field].bind, _inputIndex)
 
 	elseif _inputTable == "trigger" then
-        if _inputIndex then
-            _card = table.remove(self.fields[_field].trigger, _inputIndex)
-        else
+        -- if _inputIndex then
+        --     _card = table.remove(self.fields[_field].trigger, _inputIndex)
+        -- else
             _card = table.remove(self.fields[_field].trigger)
-        end
+        -- end
 
 	elseif _inputTable == "order" then
         if _inputIndex then

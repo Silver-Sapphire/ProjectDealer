@@ -2,7 +2,7 @@ function displayFPS()
     -- simple FPS display across all states
     love.graphics.setFont(gFonts["large"])
     love.graphics.setColor(0, 255/255, 0, 255/255)
-    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), VIRTUAL_WIDTH*2/3, 50)
+    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 40, 40)
     love.graphics.setColor(1, 1, 1, 1)
 end
 
@@ -55,10 +55,11 @@ end
 ---------------------------------------------
 ----- FUTURE METHODS ---------
 
--- display a card
+-- display a card ------------
 function RenderCard(card, x, y)
 	if card then
-		-- set color based on attribute ("art")
+		-- set color based on attribute ("art")----
+		-- flag for making text black instead of white
 		local bTxFlag = false
 		if card.trigger == 'crit' then
 			bTxFlag = true
@@ -90,7 +91,8 @@ function RenderCard(card, x, y)
 		end
 		love.graphics.printf(card.currentPower or 0, x+1, y+CARD_HEIGHT-20, CARD_WIDTH-2, 'right')
 		if card.state == 'rest' then
-			love.graphics.rectangle('fill', 1/2, 1/2, 1/2, 1/2)
+			love.graphics.setColor(1/2, 1/2, 1/2, 1/2)
+			love.graphics.rectangle('fill', x,y, CARD_WIDTH,CARD_HEIGHT)
 		end
 	end
 end

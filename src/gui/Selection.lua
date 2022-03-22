@@ -75,7 +75,8 @@ function Selection:update(dt)
                 if _selection.onSelect then
                     _selection.onSelect()
                 end
-                self.onSubmitFunction()
+                _selection.selected = true
+                self:subimtSelections()
             end  
         else
             -- prime to submit or more items

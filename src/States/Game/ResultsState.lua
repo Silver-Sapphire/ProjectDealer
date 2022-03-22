@@ -20,7 +20,15 @@ function ResultsState:update(dt)
 end
 
 function ResultsState:render()
-    love.graphics.setColor(2/3, 2/3, 1, 3/4)
+    for i, field in ipairs(self.fields) do
+        self.fields[i]:render()
+    end
+
+    if loser == 2 then
+        love.graphics.setColor(2/3, 2/3, 1, 3/4)
+    else
+        love.graphics.setColor(1, 2/3, 2/3, 3/4)
+    end
     love.graphics.rectangle('fill', 0,0, VIRTUAL_WIDTH,VIRTUAL_HEIGHT)
 
     love.graphics.setColor(1,1,1,1)

@@ -8,7 +8,7 @@ function EndPhaseState:enter(pass)
     self.turnPlayer = pass.turnPlayer
     local turnPlayer = pass.turnPlayer
     
-    -- return all G units, unlock cards, spin astral plane unit, ect
+    -- return all G units, unlock cards, spin astral plane unit, ect ----
 
     -- unlock triggers
     for k, circle in pairs(self.fields[turnPlayer].circles) do
@@ -23,7 +23,28 @@ function EndPhaseState:enter(pass)
         end
     end
 
+    -- retire music orders
+    -- spin astral plane unit
+
+    Event.dispatch("check-timing")
+
     -- trigger untriggered at the beginning of the end phase/at end of turn triggers (recursive)
+    Event.dispatch("recursive-check-timing", "begin-end",
+        function()
+            for k, field in pairs(self.fields) do
+                for k, circle in pairs(field.circles) do
+                    if #circle.units > 0 then
+                        local unit = circle.units[1]
+                        local powerLoss = unit.turnBoost
+                        unit.turnBoost = 0
+                        unit.currentPower = unit.currentPower - powerLoss
+                    
+                        unit.crit = unit.baseCrit
+                    end
+                end
+            end
+        end
+    )
 
     -- remove all "unitl end of turn" effect (recursive)
     

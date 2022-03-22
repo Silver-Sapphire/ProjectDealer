@@ -35,6 +35,10 @@ function love.load()
     -- start game --
     gStateStack = StateStack()
     gStateStack:push(StartState())
+
+    --debug lines
+    Check = false
+    Checks = {}
 end
 
 function love.keypressed(key)
@@ -105,6 +109,14 @@ function love.draw()
     gStateStack:render()
     push:finish()
     displayFPS()
+    --debug lines
+    for i, check in ipairs(Checks) do
+        love.graphics.print(check, 10, 50*i)
+    end
+    if Check then 
+        love.graphics.setColor(1/3, 1/3, 1/3, 1/3)
+        love.graphics.rectangle('fill', 0,0, VIRTUAL_WIDTH,VIRTUAL_HEIGHT)
+    end
 end
 
 function love.resize(w, h)
