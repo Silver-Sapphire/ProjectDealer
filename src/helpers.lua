@@ -89,6 +89,17 @@ function RenderCard(card, x, y)
 		if card.shield ~= 0 or card.sentinel then
 			love.graphics.printf(card.shield, x+20, y+1, CARD_HEIGHT -2, 'center', math.pi/2) -- rotate 90*
 		end
+
+		-- display crit if greater than one
+		if card.crit > 1 then
+			if not btxFlag then
+				love.graphics.setColor(1, 1, 1/2, 1) -- Y
+			else
+				love.graphics.setColor(1/2, 1/2, 0, 1)
+			end
+			love.graphics.print(card.crit, x+2, y+CARD_HEIGHT-26)
+		end
+
 		love.graphics.printf(card.currentPower or 0, x+1, y+CARD_HEIGHT-20, CARD_WIDTH-2, 'right')
 		if card.state == 'rest' then
 			love.graphics.setColor(1/2, 1/2, 1/2, 1/2)

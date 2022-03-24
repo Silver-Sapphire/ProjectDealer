@@ -3,9 +3,9 @@ ResultsState = Class{__includes = BaseState}
 function ResultsState:enter(pass)
     self.fields = pass.fields
     self.log = pass.log
-    local loser = pass.player
+    self.loser = pass.player
     self.resultString = "You "
-    if loser == 1 then
+    if self.loser == 1 then
         self.resultString = self.resultString .. "lost..."
     else
         self.resultString = self.resultString .. "won!!"
@@ -24,7 +24,7 @@ function ResultsState:render()
         self.fields[i]:render()
     end
 
-    if loser == 2 then
+    if self.loser == 2 then
         love.graphics.setColor(2/3, 2/3, 1, 3/4)
     else
         love.graphics.setColor(1, 2/3, 2/3, 3/4)

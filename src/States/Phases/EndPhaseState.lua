@@ -29,29 +29,29 @@ function EndPhaseState:enter(pass)
     Event.dispatch("check-timing")
 
     -- trigger untriggered at the beginning of the end phase/at end of turn triggers (recursive)
-    Event.dispatch("recursive-check-timing", "begin-end",
-        function()
-            for k, field in pairs(self.fields) do
-                for k, circle in pairs(field.circles) do
-                    if #circle.units > 0 then
-                        local unit = circle.units[1]
-                        local powerLoss = unit.turnBoost
-                        unit.turnBoost = 0
-                        unit.currentPower = unit.currentPower - powerLoss
-                    
-                        unit.crit = unit.baseCrit
-                    end
+    Event.dispatch("recursive-check-timing", "begin-end", function()
+        for k, field in pairs(self.fields) do
+            for k, circle in pairs(field.circles) do
+                if #circle.units > 0 then
+                    local unit = circle.units[1]
+                    local powerLoss = unit.turnBoost
+                    unit.turnBoost = 0
+                    unit.currentPower = unit.currentPower - powerLoss
+                
+                    unit.crit = unit.baseCrit
                 end
             end
         end
-    )
+    end)
 
     -- remove all "unitl end of turn" effect (recursive)
     
     -- recursivly check there are no triggers left (recursive)
 
     -- pass turn
-    vStateMachine:change('stand', {['fields']=self.fields})
+    if not GameOver then
+        vStateMachine:change('stand', pass)
+    end
 end
 
 function EndPhaseState:update(dt)

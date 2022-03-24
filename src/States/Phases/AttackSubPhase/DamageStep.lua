@@ -19,12 +19,16 @@ function DamageStep:enter(pass)
     local done = false
     local _ = DamageCheckFinishHandler
     while not done do
-        tmp = _.next
-        if tmp == nil then
-            done = true
-            _.next = ChangeHandler
+        if _ ~= nil then
+            __ = _.next
+            if __ == nil then
+                done = true
+                _.next = ChangeHandler
+            else
+                _ = __
+            end
         else
-            _ = tmp
+            done = true
         end
     end
 
@@ -46,7 +50,10 @@ function DamageStep:determineHits()
         -- compare battling units total power
         local attacker = battle.attacker.card or false
         local totalAtkPower = attacker.basePower + attacker.battleBoost
-                           + attacker.turnBoost + attacker.contBoost or 0
+                              + attacker.turnBoost + attacker.contBoost or 0
+        if totalAtkPower < attacker.currentPower then
+            -- totalAtkPower = attacker.currentPower
+        end
 
         if totalAtkPower >= battle.defender.card.currentPower + shield then 
             local _ = table.remove(self.battles, i)
@@ -69,9 +76,8 @@ function DamageStep:hitHandler()
                     Event.dispatch("damage-check", self.op)
                 end
 
-            table.remove(self.hits, i) -- remove hit from table, now that its resolved.
-            
-            break -- the vanguard won't be in the table twice
+                table.remove(self.hits, i) -- remove hit from table, now that its resolved.
+                break -- the vanguard won't be in the table twice
             end
         end
     end

@@ -1,5 +1,6 @@
 CARD_IDS = {
     ['test-starter'] = {
+        ['baseCrit'] = 2,
         ['grade'] = 0,
         ['power'] = 7
     },

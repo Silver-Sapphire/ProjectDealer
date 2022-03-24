@@ -46,20 +46,21 @@ function love.keypressed(key)
         love.event.quit()
     end
 
+    ---- debug commands ----
     if key == "q" then
         gStateStack:pop()
     end
-    -- damage debug
-    -- if key == "d" then
-    --     local card = Card(CARD_IDS['test-heal'])
+
+    if key == "d" then
+        local card = Card(CARD_IDS['test-heal'])
         
-    --     table.insert(vStateMachine.current.fields[1].damage, card)
-    -- end
+        table.insert(vStateMachine.current.fields[1].damage, card)
+    end
 
     if key == "L" then
         Event.dispatch("log-toggle")
     end
-
+    --------
     love.keyboard.keysPressed[key] = true
 end
 

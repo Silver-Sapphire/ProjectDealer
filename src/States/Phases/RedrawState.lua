@@ -70,12 +70,7 @@ function RedrawState:enter(pass)
                 vStateMachine:change('stand', {['fields']=self.fields, 
                                                ['turnPlayer']=self.turnPlayer})
             end
-        }
-        -- , 
-        -- {['destY']=VIRTUAL_HEIGHT*3/4, ['time']=1/2}, 
-
-        -- function () end
-        ))
+        }))
     end
 end
 
@@ -87,9 +82,9 @@ function RedrawState:update(dt)
             -- wait for and submit local player's decision
 
     -- debug state pop
-    if love.keyboard.isDown('m') then
-        gStateStack:pop()
-    end
+    -- if love.keyboard.isDown('m') then
+    --     gStateStack:pop()
+    -- end
 
     for k, field in pairs(self.fields) do
         field:update(dt)
@@ -114,37 +109,48 @@ function RedrawState:processAI(context)
     local numBack = 0 -- record how many cards we're going to put back
     
     -- determine grade to dig for
-    local missingGrade = false
+    local missingGrades = {}
+    local sentinels = {}
     for i = 1, 3 do -- for each grade we need to ride...
-        local flag_ = true 
         for k, card in pairs(options) do
+            local _flag = false
             if card.grade == i then -- if we don't have a card of that grade...
-                flag_ = false
+               _flag = true 
             end
-        end
-        if flag_ then
-            missingGrade = i -- then we flag that as our primary grade to dig for.
-            break
+            if not _flag then
+                table.insert(missingGrades, i)
+            end
+            if card.sentinel then
+                table.insert(sentinels, card)
+            end
         end
     end
     
     -------- trigger/ sentinel logic
 
     -- redraw all triggers (change to keep a g3 heal guard / s.f. crit / sentiel trigger)
+    local keepCritFlag = false
     for k, option in pairs(options) do
-        if option.card.trigger and not option.selected then
-            option.selected = true
-            numBack = numBack + 1
+        local trigger = option.card.trigger
+        if trigger and not option.selected then
+            -- case where we keep a trigger
+            if #missingGrades == 0 and trigger == "crit" and not keepCritFlag then
+                -- do nothing, and skip this crit
+                keepCritFlag = true
+            else
+            -- normal case
+                option.selected = true
+                numBack = numBack + 1
+            end
         end
     end
 
     -- redraw any sentinels after the first (change to count g3 heal guards and rollock type cards as sentiels)
-    local sentinelCount = 0
-    for k, option in pairs(options) do
+    for i, option in ipairs(options) do
         if option.card.sentinel and not option.selected then
-            sentinelCount = sentinelCount + 1
-            if sentinelCount > 1 then
+            if #sentinels > 1 then
                 option.selected = true
+                table.remove(sentinels, i)
                 numBack = numBack + 1
             end
         end
@@ -154,7 +160,7 @@ function RedrawState:processAI(context)
 
     -- keep a non sentinel 1
     local g1flag_ = false
-    if missingGrade ~= 1 then
+    if missingGrades[1] ~= 1 then---------------------
         for k, option in pairs(options) do
             if not option.selected and option.card.grade == 1 then
                 if not g1flag_ then
@@ -168,19 +174,25 @@ function RedrawState:processAI(context)
     end
 
     -- redraw 3's to dig for 1's
-    local g3Count = 0
-    if missingGrade ~= 3 then
+    local g3keep = false
+    local missing3flag = false
+    for k, grade in pairs(missingGrades) do
+        if grade == 3 then
+            missing3flag = true
+        end
+    end
+    if missing3flag then
         for k, option in pairs(options) do
             if not option.selected and option.card.grade == 3 then
                 if missingGrade == 1 then
                     option.selected = true -- redraw all 3's looking for a g1
                     numBack = numBack + 1
                 else
-                    g3Count = g3Count + 1
-                    if g3Count > 1 then -- only keep 1 g3 if we keep any
+                    if g3keep then -- only keep 1 g3 if we keep any
                         option.selected = true 
                         numBack = numBack + 1
                     end
+                    g3keep = true
                 end
             end
         end
@@ -188,14 +200,20 @@ function RedrawState:processAI(context)
 
     -- keep as many 2's as possible
     local g2Count = 0
-    if missingGrade and missingGrade ~= 2 then
+    local missing2flag = false
+    for k, grade in pairs(missingGrades) do
+        if grade == 2 then
+            missing2flag = true
+        end
+    end
+    if not missin2flag then
         for k, option in pairs(options) do
             if not option.selected and option.card.grade == 2 then
                 g2Count = g2Count + 1
-                if missingGrade == 1 and g2Count > 1 then
+                if missingGrades[1] == 1 and g2Count > 1 then
                     option.selected = true
                     numBack = numBack + 1
-                elseif g2Count > 2 then -- digging for a 3 implied
+                elseif #missingGrades > 0 then -- digging for a 3 implied
                     option.selected = true
                     numBack = numBack + 1
                 end

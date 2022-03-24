@@ -28,7 +28,7 @@ function VanguardState:enter()
         ['drive'] = function() return DriveStep() end,
         ['damage'] = function() return DamageStep() end,
         ['close'] = function() return CloseStep() end,
-        -- game summary /log (win/lose state)
+        -- game summary/log (win/lose state)
         ['results'] = function() return ResultsState() end
     }    
     -- setup stand/draw, ect event handlers
@@ -36,7 +36,7 @@ function VanguardState:enter()
 
     for k, handler in pairs(self.handlers) do
         if not handler.isRegistered then
-            handler:register()
+            handler.register(handler)
         end
     end
 
@@ -104,10 +104,11 @@ function VanguardState:pushTriggerMenu(player, effects, text_) --effects = {type
     gStateStack:push(MenuState(tMenu))
 end
 
+------ EVENT HANDLERS ------
 function VanguardState:init()
     self.handlers = {}
     -- setup game actions, with self discriptive name
-    DrawHandler = DrawHandler or Event.on('draw', function(t)
+    local DrawHandler = DrawHandler or Event.on('draw', function(t)
         for i = 1, t.qty do
             if #self.fields[t.player].deck ~= 0 then
                 local _ = table.remove(self.fields[t.player].deck)
@@ -120,7 +121,7 @@ function VanguardState:init()
     end)
     table.insert(self.handlers, DrawHandler)
     
-    RideHandler = RideHandler or Event.on('ride', function (selection)
+    local RideHandler = RideHandler or Event.on('ride', function (selection)
         -- move selected card to V
         self:moveCard({
             _field = selection.player,
@@ -143,106 +144,117 @@ function VanguardState:init()
     end)
     table.insert(self.handlers, RideHandler)
 
-    CallHandler = CallHandler or Event.on('call', function(units)
+    local CallHandler = CallHandler or Event.on('call', function(units)
         -- TODO make work with call to open R AND skills that call to any R
     end)
     table.insert(self.handlers, CallHandler)
 
-    StandHandler = StandHandler or Event.on('stand', function(unit)
+    local StandHandler = StandHandler or Event.on('stand', function(unit)
         unit.state = "stand"
         --animate
     end)
     table.insert(self.handlers, StandHandler)
 
-    RestHandler = RestHandler or Event.on('rest', function(unit)
+    local RestHandler = RestHandler or Event.on('rest', function(unit)
         unit.state = "rest"
         ---and here
     end)
     table.insert(self.handlers, RestHandler)
 
-    TurnCritHandler = TurnCritHandler or Event.on('turn-crit', function(request) --{unit, crit}
-        request.unit.crit = request.unit.crit + request.crit
+    local TurnCritHandler = TurnCritHandler or Event.on('turn-crit', function(unit, amt) --{unit, crit}
+        if not unit then 
+            return false
+        end
+        unit.crit = unit.crit + amt
     end)
     table.insert(self.handlers, TurnCritHandler)
 
-    TurnBoostHandler = TurnBoostHandler or Event.on('turn-boost', function(request) -- {unit, power}
-        local unit = request.unit
-        unit.turnBoost = unit.turnBoost + request.power
-        unit.currentPower = unit.currentPower + request.power
+    local TurnBoostHandler = TurnBoostHandler or Event.on('turn-boost', function(unit, power) -- {unit, power}
+        -- local unit = request.unit
+        if not unit then 
+            return false
+        end
+        unit.turnBoost = unit.turnBoost + power
+        unit.currentPower = unit.currentPower + power
     end)
     table.insert(self.handlers, TurnBoostHandler)
 
-    BattleBoostHandler = BattleBoostHandler or Event.on('battle-boost', function(request) -- {unit, power}
+    local BattleBoostHandler = BattleBoostHandler or Event.on('battle-boost', function(request) -- {unit, power}
         request.attacker.battleBoost = request.attacker.battleBoost + request.power
     end)
     table.insert(self.handlers, BattleBoostHandler)
 
-    CritTriggerHandler = CritTriggerHandler or Event.on('crit-trigger', function(card_, type_)
-        local player = card_.player
+    local CritTriggerHandler = CritTriggerHandler or Event.on('crit-trigger', function(card_, type_)
+        local player = card_.player        
+        local finishDispatch = type_.."-check-finish"
+
         if player == 1 then
-            -- set up crit effects for our menu
-            local callbackP = function(unit) 
-                Event.dispatch('turn-boost', {unit, power})
-            end
-
-            local callbackC = function(unit) 
-                Event.dispatch('turn-boost', {unit, CRITCONS})
-            end
-
-            local menu2effects = {
-                ['both'] = {
-                    text = 'Both',
-                    callback = function(unit)
-                        callbackP(unit)
-                        callbackC(unit)
-                    end
-                },
-                ['power'] = {
-                    text = 'Power +10',
-                    callback = callbackP
-                },
-                ['crit'] = {
-                    text = 'Crit +1',
-                    callback = callbackC
-                },
-                ['cancel'] = {
-                    text = 'Cancel',
-                    callback = function()
-                        -- pops in other callback
-                    end
-                }
-            }
-
             local critMenu1Callback = function(selection)
                 -- setup the 2nd menu
-                local unitPass = selection[1]
-                
+                local unitPass = selection[1].card
+                -- set up crit effects for our menu
+                local callbackP = function() 
+                    Event.dispatch('turn-boost', unitPass, 10)
+                end
+    
+                local callbackC = function() 
+                    Event.dispatch('turn-crit', unitPass, CRITCONS)
+                end
+    
+                local menu2effects = {
+                    {
+                        text = 'Both',
+                        callback = function()
+                            callbackP()
+                            callbackC()
+                        end
+                    },
+                    {
+                        text = 'Power +10',
+                        callback = callbackP
+                    },
+                    {
+                        text = 'Crit +1',
+                        callback = callbackC
+                    },
+                    {
+                        text = 'Cancel',
+                        callback = function()
+                            -- pops in other callback
+                        end
+                    }
+                }
                 local callback2 = function(selections)
-                    for key, selection in pairs(selections) do
-                        if key == 'power' then
-                            selection.callback(unitPass)
-                            -- push another menu for crit gain
+                    for k, selection in pairs(selections) do
+                        local key = selection.text
+                        if key == 'Power +10' then
+                            selection.callback()
+                            -- push another menu for crit gain  
+                            gStateStack:pop()
                             local lastCall = function()
+                                gStateStack:pop()
+                                gStateStack:pop()
                                 callbackC()
                                 local finishDispatch = type_.."-check-finish"
                                 Event.dispatch(finishDispatch, player)
                             end
                             self:pushTriggerMenu(player, lastCall, "And the crit?")
 
-                        elseif key == 'crit' then
-                            selection.callback(unitPass)
-                            -- push another menu for power gain   
-                            gStateStack:pop()
+                        elseif key == 'Crit +1' then
+                            selection.callback()
+                            -- push another menu for power gain 
                             gStateStack:pop()
                             local lastCall = function()
+                                gStateStack:pop()
+                                gStateStack:pop()
                                 callbackP()
                                 local finishDispatch = type_.."-check-finish"
                                 Event.dispatch(finishDispatch, player)
                             end
                             self:pushTriggerMenu(player, lastCall, "And the power?")
 
-                        elseif key == 'both' then 
-                            selection.callback(unitPass)
+                        elseif key == 'Both' then 
+                            selection.callback()
                             gStateStack:pop()
                             gStateStack:pop()
                             local finishDispatch = type_.."-check-finish"
@@ -262,12 +274,12 @@ function VanguardState:init()
             self:pushTriggerMenu(player, critMenu1Callback, "Who will gain the effects?")
         else
             -- AI / P2 
-            
+            Event.dispatch(finishDispatch, player)
         end
     end)
     table.insert(self.handlers, CritTriggerHandler)
 
-    HealHandler = HealHandler or Event.on('heal', function(player)
+    local HealHandler = HealHandler or Event.on('heal', function(player)
         -- TODO turn into menu instead of auto
         if #self.fields[player].damage > 0 then
             self:moveCard({
@@ -280,27 +292,27 @@ function VanguardState:init()
     end)
     table.insert(self.handlers, HealHandler)
 
-    HealTriggerHandler = HealTriggerHandler or Event.on('heal-trigger', function(card_, type_)
+    local HealTriggerHandler = HealTriggerHandler or Event.on('heal-trigger', function(card_, type_)
         local player = card_.player
         --recover 1
         Event.dispatch('heal', player)
+        local finishDispatch = type_.."-check-finish"
 
         if player == 1 then
             -- heal power menu
             local callback = function(selection)
                 gStateStack:pop()
-                Event.dispatch('turn-boost', {unit=selection[1].card, power=10}) -- TODO base off heal trigger instead of magic #
-                local finishDispatch = type_.."-check-finish"
+                Event.dispatch('turn-boost', selection[1].card, 0) -- TODO base off heal trigger instead of magic #
                 Event.dispatch(finishDispatch, player)
             end
             self:pushTriggerMenu(player, callback, "Who will get the power?")
         else -- AI / P2
-
+            Event.dispatch(finishDispatch, player)
         end
     end)
     table.insert(self.handlers, HealTriggerHandler)
 
-    TriggerCheckHandler = TriggerCheckHandler or Event.on('trigger-check', function(type_, player)
+    local TriggerCheckHandler = TriggerCheckHandler or Event.on('trigger-check', function(type_, player)
         -- TODO animation
         local check = self:moveCard({
             _field = player,
@@ -325,13 +337,13 @@ function VanguardState:init()
     end)
     table.insert(self.handlers, TriggerCheckHandler)
 
-    DamageCheckHandler = DamageCheckHandler or Event.on('damage-check', function(player) 
+    local DamageCheckHandler = DamageCheckHandler or Event.on('damage-check', function(player) 
         Event.dispatch("trigger-check", "damage", player)
         Event.dispatch("check-timing")
     end)
     table.insert(self.handlers, DamageCheckHandler)
 
-    DamageCheckFinishHandler = DamageCheckFinishHandler or Event.on('damage-check-finish', function (player)
+    local DamageCheckFinishHandler = DamageCheckFinishHandler or Event.on('damage-check-finish', function (player)
         self:moveCard({
             _field = player,
             _inputTable = "trigger",
@@ -342,7 +354,7 @@ function VanguardState:init()
     end)
     table.insert(self.handlers, DamageCheckFinishHandler)
 
-    RetireHandler = RetireHandler or Event.on("retire", function(unit)
+    local RetireHandler = RetireHandler or Event.on("retire", function(unit)
         self:moveCard({
             _field = unit.player,
             _inputTable = unit.table,
@@ -354,12 +366,12 @@ function VanguardState:init()
     end)
     table.insert(self.handlers, RetireHandler)
 
-    RetiredHandler = RetiredHandler or Event.on("retired", function(unit)
+    local RetiredHandler = RetiredHandler or Event.on("retired", function(unit)
         --
     end)
     table.insert(self.handlers, RetiredHandler)
 
-    GameOverHandler = GameOverHandler or Event.on("game-over", function(pass)
+    local GameOverHandler = GameOverHandler or Event.on("game-over", function(pass)
         local finalPass = pass
         finalPass.fields = self.fields
         --finalPass.log = self.log
@@ -368,7 +380,7 @@ function VanguardState:init()
     end)
     table.insert(self.handlers, GameOverHandler)
   
-    CheckTimingHandler = CheckTimingHandler or Event.on("check-timing", function()
+    local CheckTimingHandler = CheckTimingHandler or Event.on("check-timing", function()
         -- resolve all rule actions ---------------
         for i = 1, 2 do
             -- check to see if a player lost the game
@@ -413,7 +425,7 @@ function VanguardState:init()
     end)
     table.insert(self.handlers, CheckTimingHandler)
 
-    RecursiveCheckTimingHandler = RecursiveCheckTimingHandler or Event.on("recursive-check-timing", function(event, callback)
+    local RecursiveCheckTimingHandler = RecursiveCheckTimingHandler or Event.on("recursive-check-timing", function(event, callback)
         Event.dispatch(event)
         Event.dispatch("check-timing")
         -- self:checkTiming()
@@ -425,4 +437,11 @@ function VanguardState:init()
         end
     end)    
     table.insert(self.handlers, RecursiveCheckTimingHandler)
+end
+
+function VanguardState:exit()
+    for k, handler in pairs(self.handlers) do
+        handler:remove(handler)
+        handler = nil
+    end
 end

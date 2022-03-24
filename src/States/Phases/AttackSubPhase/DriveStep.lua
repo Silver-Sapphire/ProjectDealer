@@ -16,14 +16,15 @@ function DriveStep:enter(pass)
         end,
         ['drive'] = function() -- further split in each drive check
             -- determine number of checks to make
-            self.drive = 0
-            self.finishedChecks = 0
+            FinishedChecks = 0 -- cringe global to get around handler being from a pevious iteration of 
             if self.attacker.table == "vanguard" then
                 if self.attacker.card.grade == 3 then
                     self.drive = 2
                 else
                     self.drive = 1
                 end
+            else
+                self.drive = 0
             end
             for i = self.drive, 1, -1 do -- reverse loop to do nothing when drive = 0
                 Event.dispatch("drive-check")
@@ -36,13 +37,13 @@ end
 
 -- move to the next state only after we finish our drive checks
 function DriveStep:update(dt)
-    local split = {
-        ['change'] = function()
-            vStateMachine:change("damage", self.pass)
-        end
-    }
-    if self.drive == self.finishedChecks then
-        PhaseSplitter(split)
+    if FinishedChecks >= self.drive then
+        local split = {
+            ['change'] = function()
+                vStateMachine:change("damage", self.pass)
+            end
+        }
+        PhaseSplitter(split) -- checking for deckout
     end
 end
 
@@ -62,7 +63,7 @@ function DriveStep:init()
             _outputTable = "hand"
         })
         Event.dispatch("check-timing")
-        self.finishedChecks = self.finishedChecks + 1
+        FinishedChecks = FinishedChecks + 1
     end)
 end
 
@@ -79,5 +80,8 @@ function DriveStep:render()
     end
     love.graphics.printf('Battle', 0, VIRTUAL_HEIGHT/2 + PHASE_TEXT_GAP * 2, VIRTUAL_WIDTH, 'right')
     love.graphics.print('Drive Step', 200, 200)
+
+    -- love.graphics.print(self.drive, 200, 300)
+    -- love.graphics.print(self.finishedChecks, 200, 400)
 end
 
