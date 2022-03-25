@@ -23,28 +23,15 @@ function MainPhaseState:enter(pass)
             table.insert(actions, action)
         end
 
-        -- determine if we have cards on R to swap
-        local leftC = 0
-        local rightC = 0
-        for k, circle in pairs(self.fields[turnPlayer].circles) do
-            if #circle.units > 0 then
-                local column = circle.column 
-                if column == "left" then
-                    leftC = leftC + 1
-                elseif column == "right" then
-                    rightC = rightC + 1
-                end
-            end
-        end
-        if rightC > 0 or leftC > 0 then
+        -- if rightC > 0 or leftC > 0 then
             local action = {
                 text = "Move Units", 
                 onSelect = function()
-                    self:createMoveMenu(leftC, rightC)
+                    self:createMoveMenu()
                 end
             }
             table.insert(actions, action)
-        end
+        -- end
 
         if self.fields[turnPlayer].turn ~= 1 then
             local action = {
@@ -170,8 +157,50 @@ function MainPhaseState:createCallMenu(options)
     }))
 end
 
+--- TODO work with stochia free move grade 1
 function MainPhaseState:createMoveMenu()
+    local moves = {}
+    -- determine if we have cards on R to swap
+    local leftC = 0
+    local rightC = 0
+    for k, circle in pairs(self.fields[turnPlayer].circles) do
+        if #circle.units > 0 then
+            local column = circle.column 
+            if column == "left" then
+                leftC = leftC + 1
+            elseif column == "right" then
+                rightC = rightC + 1
+            end
+        end
+    end
 
+    if leftC > 0 then
+        local move = {
+            text = "Left Swap",
+            onSelect = function ()
+                Event.dispatch("swap-left", self.turnPlayer)
+            end
+        }
+    end
+    if rightC > 0 then
+        local move = {
+            text = "Right Swap",
+            onSelect = function ()
+                Event.dispatch("swap-right", self.turnPlayer)
+            end
+        }
+    end
+
+    local move = {
+        text = "Cancel",
+        onSelect = function ()
+            gStateStack:pop()
+        end
+    }
+    table.insert(moves, move)
+
+    local moveMenu = CraftMenu()
+    gStateStack:push(MenuState(moveMenu))
 end
 
 function MainPhaseState:processAI()

@@ -16,6 +16,7 @@ function DamageStep:enter(pass)
     ChangeHandler = ChangeHandler or Event.on("change", function()
     
     end)
+    --?????????????--
     local done = false
     local _ = DamageCheckFinishHandler
     while not done do
@@ -31,6 +32,7 @@ function DamageStep:enter(pass)
             done = true
         end
     end
+    ------------
 
     PhaseSplitter(self:initSplits())
 end
