@@ -439,8 +439,8 @@ function VanguardState:init()
     table.insert(self.handlers, RecursiveCheckTimingHandler)
 
     local SwapHandler = SwapHandler or Event.on("swap", function(circles)
-        if #circles ~= then 2 return false end
-        local _ = circles[1].
+        -- if #circles ~= then 2 return false end
+        -- local _ = circles[1].
     end)
     table.insert(self.handlers, SwapHandler)
     

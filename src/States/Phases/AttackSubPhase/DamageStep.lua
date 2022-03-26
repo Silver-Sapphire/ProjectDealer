@@ -46,11 +46,25 @@ function DamageStep:determineHits()
     for i = 1, #self.battles do
         local battle = self.battles[i]
         local shield = 0
+        ----- THIS WILL BUG WHEN SHIELD VALUES CHANGE MID BATTLE ----
         for k, guardian in pairs(battle.guardians) do
             shield = shield + guardian.shield
         end
+        -- get info of card on field from battle index
+        local circle = battle.attacker.table
+        local _ = battle.attacker.table
+        local attacker 
+
+        --- DEBUG LINES
+        for k, circle in pairs(self.fields[self.turnPlayer].circles) do
+            if k == _ then
+                attacker = circle.units[1]
+                break
+            end
+        end
+
         -- compare battling units total power
-        local attacker = battle.attacker.card or false
+        -- local attacker = self.fields[turnPlayer].circles[circle].units[1]
         local totalAtkPower = attacker.basePower + attacker.battleBoost
                               + attacker.turnBoost + attacker.contBoost or 0
         if totalAtkPower < attacker.currentPower then
