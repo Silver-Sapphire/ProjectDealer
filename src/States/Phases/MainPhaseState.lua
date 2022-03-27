@@ -163,9 +163,9 @@ function MainPhaseState:createMoveMenu()
     -- determine if we have cards on R to swap
     local leftC = 0
     local rightC = 0
-    for k, circle in pairs(self.fields[turnPlayer].circles) do
+    for k, circle in pairs(self.fields[self.turnPlayer].circles) do
         if #circle.units > 0 then
-            local column = circle.column 
+            local column = circle.column
             if column == "left" then
                 leftC = leftC + 1
             elseif column == "right" then
@@ -174,23 +174,29 @@ function MainPhaseState:createMoveMenu()
         end
     end
 
+    -- create a swap event in a column, if theres units in it
     if leftC > 0 then
         local move = {
             text = "Left Swap",
             onSelect = function ()
                 Event.dispatch("swap-left", self.turnPlayer)
+                gStateStack:pop()
             end
         }
+        table.insert(moves, move)
     end
     if rightC > 0 then
         local move = {
             text = "Right Swap",
             onSelect = function ()
                 Event.dispatch("swap-right", self.turnPlayer)
+                gStateStack:pop()
             end
         }
+        table.insert(moves, move)
     end
 
+    -- ... or not
     local move = {
         text = "Cancel",
         onSelect = function ()
@@ -199,7 +205,7 @@ function MainPhaseState:createMoveMenu()
     }
     table.insert(moves, move)
 
-    local moveMenu = CraftMenu()
+    local moveMenu = CraftMenu("medium-2", moves)
     gStateStack:push(MenuState(moveMenu))
 end
 

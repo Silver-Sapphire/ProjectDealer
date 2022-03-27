@@ -439,18 +439,32 @@ function VanguardState:init()
     table.insert(self.handlers, RecursiveCheckTimingHandler)
 
     local SwapHandler = SwapHandler or Event.on("swap", function(circles)
-        -- if #circles ~= then 2 return false end
-        -- local _ = circles[1].
+        if #circles ~= 2 then return false end
+        local _ = circles[1].units[1]
+        circles[1].units[1] = circles[2].units[1]
+        circles[2].units[1] = _
     end)
     table.insert(self.handlers, SwapHandler)
     
     local SwapLeftHandler = SwapLeftHandler or Event.on("swap-left", function(player)
-        
+        local circles = {}
+        local circle = self.fields[player].circles.frontLeft
+        table.insert(circles, circle)
+        circle = self.fields[player].circles.backLeft
+        table.insert(circles, circle)
+
+        Event.dispatch("swap", circles)
     end)
     table.insert(self.handlers, SwapLeftHandler)
     
     local SwapRightHandler = SwapRightHandler or Event.on("swap-right", function(player)
-        
+        local circles = {}
+        local circle = self.fields[player].circles.frontRight
+        table.insert(circles, circle)
+        circle = self.fields[player].circles.backRight
+        table.insert(circles, circle)
+
+        Event.dispatch("swap", circles)
     end)
     table.insert(self.handlers, SwapRightHandler)
 end

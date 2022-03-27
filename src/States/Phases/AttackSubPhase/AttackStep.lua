@@ -28,6 +28,7 @@ function AttackStep:enter(pass)
     self.possibleAttacks = self:determinePossibleAttacks(turnPlayer)
 
     if #self.possibleAttacks > 0 then
+        -- Count which battle of the turn this is (reset at endphase)
         AttackNum = AttackNum + 1
 
         Event.dispatch("begin-attack-step")
@@ -48,6 +49,7 @@ function AttackStep:enter(pass)
 end
 
 function AttackStep:pushAtkMenu()
+    -- self.possibleAttacks = self:determinePossibleAttacks(turnPlayer)
     local text = "Select a unit to attack with"
     -- Only let us pass turn if we aren't forced to atk
     if not CommitFlag then
@@ -60,6 +62,7 @@ function AttackStep:pushAtkMenu()
         }
         table.insert(self.possibleAttacks, option)
     end
+
     local callback = function(selection)
         if selection and #selection > 0 then 
             if selection[1].card then
@@ -82,7 +85,12 @@ function AttackStep:pushAtkTargetMenu(attacker)
     if attacker and attacker.card.state == "stand" and not attacker.card.cantAtk then
         -- create a table of options to target for attacks
         self.targets = self:findAtkTargets(attacker.card.bonus) or {}
-        local callback = function (targets_) if targets_ then self:atkCallback(targets_, attacker) end end
+        local callback = function (targets_) 
+            if targets_ then 
+                self:atkCallback(targets_, attacker) 
+            end 
+        end
+
         local cancel = {
             ['text'] = "Cancel",
             onSelect = function()
@@ -106,14 +114,15 @@ end
 
 function AttackStep:findAtkTargets(bonus)
     local targets = {}
-    for k, circle in pairs(self.fields[self.op].circles) do
+    for key, circle in pairs(self.fields[self.op].circles) do
         if 
         -- k == bonus or circle.row == "front" and 
-        #circle.units > 0 then 
+           #circle.units > 0 then 
             local target = {
                 card = circle.units[1],
                 player = self.op,
-                table = k,
+                circle = cricle,
+                table = key,
                 index = 1
             }
             table.insert(targets, target)
@@ -153,7 +162,7 @@ function AttackStep:atkCallback(targets_, attacker)
     Event.dispatch("rest", attacker.card)
     Event.dispatch("attack", {attacker=attacker, targets_=targets_})
 
-    -- setup an individual battles for units that attack more than one unit at a time
+    -- setup individual battles for units that attack more than one unit at a time
     local battles = {}
     for k, target in pairs(targets_) do
         local battle = {

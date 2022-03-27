@@ -47,7 +47,7 @@ function Field:init(decklist, flipped, player)
     self.circles = {
                         
         ['frontLeft'] = {['type'] = 'R',
-                         ['column'] = 'left',
+                         column = 'left',
                          ['row'] = 'front',
                          ['x'] = FLX, ['y'] = FLY,
                          ['units'] = {} },
@@ -59,7 +59,7 @@ function Field:init(decklist, flipped, player)
                         ['units'] = {} },
                         
         ['vanguard'] = {['type'] = 'V',
-                        ['column'] = 'middle',
+                        column = 'middle',
                         ['row'] = 'front',
                         ['x'] = VX, ['y'] = VY,
                         ['units'] = {Card(CARD_IDS['test-starter'])}
