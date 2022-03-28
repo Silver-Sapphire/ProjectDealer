@@ -16,7 +16,7 @@ function DamageStep:enter(pass)
     ChangeHandler = ChangeHandler or Event.on("change", function()
     
     end)
-    --?????????????--
+    --?????????????-- no like actually wtf is this
     local done = false
     local _ = DamageCheckFinishHandler
     while not done do
@@ -86,7 +86,14 @@ function DamageStep:hitHandler()
         local hit = self.hits[i]
         -- rearugards are retired during the cleanup function later
         if hit.defender.table == "vanguard" then
-            local crit = hit.attacker.card.crit 
+            -- check crit of card on board
+            local crit
+            for k, circle in pairs(self.fields[self.turnPlayer].circles) do
+                if k == hit.attacker.table then
+                    crit = circle.units[1].crit
+                end
+            end
+            -- deal dmg based on crit
             if crit > 0 then
                 for i = 1, crit do
                     Event.dispatch("damage-check", self.op)

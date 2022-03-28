@@ -161,6 +161,15 @@ function VanguardState:init()
     end)
     table.insert(self.handlers, RestHandler)
 
+    local BoostHandler = BoostHandler or Event.on("boost", function(attacker)
+        booster_ = self:findBooster(attacker)
+        if booster_ then
+            Event.dispatch("rest", booster_)
+            Event.dispatch("battle-boost", {attacker=attacker, power=booster_.card.currentPower or 0})
+        end
+    end)
+    table.insert(self.handlers, BoostHandler)
+
     local TurnCritHandler = TurnCritHandler or Event.on('turn-crit', function(unit, amt) --{unit, crit}
         if not unit then 
             return false

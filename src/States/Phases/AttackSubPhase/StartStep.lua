@@ -10,7 +10,7 @@ function StartStep:enter(pass)
     self.turnPlayer = pass.turnPlayer
     --local atkNum = pass.atkNum (or 0)
     
-    if not PastFirstStartStep then
+    if not PastFirstStartStep and not GameOver then
         -- beggining of battle phase/start step triggers
         Event.dispatch("begin-battle-phase")
         Event.dispatch("begin-start-step")
@@ -22,7 +22,10 @@ function StartStep:enter(pass)
     -- assume the player will atk and move to atk step (this may cause some issues down the road...)
     -- the player may decide not to atk in the attack step if they don't trigger any "start of atk step" effects
     Event.dispatch("check-timing")
-    vStateMachine:change("attack", pass)
+
+    if not GameOver then 
+        vStateMachine:change("attack", pass)
+    end
 end
 
 --TODO

@@ -1,16 +1,9 @@
 AttackStep = Class{__includes = BattlePhaseState}
 
 -- establish boost event handler
-function AttackStep:init()
-    -- a global scope, as a priemptive debug effort to avoid more than one handler existing
-    BoostHandler = BoostHandler or Event.on("boost", function(attacker)
-        booster_ = self:findBooster(attacker)
-        if booster_ then
-            Event.dispatch("rest", booster_)
-            Event.dispatch("battle-boost", {attacker=attacker, power=booster_.currentPower or 0})
-        end
-    end)
-end
+-- function AttackStep:init()
+    
+-- end
 
 function AttackStep:enter(pass)
     self.pass = pass
@@ -129,25 +122,6 @@ function AttackStep:findAtkTargets(bonus)
         end
     end
     return targets
-end
-
-function AttackStep:findBooster(attacker)
-    local atkrCircle = attacker.circle
-    local column = attacker.circle.column
-    -- determine atkr column
-    -- for k, circle in pairs(self.fields[attacker.player].circles) do
-    --     if k == atkrCircle then
-    --         column = circle.column
-    --     end
-    -- end
-
-    for k, circle in pairs(self.fields[self.turnPlayer].circles) do
-        if circle.row == "back" and circle.column == column and #circle.units > 0 then
-            if circle.units[1].ability == "boost" then
-                return circle.units[1]
-            end
-        end
-    end
 end
 
 function AttackStep:atkCallback(targets_, attacker)

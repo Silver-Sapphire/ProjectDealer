@@ -21,7 +21,7 @@ function BaseState:init() end
 function BaseState:enter() end
 function BaseState:exit() end
 
--- this behaviour got used in almost every state, so putting it here seemed fitting
+-- the rest of the behaviour got used in almost every state, so putting it here seemed fitting
 function BaseState:update(dt)
     if self.fields then
         for k, field in pairs(self.fields) do
@@ -136,7 +136,31 @@ function BaseState:determinePossibleAttacks(player)
     return possibleAttacks
 end
 
--- a function that finds a list of cards in a z one, to be later screened for target viability
+function BaseState:findBooster(attacker)
+    local atkrCircle = attacker.circle
+    local column = attacker.circle.column
+    -- determine atkr column
+    -- for k, circle in pairs(self.fields[attacker.player].circles) do
+    --     if k == atkrCircle then
+    --         column = circle.column
+    --     end
+    -- end
+
+    for k, circle in pairs(self.fields[attacker.player].circles) do
+        if circle.row == "back" and circle.column == column and #circle.units > 0 then
+            if circle.units[1].ability == "boost" then
+                return {
+                    card = circle.units[1],
+                    player = attacker.player,
+                    circle = circle, 
+                    table_ = k
+                }
+            end
+        end
+    end
+end
+
+-- a function that finds a list of cards in a z|one, to be later screened for target viability
 -- function BaseState:findTargets(z ones)
 --     local targets = {}
 --     for table_, z one in pairs(z ones) do
