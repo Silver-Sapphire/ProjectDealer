@@ -24,10 +24,10 @@ function ResultsState:render()
         self.fields[i]:render()
     end
 
-    if self.loser == 2 then
-        love.graphics.setColor(2/3, 2/3, 1, 3/4)
-    else
+    if self.loser == 1 then
         love.graphics.setColor(1, 2/3, 2/3, 3/4)
+    else
+        love.graphics.setColor(2/3, 2/3, 1, 3/4)
     end
     love.graphics.rectangle('fill', 0,0, VIRTUAL_WIDTH,VIRTUAL_HEIGHT)
 

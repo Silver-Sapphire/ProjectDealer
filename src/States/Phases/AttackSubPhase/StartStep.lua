@@ -17,17 +17,18 @@ function StartStep:enter(pass)
         -- check timing
         Event.dispatch("check-timing")
         PastFirstStartStep = true
+        Event.dispatch("test", pass)
     end
 
-    -- assume the player will atk and move to atk step (this may cause some issues down the road...)
-    -- the player may decide not to atk in the attack step if they don't trigger any "start of atk step" effects
-    Event.dispatch("check-timing")
-
     if not GameOver then 
+        -- assume the player will atk and move to atk step (this may cause some issues down the road...)
+        -- the player may decide not to atk in the attack step if they don't trigger any "start of atk step" effects
+        Event.dispatch("check-timing")
         vStateMachine:change("attack", pass)
     end
 end
 
---TODO
-    -- battle begins (incriment counter)
-
+Event.on("test", function(pass)
+    pass.player = 2
+    Event.dispatch("game-over", pass)
+end)
