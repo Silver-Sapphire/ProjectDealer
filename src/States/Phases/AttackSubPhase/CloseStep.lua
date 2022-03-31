@@ -10,7 +10,9 @@ function CloseStep:enter(pass)
     Event.dispatch("recursive-check-timing", "begin-close-step", function()end)
 
     pass.battles = nil
-    vStateMachine:change("start", pass)
+    if not GameOver then
+        vStateMachine:change("start", pass)
+    end
 end
 
 function CloseStep:render()

@@ -4,11 +4,11 @@ function ResultsState:enter(pass)
     self.fields = pass.fields
     self.log = pass.log
     self.loser = pass.player
-    self.resultString = "You "
+    self.resultString1 = "You "
     if self.loser == 1 then
-        self.resultString = self.resultString .. "lost..."
+        self.resultString1 = self.resultString1 .. "lost..."
     else
-        self.resultString = self.resultString .. "won!!"
+        self.resultString1 = self.resultString1 .. "won!!"
     end
 end
 
@@ -33,9 +33,8 @@ function ResultsState:render()
 
     love.graphics.setColor(1,1,1,1)
     love.graphics.setFont(gFonts['massive'])
-    love.graphics.printf(self.resultString, 0, VIRTUAL_HEIGHT/5, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf(self.resultString1, 0, VIRTUAL_HEIGHT/5, VIRTUAL_WIDTH, 'center')
 
     love.graphics.setFont(gFonts['large'])
     love.graphics.printf("Press space to return to main menu", 0, VIRTUAL_HEIGHT/3, VIRTUAL_WIDTH, 'center')
-
 end
